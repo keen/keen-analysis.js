@@ -1,0 +1,22 @@
+{
+  "name": "keen-analysis.js",
+  "version": "0.0.0",
+  "description": "Analysis SDK for Keen IO",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keen/keen-analysis.js.git"
+  },
+  "author": "Dustin Larimer <dustin@keen.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keen/keen-analysis.js/issues"
+  },
+  "homepage": "https://github.com/keen/keen-analysis.js#readme",
+  "dependencies": {
+    "keen-tracking": "0.0.5"
+  }
+}
