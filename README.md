@@ -11,7 +11,7 @@ var client = new Keen({
 // Ad-hoc queries (analysis_type, query_params)
 client
   .query('count', {
-    eventCollection: 'pageviews'
+    event_collection: 'pageviews'
   })
   .then(function(res){
     // do something with the result
@@ -82,8 +82,9 @@ client
   .send({
     refresh_rate: 60 * 60 * 4,
     query: {},
+    query_name: 'daily-pageviews-this-14-days',
     metadata: {
-      query_name: 'Daily pageviews (this 14 days)'
+      display_name: 'Daily pageviews (this 14 days)'
     }
     // ...
   })
