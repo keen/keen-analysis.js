@@ -31,7 +31,9 @@ client
 
 // Retrieve all saved queries
 client
-  .get(client.queryPath() + '/saved')
+  .get(client.url('queries', 'saved'))
+  .auth(client.masterKey())
+  .send()
   .then(function(res){
     // handle response
   })
@@ -42,7 +44,9 @@ client
 
 // Retrieve a saved query
 client
-  .get(client.queryPath() + '/saved/existing-saved-query')
+  .get(client.url('queries', 'saved', 'existing-saved-query'))
+  .auth(client.masterKey())
+  .send()
   .then(function(res){
     // handle response
   })
@@ -53,19 +57,29 @@ client
 
 // Create a saved query
 client
-  .post(client.queryPath() + '/saved/new-saved-query', {
+  .post(client.url('queries', 'saved', 'new-saved-query'))
+  .auth(client.masterKey())
+  .send({
     refresh_rate: 0,
     query: {},
     metadata: {
       query_name: 'My New Query'
     }
     // ...
+  })
+  .then(function(res){
+    // handle response
+  })
+  .catch(function(err){
+    // an error occured!
   });
 
 
 // Update a saved query
 client
-  .put(client.queryPath() + '/saved/new-saved-query', {
+  .put(client.url('queries', 'saved', 'new-saved-query'))
+  .auth(client.masterKey())
+  .send({
     refresh_rate: 60 * 60 * 4,
     query: {},
     metadata: {
@@ -80,7 +94,9 @@ client
 
 // Delete a saved query
 client
-  .del(client.queryPath() + '/saved/new-saved-query')
+  .del(client.url('queries', 'saved', 'new-saved-query'))
+  .auth(client.masterKey())
+  .send()
   .then(function(res){
     // handle response
   })
