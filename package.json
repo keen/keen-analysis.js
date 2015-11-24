@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/keen/keen-analysis.js#readme",
   "dependencies": {
-    "keen-tracking": "0.0.5"
+    "keen-tracking": "^0.1.0"
   }
 }
