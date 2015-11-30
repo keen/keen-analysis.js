@@ -64,7 +64,7 @@ gulp.task('test:unit', ['test:phantom', 'test:mocha']);
 // });
 
 gulp.task('test:browserify', function(){
-  return gulp.src('./test/unit/index.js')
+  return gulp.src('./test/unit/browser.js')
     .pipe(through2.obj(function(file, enc, next){
       browserify(file.path)
         .bundle(function(err, res){
