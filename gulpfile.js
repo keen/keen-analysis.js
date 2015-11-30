@@ -19,7 +19,7 @@ gulp.task('default', ['build', 'connect', 'watch']);
 // Development tasks
 // --------------------------------
 
-gulp.task('build', ['build:browserify', 'build:minify']);
+gulp.task('build', ['build:browserify', 'build:minify', 'test:browserify']);
 
 gulp.task('build:browserify', function(){
   return gulp.src('./lib/index.js')
@@ -51,7 +51,7 @@ gulp.task('connect', ['build'], function () {
 });
 
 gulp.task('watch', ['build'], function() {
-  gulp.watch([ 'lib/**/*.js', 'gulpfile.js' ], ['build']);
+  gulp.watch([ 'lib/**/*.js', 'gulpfile.js' ], ['build', 'test:browserify']);
 });
 
 // Test tasks
@@ -82,7 +82,7 @@ gulp.task('test:mocha', ['test:browserify'], function () {
   return gulp.src('./test/unit/server.js', { read: false })
     .pipe(mocha({
       reporter: 'nyan',
-      timeout: 5000
+      timeout: 10 * 1000
     }));
 });
 

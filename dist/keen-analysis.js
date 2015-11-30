@@ -64,13 +64,14 @@ request.prototype.auth = function(str){
   return this;
 };
 request.prototype.send = function(obj){
-  var self, httpHandler, httpOptions;
-  this.config.params = typeof obj === 'object' ? obj : {};
+  var self = this,
+      httpHandler,
+      httpOptions;
+  this.config.params = (obj && typeof obj === 'object') ? obj : {};
   httpHandler = httpHandlers[this.config['method']],
   httpOptions = extend({}, this.config);
-  self = this;
   return new Promise(function(resolve, reject) {
-    httpHandler.call(self, httpOptions, function(err, res){
+    httpHandler(httpOptions, function(err, res){
       if (err) {
         reject(err);
       }
@@ -81,6 +82,8 @@ request.prototype.send = function(obj){
   });
 };
 },{"./utils/http-server":3,"keen-tracking/lib/utils/each":18,"keen-tracking/lib/utils/extend":19,"keen-tracking/lib/utils/json":20,"promise":28}],3:[function(require,module,exports){
+var each = require('keen-tracking/lib/utils/each'),
+    json = require('keen-tracking/lib/utils/json');
 module.exports = {
   'GET'    : get,
   'POST'   : post,
@@ -140,7 +143,7 @@ function xhrObject() {
 function sendXhr(method, config, callback){
   var xhr = xhrObject(),
       cb = callback,
-      payload;
+      url = config.url;
   callback = null;
   xhr.onreadystatechange = function() {
     var response;
@@ -164,16 +167,23 @@ function sendXhr(method, config, callback){
       }
     }
   };
-  xhr.open(config['method'], config.url, true);
-  xhr.setRequestHeader('Authorization', config.api_key);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  if (data) {
-    payload = serialize(data);
-  }
-  if (method.toUpperCase() !== 'GET' && payload) {
-    xhr.send(payload);
+  if (method !== 'GET') {
+    xhr.open(method, url, true);
+    xhr.setRequestHeader('Authorization', config.api_key);
+    xhr.setRequestHeader('Content-type', 'application/json');
+    if (config.params) {
+      xhr.send( json.stringify(config.params) );
+    }
+    else {
+      xhr.send();
+    }
   }
   else {
+    url += '?api_key=' + config.api_key;
+    if (config.params) {
+      url += '&' + serialize(config.params);
+    }
+    xhr.open(method, url, true);
     xhr.send();
   }
 }
@@ -186,8 +196,7 @@ function xdrObject() {
 }
 function sendXdr(method, config, callback) {
   var xdr = xdrObject(),
-      cb = callback,
-      payload;
+      cb = callback;
   if (xdr) {
     xdr.timeout = config.timeout || 300 * 1000;
     xdr.ontimeout = function () {
@@ -202,9 +211,8 @@ function sendXdr(method, config, callback) {
     };
     xdr.open(method.toLowerCase(), config.url);
     setTimeout(function () {
-      if (config['data']) {
-        payload = serialize(config['data']);
-        xdr.send(payload);
+      if (config['params']) {
+        xdr.send( serialize(config['params']) );
       }
       else {
         xdr.send();
@@ -267,14 +275,14 @@ function sendJsonp(config, callback){
 function serialize(data){
   var query = [];
   each(data, function(value, key){
-    if ('string' !== typeof value) {
+    if (typeof value !== 'string') {
       value = json.stringify(value);
     }
     query.push(key + '=' + encodeURIComponent(value));
   });
   return query.join('&');
 }
-},{}],4:[function(require,module,exports){
+},{"keen-tracking/lib/utils/each":18,"keen-tracking/lib/utils/json":20}],4:[function(require,module,exports){
 (function (global){
 ;(function (f) {
   if ('undefined' !== typeof define && define.amd && typeof define === 'function') {

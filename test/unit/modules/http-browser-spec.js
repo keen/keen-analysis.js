@@ -6,6 +6,7 @@ var KeenClient = require('../../../lib/index');
 describe('HTTP methods (browser)', function(){
 
   beforeEach(function(){
+    this.timeout(10 * 1000);
     this.client = new KeenClient(helpers.client);
   });
 
@@ -20,18 +21,43 @@ describe('HTTP methods (browser)', function(){
         .get(this.client.url('projectId'))
         .auth(this.client.masterKey())
         .send()
-        .then(done)
+        .then(function(res){
+          done();
+        })
         .catch(done);
     });
 
-    // it('should get the correct readKey value', function(){
-    //   expect(this.client.readKey()).to.eql(helpers.client.readKey);
-    // });
-    //
-    // it('should set a readKey value', function(){
-    //   this.client.readKey('123');
-    //   expect(this.client.config.readKey).to.eql('123');
-    // });
+    it('should make a GET request with data to an API endpoint', function(done){
+      this.client
+        .get(this.client.url('queries', 'count'))
+        .auth(this.client.readKey())
+        .send({
+          event_collection: 'pageview',
+          timeframe: 'this_12_months'
+        })
+        .then(function(res){
+          done();
+        })
+        .catch(done);
+    });
+
+  });
+
+  describe('.post()', function(){
+
+    it('should make a POST request with data to an API endpoint', function(done){
+      this.client
+        .post(this.client.url('queries', 'count'))
+        .auth(this.client.readKey())
+        .send({
+          event_collection: 'pageview',
+          timeframe: 'this_12_months'
+        })
+        .then(function(res){
+          done();
+        })
+        .catch(done);
+    });
 
   });
 
