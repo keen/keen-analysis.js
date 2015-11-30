@@ -88,21 +88,22 @@ module.exports = {
   'DELETE' : del
 };
 function get(config, callback){
-  setTimeout(function(){
-    console.log('GET RESPONSE');
-    callback(null, { result: 1234 });
-  }, 1000);
-  return;
   if (xhrObject()) {
-    return sendXhr('GET', config.url, config.params, config.api_key, callback);
+    return sendXhr('GET', config, callback);
+  }
+  else if (xdrObject()){
+    return sendXdr('GET', config, callback);
   }
   else {
-    return sendJsonp(config.url, config.params, config.api_key, callback);
+    return sendJsonp(config, callback);
   }
 }
 function post(config, callback){
   if (xhrObject()) {
-    return sendXhr('POST', config.url, config.params, config.api_key, callback);
+    return sendXhr('POST', config, callback);
+  }
+  else if (xdrObject()){
+    return sendXdr('POST', config, callback);
   }
   else {
     callback('XHR POST not supported', null);
@@ -110,7 +111,7 @@ function post(config, callback){
 }
 function put(config, callback) {
   if (xhrObject()) {
-    return sendXhr('PUT', config.url, config.params, config.api_key, callback);
+    return sendXhr('PUT', config, callback);
   }
   else {
     callback('XHR PUT not supported', null);
@@ -118,7 +119,7 @@ function put(config, callback) {
 }
 function del(config, callback) {
   if (xhrObject()) {
-    return sendXhr('DELETE', config.url, config.params, config.api_key, callback);
+    return sendXhr('DELETE', config, callback);
   }
   else {
     callback('XHR DELETE not supported', null);
@@ -136,7 +137,7 @@ function xhrObject() {
   }
   return false;
 }
-function sendXhr(method, url, data, api_key, callback){
+function sendXhr(method, config, callback){
   var xhr = xhrObject(),
       cb = callback,
       payload;
@@ -163,8 +164,8 @@ function sendXhr(method, url, data, api_key, callback){
       }
     }
   };
-  xhr.open(method, url, true);
-  xhr.setRequestHeader('Authorization', api_key);
+  xhr.open(config['method'], config.url, true);
+  xhr.setRequestHeader('Authorization', config.api_key);
   xhr.setRequestHeader('Content-Type', 'application/json');
   if (data) {
     payload = serialize(data);
@@ -176,48 +177,86 @@ function sendXhr(method, url, data, api_key, callback){
     xhr.send();
   }
 }
-function sendJsonp(url, params, callback){
-  var cb = callback,
+function xdrObject() {
+  var root = 'undefined' == typeof window ? this : window;
+  if (root.XDomainRequest) {
+    return new root.XDomainRequest();
+  }
+  return false;
+}
+function sendXdr(method, config, callback) {
+  var xdr = xdrObject(),
+      cb = callback,
+      payload;
+  if (xdr) {
+    xdr.timeout = config.timeout || 300 * 1000;
+    xdr.ontimeout = function () {
+      handleResponse(xdr, null);
+    };
+    xdr.onerror = function () {
+      handleResponse(xdr, null);
+    };
+    xdr.onload = function() {
+      var response = json.parse(xdr.responseText);
+      handleResponse(null, response);
+    };
+    xdr.open(method.toLowerCase(), config.url);
+    setTimeout(function () {
+      if (config['data']) {
+        payload = serialize(config['data']);
+        xdr.send(payload);
+      }
+      else {
+        xdr.send();
+      }
+    }, 0);
+  }
+  function handleResponse(a, b){
+    if (cb && typeof cb === 'function') {
+      cb(a, b);
+      callback = cb = void 0;
+    }
+  }
+}
+function sendJsonp(config, callback){
+  var url = config.url,
+      cb = callback,
       timestamp = new Date().getTime(),
       script = document.createElement('script'),
       parent = document.getElementsByTagName('head')[0],
       callbackName = 'keenJSONPCallback',
       loaded = false;
-  callback = null;
   callbackName += timestamp;
   while (callbackName in window) {
     callbackName += 'a';
   }
   window[callbackName] = function(response) {
-    if (loaded === true) return;
-    loaded = true;
-    if (cb) {
-      cb(null, response);
+    if (loaded === true) {
+      return;
     }
-    cleanup();
+    handleResponse(null, response);
   };
-  script.src = url + '&jsonp=' + callbackName;
-  parent.appendChild(script);
+  if (config.params) {
+    url += serialize(config.params);
+  }
   script.onreadystatechange = function() {
     if (loaded === false && this.readyState === 'loaded') {
-      loaded = true;
-      handleError();
-      cleanup();
+      handleResponse('An error occurred', null);
     }
   };
   script.onerror = function() {
     if (loaded === false) {
-      loaded = true;
-      handleError();
-      cleanup();
+      handleResponse('An error occurred', null);
     }
   };
-  function handleError(){
-    if (cb) {
-      cb('An error occurred!', null);
+  script.src = url + '&jsonp=' + callbackName;
+  parent.appendChild(script);
+  function handleResponse(a, b){
+    loaded = true;
+    if (cb && typeof cb === 'function') {
+      cb(a, b);
+      callback = cb = void 0;
     }
-  }
-  function cleanup(){
     window[callbackName] = undefined;
     try {
       delete window[callbackName];
