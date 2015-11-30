@@ -4,14 +4,15 @@ var gulp = require('gulp'),
 var browserify = require('browserify'),
     connect = require('gulp-connect'),
     compress = require('gulp-yuicompressor'),
-    del = require('del'),
+    // del = require('del'),
     karma = require('karma').server,
     mocha = require('gulp-mocha'),
     mochaPhantomJS = require('gulp-mocha-phantomjs'),
     rename = require('gulp-rename'),
     squash = require('gulp-remove-empty-lines'),
     strip = require('gulp-strip-comments'),
-    through2 = require('through2');
+    through2 = require('through2'),
+    util = require('gulp-util');
 
 gulp.task('default', ['build', 'connect', 'watch']);
 
@@ -44,7 +45,7 @@ gulp.task('build:minify', ['build:browserify'], function(){
 
 gulp.task('connect', ['build'], function () {
   return connect.server({
-      root: [ __dirname, 'test', 'test/unit', 'test/demo' ],
+      root: [ __dirname, 'test', 'test/unit', 'test/demo', 'test/vendor' ],
       port: 9001
     });
 });
@@ -56,9 +57,42 @@ gulp.task('watch', ['build'], function() {
 // Test tasks
 // --------------------------------
 
-gulp.task('test:unit', ['test-with-mocha']);
+gulp.task('test:unit', ['test:phantom', 'test:mocha']);
 
-gulp.task('test-with-mocha', function () {
+// gulp.task('test:clean', function(callback){
+//   del(['./test/unit/build'], callback);
+// });
+
+gulp.task('test:browserify', function(){
+  return gulp.src('./test/unit/index.js')
+    .pipe(through2.obj(function(file, enc, next){
+      browserify(file.path)
+        .bundle(function(err, res){
+            file.contents = res;
+            next(null, file);
+        });
+    }))
+    .pipe(strip({ line: true }))
+    .pipe(squash())
+    .pipe(rename('browserified-tests.js'))
+    .pipe(gulp.dest('./test/unit/build'));
+});
+
+gulp.task('test:mocha', ['test:browserify'], function () {
   return gulp.src('./test/unit/server.js', { read: false })
-  .pipe(mocha({ reporter: 'nyan' }));
+    .pipe(mocha({
+      reporter: 'nyan',
+      timeout: 5000
+    }));
+});
+
+gulp.task('test:phantom', ['test:browserify'], function () {
+  return gulp.src('./test/unit/index.html')
+    .pipe(mochaPhantomJS())
+    .once('error', function () {
+      process.exit(1);
+    })
+    .once('end', function () {
+      process.exit();
+    });
 });

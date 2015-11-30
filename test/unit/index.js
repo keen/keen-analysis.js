@@ -15,4 +15,8 @@ describe('Client accessors', function(){
     this.client = null;
   });
 
+  it('should pass', function(){
+    expect(1).to.eql(1);
+  });
+
 });
