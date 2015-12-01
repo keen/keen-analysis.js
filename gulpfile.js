@@ -82,13 +82,15 @@ gulp.task('test:mocha', ['test:browserify'], function () {
   return gulp.src('./test/unit/server.js', { read: false })
     .pipe(mocha({
       reporter: 'nyan',
-      timeout: 10 * 1000
+      timeout: 300 * 1000
     }));
 });
 
 gulp.task('test:phantom', ['test:browserify'], function () {
   return gulp.src('./test/unit/index.html')
-    .pipe(mochaPhantomJS())
+    .pipe(mochaPhantomJS({
+      mocha: { timeout: 300 * 1000 }
+    }))
     .once('error', function () {
       process.exit(1);
     })

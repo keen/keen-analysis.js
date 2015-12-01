@@ -6,8 +6,13 @@ var KeenClient = require('../../../lib/index');
 describe('HTTP methods (browser)', function(){
 
   beforeEach(function(){
-    this.timeout(10 * 1000);
+    this.timeout(300 * 1000);
     this.client = new KeenClient(helpers.client);
+
+    // PhantomJS SSL handshake issue
+    if (typeof window !== 'undefined' && window._phantom) {
+      this.client.config['protocol'] = 'http';
+    }
   });
 
   afterEach(function(){
