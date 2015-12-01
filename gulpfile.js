@@ -64,7 +64,7 @@ gulp.task('test:unit', ['test:phantom', 'test:mocha']);
 // });
 
 gulp.task('test:browserify', function(){
-  return gulp.src('./test/unit/browser.js')
+  return gulp.src('./test/unit/index.js')
     .pipe(through2.obj(function(file, enc, next){
       browserify(file.path)
         .bundle(function(err, res){
@@ -79,7 +79,7 @@ gulp.task('test:browserify', function(){
 });
 
 gulp.task('test:mocha', ['test:browserify'], function () {
-  return gulp.src('./test/unit/server.js', { read: false })
+  return gulp.src('./test/unit/index.js', { read: false })
     .pipe(mocha({
       reporter: 'nyan',
       timeout: 300 * 1000

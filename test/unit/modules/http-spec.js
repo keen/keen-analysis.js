@@ -3,7 +3,7 @@ var helpers = require('../helpers/client-config');
 
 var KeenClient = require('../../../lib/index');
 
-describe('HTTP methods (browser)', function(){
+describe('HTTP methods', function(){
 
   beforeEach(function(){
     this.timeout(300 * 1000);
