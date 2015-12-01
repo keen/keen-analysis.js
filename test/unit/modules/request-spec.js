@@ -3,10 +3,16 @@ var helpers = require('../helpers/client-config');
 
 var KeenClient = require('../../../lib/index');
 
-describe('HTTP methods (browser)', function(){
+describe('Request methods', function(){
 
   beforeEach(function(){
+    this.timeout(300 * 1000);
     this.client = new KeenClient(helpers.client);
+
+    // PhantomJS SSL handshake issue
+    if (typeof window !== 'undefined' && window._phantom) {
+      this.client.config['protocol'] = 'http';
+    }
   });
 
   afterEach(function(){
@@ -25,6 +31,31 @@ describe('HTTP methods (browser)', function(){
       var req = this.client.get('/test').timeout(100);
       expect(req.config.timeout).to.eql(100);
     });
+  });
+
+  describe('.query()', function(){
+
+    it('should make a POST request with data to a query endpoint', function(done){
+      this.client
+        .query('count', {
+          event_collection: 'pageview',
+          timeframe: 'this_12_months'
+        })
+        .then(function(res){
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should make a GET request to a saved query endpoint', function(done){
+      this.client
+        .query('saved', 'saved-query-test/result')
+        .then(function(res){
+          done();
+        })
+        .catch(done);
+    });
+
   });
 
 });

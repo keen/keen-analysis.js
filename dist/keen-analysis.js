@@ -15,9 +15,15 @@ K.prototype.readKey = function(str){
   return this;
 }
 K.prototype.query = function(a, b){
-  if (b && typeof b === 'string') {
+  if (a && !b) {
     return this
-      .post(this.url('queries', a, b))
+      .get(this.url('queries', a))
+      .auth(this.readKey())
+      .send();
+  }
+  else if (a && b && typeof b === 'string') {
+    return this
+      .get(this.url('queries', a, b))
       .auth(this.readKey())
       .send();
   }
@@ -50,7 +56,7 @@ function request(method){
   this.config = {
     'api_key' : '',
     'method'  : method,
-    'params'  : {},
+    'params'  : undefined,
     'timeout' : 300 * 1000,
     'url'     : ''
   };
@@ -72,7 +78,7 @@ request.prototype.send = function(obj){
   var self = this,
       httpHandler,
       httpOptions;
-  this.config.params = (obj && typeof obj === 'object') ? obj : {};
+  this.config.params = (obj && typeof obj === 'object') ? obj : undefined;
   httpHandler = httpHandlers[this.config['method']],
   httpOptions = extend({}, this.config);
   return new Promise(function(resolve, reject) {

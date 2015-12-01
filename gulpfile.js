@@ -51,7 +51,11 @@ gulp.task('connect', ['build'], function () {
 });
 
 gulp.task('watch', ['build'], function() {
-  gulp.watch([ 'lib/**/*.js', 'gulpfile.js' ], ['build', 'test:browserify']);
+  gulp.watch([
+    'lib/**/*.js',
+    'gulpfile.js',
+    'test/**/*.js'
+  ], ['build', 'test:browserify']);
 });
 
 // Test tasks
