@@ -36,6 +36,7 @@ describe('Request methods', function(){
   describe('.query()', function(){
 
     it('should make a POST request with data to a query endpoint', function(done){
+      this.timeout(300 * 1000);
       this.client
         .query('count', {
           event_collection: 'pageview',
@@ -48,6 +49,7 @@ describe('Request methods', function(){
     });
 
     it('should make a GET request to a saved query endpoint', function(done){
+      this.timeout(300 * 1000);
       this.client
         .query('saved', 'saved-query-test/result')
         .then(function(res){

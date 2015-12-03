@@ -93,7 +93,10 @@ gulp.task('test:mocha', ['test:browserify'], function () {
 gulp.task('test:phantom', ['test:browserify'], function () {
   return gulp.src('./test/unit/index.html')
     .pipe(mochaPhantomJS({
-      mocha: { timeout: 300 * 1000 }
+      mocha: {
+        reporter: 'nyan',
+        timeout: 300 * 1000
+      }
     }))
     .once('error', function () {
       process.exit(1);

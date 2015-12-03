@@ -1,9 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var K = require('keen-tracking');
+var K = require('keen-tracking'),
+    Promise = require('promise');
 var each = require('keen-tracking/lib/utils/each'),
-    extend = require('keen-tracking/lib/utils/extend'),
-    request = require('./request');
+    extend = require('keen-tracking/lib/utils/extend');
+var request = require('./request');
 K.resources.queries = '{protocol}://{host}/3.0/projects/{projectId}/queries';
+extend(K.prototype, request);
 K.prototype.masterKey = function(str){
   if (!arguments.length) return this.config.masterKey;
   this.config.masterKey = str ? String(str) : null;
@@ -13,7 +15,7 @@ K.prototype.readKey = function(str){
   if (!arguments.length) return this.config.readKey;
   this.config.readKey = str ? String(str) : null;
   return this;
-}
+};
 K.prototype.query = function(a, b){
   if (a && !b) {
     return this
@@ -33,10 +35,93 @@ K.prototype.query = function(a, b){
       .auth(this.readKey())
       .send(b);
   }
+};
+K.Query = Query;
+K.prototype.run = function(q, callback){
+  var self = this,
+      cb = callback,
+      queries,
+      promises,
+      output;
+  callback = null;
+  queries = q instanceof Array? q : [q];
+  promises = [];
+  each(queries, function(query, i){
+    if (typeof query === 'string') {
+      promises.push(self.query('saved', query + '/result'));
+    }
+    else if (query instanceof K.Query) {
+      promises.push(self.query(query.analysis, query.params));
+    }
+  });
+  if (promises.length > 1) {
+    output = Promise.all(promises);
+  }
+  else {
+    output = promises[0];
+  }
+  if (cb) {
+    output.then(function(res){
+      cb(null, res);
+    });
+    output['catch'](function(err){
+      cb(err, null);
+    });
+  }
+  return output;
+};
+function Query(analysisType, params) {
+  this.analysis = analysisType;
+  this.params = {};
+  this.set(params);
+  if (this.params.timezone === void 0) {
+    this.params.timezone = new Date().getTimezoneOffset() * -60;
+  }
 }
-extend(K.prototype, request);
+Query.prototype.set = function(attributes) {
+  var self = this;
+  each(attributes, function(v, k){
+    var key = k, value = v;
+    if (k.match(new RegExp('[A-Z]'))) {
+      key = k.replace(/([A-Z])/g, function($1) { return '_'+$1.toLowerCase(); });
+    }
+    self.params[key] = value;
+    if (value instanceof Array) {
+      each(value, function(dv, index){
+        if (dv instanceof Array == false && typeof dv === 'object') {
+          each(dv, function(deepValue, deepKey){
+            if (deepKey.match(new RegExp('[A-Z]'))) {
+              var _deepKey = deepKey.replace(/([A-Z])/g, function($1) { return '_'+$1.toLowerCase(); });
+              delete self.params[key][index][deepKey];
+              self.params[key][index][_deepKey] = deepValue;
+            }
+          });
+        }
+      });
+    }
+  });
+  return self;
+};
+Query.prototype.get = function(attribute) {
+  var key = attribute;
+  if (key.match(new RegExp('[A-Z]'))) {
+    key = key.replace(/([A-Z])/g, function($1) { return '_'+$1.toLowerCase(); });
+  }
+  if (this.params) {
+    return this.params[key] || null;
+  }
+};
+Query.prototype.addFilter = function(property, operator, value) {
+  this.params.filters = this.params.filters || [];
+  this.params.filters.push({
+    'property_name': property,
+    'operator': operator,
+    'property_value': value
+  });
+  return this;
+};
 module.exports = K;
-},{"./request":2,"keen-tracking":5,"keen-tracking/lib/utils/each":19,"keen-tracking/lib/utils/extend":20}],2:[function(require,module,exports){
+},{"./request":2,"keen-tracking":5,"keen-tracking/lib/utils/each":19,"keen-tracking/lib/utils/extend":20,"promise":29}],2:[function(require,module,exports){
 var Promise = require('promise');
 var each = require('keen-tracking/lib/utils/each'),
     extend = require('keen-tracking/lib/utils/extend'),
@@ -163,18 +248,27 @@ function sendXhr(method, config, callback){
       if (xhr.status >= 200 && xhr.status < 300) {
         try {
           response = json.parse( xhr.responseText );
-        } catch (e) {
+          if (cb && response) {
+            cb(null, response);
+          }
+        }
+        catch (e) {
           if (cb) {
             cb(xhr, null);
           }
         }
-        if (cb && response) {
-          cb(null, response);
-        }
       }
       else {
-        if (cb) {
-          cb(xhr, null);
+        try {
+          response = json.parse( xhr.responseText );
+          if (cb && response) {
+            cb(response, null);
+          }
+        }
+        catch (e) {
+          if (cb) {
+            cb(xhr, null);
+          }
         }
       }
     }
