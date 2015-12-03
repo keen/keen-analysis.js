@@ -1,6 +1,6 @@
-var expect = require('chai').expect;
-var helpers = require('../helpers/client-config');
+var assert = require('proclaim');
 
+var helpers = require('../helpers/client-config');
 var KeenClient = require('../../../lib/index');
 
 describe('Keen.Query', function(){
@@ -25,24 +25,24 @@ describe('Keen.Query', function(){
       var q = new KeenClient.Query('count', {
         eventCollection: 'pageviews'
       });
-      expect(q).to.be.an.instanceof(KeenClient.Query);
+      assert.isInstanceOf(q, KeenClient.Query);
     });
 
     it('should have a correct analysis propery', function(){
       var q = new KeenClient.Query('count');
-      expect(q).to.have.property('analysis').eql('count');
+      assert.equal(q.analysis, 'count');
     });
 
     it('should have a params object', function(){
       var q = new KeenClient.Query('count');
-      expect(q).to.have.property('params');
+      assert.isObject(q.params);
     });
 
     it('should have a params.event_collection property', function(){
       var q = new KeenClient.Query('count', {
         eventCollection: 'pageviews'
       });
-      expect(q.params).to.have.property('event_collection').eql('pageviews');
+      assert.equal(q.params.event_collection, 'pageviews');
     });
 
   });
@@ -63,34 +63,32 @@ describe('Keen.Query', function(){
 
     it('should throw an error when passed an invalid object', function(){
       var self = this;
-      expect(function(){ self.run(null); }).to.throw(Error);
-      expect(function(){ self.run({}); }).to.throw(Error);
-      expect(function(){ self.run(0); }).to.throw(Error);
+      assert.throws(function(){ self.run(null); });
+      assert.throws(function(){ self.run({}); });
+      assert.throws(function(){ self.run(0); });
     });
 
     it('should return a response when successful', function(){
       this.client.run(this.query, function(err, res){
-        expect(err).to.be.a('null');
-        expect(res).to.be.an('object');
+        assert.isNull(err);
+        assert.isObject(res);
       });
     });
 
     it('should return an error when unsuccessful', function(){
       var q = new KeenClient.Query('count');
       this.client.run(q, function(err, res){
-        // console.log(err, res);
-        expect(err).to.exist;
-        expect(err['error_code']).to.exist;
-        expect(res).to.be.a('null');
+        assert.isNotNull(err);
+        assert.isString(err.error_code);
+        assert.isNull(res);
       });
     });
 
-    it('should handle multiple query objects', function(done){
+    it('should handle multiple query objects', function(){
       this.client.run([this.query, this.query, this.query], function(err, res){
-        expect(err).to.be.a('null');
-        expect(res).to.be.an('array')
-          .and.to.have.length(3);
-        done();
+        assert.isNull(err);
+        assert.isArray(res);
+        assert.lengthEquals(res, 3);
       });
     });
 
@@ -98,8 +96,8 @@ describe('Keen.Query', function(){
       this.client
         .run([this.query, this.query, this.query])
         .then(function(res){
-          expect(res).to.be.an('array')
-            .and.to.have.length(3);
+          assert.isArray(res);
+          assert.lengthEquals(res, 3);
           done();
         })
         .catch(done);
@@ -122,25 +120,23 @@ describe('Keen.Query', function(){
 
     it('should add filters correctly', function(){
       this.query.addFilter('property', 'eq', 'value');
-      expect(this.query.params).to.have.property('filters')
-        .that.is.an('array')
-        .with.deep.property('[0]')
-        .that.deep.equals({
-          operator: 'eq',
-          property_name: 'property',
-          property_value: 'value'
-        });
+      assert.isArray(this.query.params.filters);
+      assert.deepEqual(this.query.params.filters[0], {
+        operator: 'eq',
+        property_name: 'property',
+        property_value: 'value'
+      });
     });
 
     it('should allow filters with values that are null or false', function(){
       this.query.addFilter('a', 'eq', null);
       this.query.addFilter('b', 'eq', false);
-      expect(this.query.params.filters[0]).to.deep.equals({
+      assert.deepEqual(this.query.params.filters[0], {
         operator: 'eq',
         property_name: 'a',
         property_value: null
       });
-      expect(this.query.params.filters[1]).to.deep.equals({
+      assert.deepEqual(this.query.params.filters[1], {
         operator: 'eq',
         property_name: 'b',
         property_value: false
@@ -150,12 +146,12 @@ describe('Keen.Query', function(){
     it('should allow multiple filters on the same property name', function(){
       this.query.addFilter('a', 'eq', 'b');
       this.query.addFilter('a', 'eq', 'c');
-      expect(this.query.params.filters[0]).to.deep.equals({
+      assert.deepEqual(this.query.params.filters[0], {
         operator: 'eq',
         property_name: 'a',
         property_value: 'b'
       });
-      expect(this.query.params.filters[1]).to.deep.equals({
+      assert.deepEqual(this.query.params.filters[1], {
         operator: 'eq',
         property_name: 'a',
         property_value: 'c'
@@ -178,11 +174,11 @@ describe('Keen.Query', function(){
     });
 
     it('should return values for camelCased attributes', function(){
-      expect(this.query.get('eventCollection')).to.eql('pageviews');
+      assert.equal(this.query.get('eventCollection'), 'pageviews');
     });
 
     it('should return values for underscored attributes', function(){
-      expect(this.query.get('event_collection')).to.eql('pageviews');
+      assert.equal(this.query.get('event_collection'), 'pageviews');
     });
 
   });
@@ -202,16 +198,16 @@ describe('Keen.Query', function(){
 
     it('should set multiple specified attributes', function(){
       this.query.set({ timeframe: 'this_7_days', interval: 'daily' });
-      expect(this.query.params).to.have.property('timeframe').eql('this_7_days');
-      expect(this.query.params).to.have.property('interval').eql('daily');
+      assert.equal(this.query.params.timeframe, 'this_7_days');
+      assert.equal(this.query.params.interval, 'daily');
     });
 
     it('should apply the latest attribute over previous values', function(){
       this.query.set({ timeframe: 'this_7_days', interval: 'daily' });
       this.query.set({ timeframe: 'this_21_days' });
       this.query.set({ timeframe: 'this_14_days' });
-      expect(this.query.params).to.have.property('timeframe').eql('this_14_days');
-      expect(this.query.params).to.have.property('interval').eql('daily');
+      assert.equal(this.query.params.timeframe, 'this_14_days');
+      assert.equal(this.query.params.interval, 'daily');
     });
 
   });

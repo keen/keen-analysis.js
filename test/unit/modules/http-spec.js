@@ -1,6 +1,4 @@
-var expect = require('chai').expect;
 var helpers = require('../helpers/client-config');
-
 var KeenClient = require('../../../lib/index');
 
 describe('HTTP methods', function(){
