@@ -5,7 +5,7 @@ var browserify = require('browserify'),
     connect = require('gulp-connect'),
     compress = require('gulp-yuicompressor'),
     // del = require('del'),
-    karma = require('karma').server,
+    karma = require('karma').Server,
     mocha = require('gulp-mocha'),
     mochaPhantomJS = require('gulp-mocha-phantomjs'),
     rename = require('gulp-rename'),
@@ -104,4 +104,18 @@ gulp.task('test:phantom', ['test:browserify'], function () {
     .once('end', function () {
       process.exit();
     });
+});
+
+gulp.task('test:karma', ['build', 'test:browserify'], function (done){
+  new karma({
+    configFile: __dirname + '/config-karma.js',
+    singleRun: true
+  }, done).start();
+});
+
+gulp.task('test:sauce', ['build', 'test:browserify'], function(done){
+  new karma({
+    configFile: __dirname + '/config-sauce.js',
+    singleRun: true
+  }, done).start();
 });

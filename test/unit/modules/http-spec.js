@@ -4,7 +4,6 @@ var KeenClient = require('../../../lib/index');
 describe('HTTP methods', function(){
 
   beforeEach(function(){
-    this.timeout(300 * 1000);
     this.client = new KeenClient(helpers.client);
 
     // PhantomJS SSL handshake issue
@@ -20,6 +19,7 @@ describe('HTTP methods', function(){
   describe('.get()', function(){
 
     it('should make a GET request to an API endpoint', function(done){
+      this.timeout(300 * 1000);
       this.client
         .get(this.client.url('projectId'))
         .auth(this.client.masterKey())
@@ -31,6 +31,7 @@ describe('HTTP methods', function(){
     });
 
     it('should make a GET request with data to an API endpoint', function(done){
+      this.timeout(300 * 1000);
       this.client
         .get(this.client.url('queries', 'count'))
         .auth(this.client.readKey())
@@ -49,6 +50,7 @@ describe('HTTP methods', function(){
   describe('.post()', function(){
 
     it('should make a POST request with data to an API endpoint', function(done){
+      this.timeout(300 * 1000);
       this.client
         .post(this.client.url('queries', 'count'))
         .auth(this.client.readKey())

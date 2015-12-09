@@ -6,7 +6,6 @@ var KeenClient = require('../../../lib/index');
 describe('Request methods', function(){
 
   beforeEach(function(){
-    this.timeout(300 * 1000);
     this.client = new KeenClient(helpers.client);
 
     // PhantomJS SSL handshake issue
@@ -45,7 +44,9 @@ describe('Request methods', function(){
         .then(function(res){
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          done(err);
+        });
     });
 
     it('should make a GET request to a saved query endpoint', function(done){

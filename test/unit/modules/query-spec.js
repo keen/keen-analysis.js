@@ -93,11 +93,11 @@ describe('Keen.Query', function(){
     });
 
     it('should return a promise', function(done){
+      this.timeout(300 * 1000);
       this.client
         .run([this.query, this.query, this.query])
         .then(function(res){
           assert.isArray(res);
-          assert.lengthEquals(res, 3);
           done();
         })
         .catch(done);
