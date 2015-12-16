@@ -42,6 +42,10 @@ describe('Request methods', function(){
           timeframe: 'this_12_months'
         })
         .then(function(res){
+          assert.equal(res.query.analysis_type, 'count');
+          assert.equal(res.query.event_collection, 'pageview');
+          assert.equal(res.query.timeframe, 'this_12_months');
+          assert.isNumber(res.result);
           done();
         })
         .catch(function(err){

@@ -26,8 +26,8 @@ gulp.task('build:browserify', function(){
     .pipe(through2.obj(function(file, enc, next){
       browserify(file.path)
         .bundle(function(err, res){
-            file.contents = res;
-            next(null, file);
+          file.contents = res;
+          next(null, file);
         });
     }))
     .pipe(strip({ line: true }))

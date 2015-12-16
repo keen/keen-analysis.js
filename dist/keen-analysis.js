@@ -30,10 +30,17 @@ K.prototype.query = function(a, b){
       .send();
   }
   else if (a && b && typeof b === 'object') {
+    var q = extend({ analysis_type: a }, b);
     return this
       .post(this.url('queries', a))
       .auth(this.readKey())
-      .send(b);
+      .send(b)
+      .then(function(res){
+        return extend(this, res);
+      }.bind({ query: q }))
+      ['catch'](function(err){
+        return Promise.reject(err);
+      });
   }
 };
 K.Query = Query;
