@@ -34,7 +34,7 @@ describe('Request methods', function(){
 
   describe('.query()', function(){
 
-    it('should make a POST request with data to a query endpoint', function(done){
+    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', function(done){
       this.timeout(300 * 1000);
       this.client
         .query('count', {
@@ -53,14 +53,38 @@ describe('Request methods', function(){
         });
     });
 
-    it('should make a GET request to a saved query endpoint', function(done){
+    it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', function(done){
+      this.timeout(300 * 1000);
+      this.client
+        .query('count', {
+          event_collection: false
+        })
+        .then(done)
+        .catch(function(err){
+          done();
+        });
+    });
+
+    it('should make a GET request to a saved query endpoint, returning a response when successful', function(done){
       this.timeout(300 * 1000);
       this.client
         .query('saved', 'saved-query-test/result')
         .then(function(res){
+          assert.isObject(res);
+          assert.isObject(res.query);
           done();
         })
         .catch(done);
+    });
+
+    it('should make a GET request to a saved query endpoint, returning an error when unsuccessful', function(done){
+      this.timeout(300 * 1000);
+      this.client
+        .query('saved', 'does-not-exist/result')
+        .then(done)
+        .catch(function(err){
+          done();
+        });
     });
 
   });

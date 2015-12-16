@@ -36,10 +36,7 @@ K.prototype.query = function(a, b){
       .auth(this.readKey())
       .send(b)
       .then(function(res){
-        return extend(this, res);
-      }.bind({ query: q }))
-      ['catch'](function(err){
-        return Promise.reject(err);
+        return extend({ query: q }, res);
       });
   }
 };

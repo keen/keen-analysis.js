@@ -68,10 +68,13 @@ describe('Keen.Query', function(){
       assert.throws(function(){ self.run(0); });
     });
 
-    it('should return a response when successful', function(){
+    it('should return a response and query parameters when successful', function(){
       this.client.run(this.query, function(err, res){
         assert.isNull(err);
         assert.isObject(res);
+        assert.equal(res.query.analysis_type, 'count');
+        assert.equal(res.query.event_collection, 'pageview');
+        assert.equal(res.query.timeframe, 'this_12_months');
       });
     });
 
