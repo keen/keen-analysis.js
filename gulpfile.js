@@ -1,10 +1,10 @@
 var gulp = require('gulp'),
     pkg = require('./package.json');
 
-var browserify = require('browserify'),
+var aws = require('gulp-awspublish')
+    browserify = require('browserify'),
     connect = require('gulp-connect'),
     compress = require('gulp-yuicompressor'),
-    // del = require('del'),
     karma = require('karma').Server,
     mocha = require('gulp-mocha'),
     mochaPhantomJS = require('gulp-mocha-phantomjs'),
@@ -118,4 +118,40 @@ gulp.task('test:sauce', ['build', 'test:browserify'], function(done){
     configFile: __dirname + '/config-sauce.js',
     singleRun: true
   }, done).start();
+});
+
+// ---------------------
+
+gulp.task('deploy', ['build', 'test:mocha', 'test:karma'], function() {
+  var cacheLife, publisher, headers;
+  if (!process.env.AWS_KEY || !process.env.AWS_SECRET) {
+    throw 'AWS credentials are required!';
+  }
+  cacheLife = (1000 * 60 * 60); // 1 hour (* 24 * 365)
+  headers = {
+    'Cache-Control': 'max-age=' + cacheLife + ', public'
+  };
+  publisher = aws.create({
+    'accessKeyId': process.env.AWS_KEY,
+    'secretAccessKey': process.env.AWS_SECRET,
+    'params': {
+      'Bucket': 'keen-js',
+      'Expires': new Date(Date.now() + cacheLife)
+    }
+  });
+
+  return gulp.src([
+      './dist/' + pkg.name + '.js',
+      './dist/' + pkg.name + '.min.js'
+    ])
+    .pipe(rename(function(path) {
+      path.dirname += '/';
+      var name = pkg.name + '-' + pkg.version;
+      path.basename = (path.basename.indexOf('min') > -1) ? name + '.min' : name;
+    }))
+    .pipe(aws.gzip())
+    .pipe(publisher.publish(headers, { force: true }))
+    .pipe(publisher.cache())
+    .pipe(aws.reporter());
+
 });
