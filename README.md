@@ -231,14 +231,41 @@ client
   });
 ```
 
+## Keen.Query
+
+The `Keen.Query` object and `client.run()` method introduced in [keen-js](https://github.com/keen/keen-js) are still supported. However, `client.run()` now also returns a promise, as an alternate interface to the node-style callback.
+
+```javascript
+var query = new Keen.Query('count', {
+  event_collection: 'pageviews',
+  timeframe: 'this_14_days'
+});
+
+// Node-style callback
+client.run(query, function(err, res){
+  if (err) {
+    // catch and handle errors
+  }
+  else {
+    // do something with the result
+  }
+});
+
+// promise
+client
+  .run(query)
+  .then(function(res){
+    // do something with the result
+  })
+  .catch(function(err){
+    // catch and handle errors
+  });
+```
+
 
 ## Contributing
 
 This is an open source project and we love involvement from the community! Hit us up with pull requests and issues. The more contributions the better!
-
-**TODO:**
-
-* [ ] Design and build debugging tools
 
 [Learn more about contributing to this project](./CONTRIBUTING.md).
 
