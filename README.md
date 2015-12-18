@@ -24,9 +24,9 @@ If you haven't done so already, login to Keen IO to create a project. The Projec
 
 There are several breaking changes from [keen-js](https://github.com/keen/keen-js). Since this library includes and extends [keen-tracking.js](https://github.com/keen/keen-tracking.js), please review those [upgrade notes](https://github.com/keen/keen-tracking.js/blob/master/README.md#upgrading-from-keen-js) as well.
 
-* **All new HTTP methods:** [keen-js](https://github.com/keen/keen-js) supports generic HTTP methods (`.get()`, `.post()`, `.put()`, and `.del()`) for interacting with various API resources. The new Promise-backed design of this SDK necessitated a full rethinking of how these methods work.
-* **camelCase conversion:** previously, query parameters could be provided to a `Keen.Query` object in camelCase format, and would be converted to the underscore format that the API requires. Eg: `eventCollection` would be converted to `event_collection` before being sent to the API. This pattern has caused plenty of confusion of the years, so we're axing this entirely. All query parameters must be supplied in the format that the API requires (`event_collection`).
-* **`Keen.Request` has been removed:** this object is no longer necessary for managing query requests.
+* **All new HTTP methods:** [keen-js](https://github.com/keen/keen-js) supports generic HTTP methods (`.get()`, `.post()`, `.put()`, and `.del()`) for interacting with various API resources. The new Promise-backed design of this SDK necessitated a full rethinking of how these methods behave.
+* **camelCase conversion:** previously, query parameters could be provided to a `Keen.Query` object in camelCase format, and would be converted to the underscore format that the API requires. Eg: `eventCollection` would be converted to `event_collection` before being sent to the API. This pattern has caused plenty of confusion, so we have axed this conversion entirely. All query parameters must be supplied in the format outlined by the [API reference](https://keen.io/docs/api) (`event_collection`).
+* **`Keen.Request` object has been removed:** this object is no longer necessary for managing query requests.
 
 <a name="additional-resources"></a>
 **Additional resources:**
@@ -97,6 +97,8 @@ client
     // catch and handle errors
   });
 ```
+
+**Important:** the `res` response object returned in the example above will also include a `query` object containing the `analysis_type` and query parameters shaping the request. This query information is artificially appended to the response by this SDK, as this information is currently only provided by the API for saved queries. **Why?** Query parameters are extremely useful for intelligent response handling downstream, particularly by our own automagical visualization capabilities in [keen-dataviz.js](https://github.com/keen/keen-dataviz.js).
 
 ### Saved queries
 
@@ -171,10 +173,11 @@ client
   .auth(client.masterKey())
   .send({
     refresh_rate: 0,
-    query: {},
-    metadata: {
-      query_name: 'My New Query'
-    }
+    query: {
+      analysis_type: 'count',
+      event_collection: 'pageviews'
+    },
+    metadata: {}
     // ...
   })
   .then(function(res){
@@ -190,12 +193,15 @@ client
 ```javascript
 // Update a saved query
 client
-  .put(client.url('queries', 'saved', 'new-saved-query'))
+  .put(client.url('queries', 'saved', 'daily-pageviews-this-14-days'))
   .auth(client.masterKey())
   .send({
     refresh_rate: 60 * 60 * 4,
-    query: {},
-    query_name: 'daily-pageviews-this-14-days',
+    query: {
+      analysis_type: 'count',
+      event_collection: 'pageviews',
+      timeframe: 'this_14_days'
+    },
     metadata: {
       display_name: 'Daily pageviews (this 14 days)'
     }
