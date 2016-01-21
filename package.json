@@ -1,7 +1,7 @@
 {
   "name": "keen-analysis",
-  "version": "0.0.1",
-  "description": "Analysis SDK for Keen IO",
+  "version": "0.0.2",
+  "description": "Data Analysis SDK for Keen IO",
   "main": "lib/index.js",
   "browser": {
     "./lib/utils/http-server.js": "./lib/utils/http-browser.js"

@@ -1,0 +1,22 @@
+{
+  "name": "keen-analysis",
+  "description": "Data Analysis SDK for Keen IO",
+  "main": "dist/keen-analysis.js",
+  "authors": [
+    "Dustin Larimer <dustin@keen.io>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/keen/keen-analysis.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
