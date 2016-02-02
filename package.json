@@ -1,6 +1,6 @@
 {
   "name": "keen-analysis",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Data Analysis SDK for Keen IO",
   "main": "lib/index.js",
   "browser": {
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/keen/keen-analysis.js#readme",
   "dependencies": {
-    "keen-tracking": "^0.1.0",
+    "keen-tracking": "^0.1.1",
     "promise": "^7.0.4"
   },
   "devDependencies": {

@@ -51,7 +51,7 @@ Need a hand with something? Shoot us an email at [team@keen.io](mailto:team@keen
 Include [keen-analysis.js](dist/keen-analysis.js) within your page or project.
 
 ```html
-<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-0.0.2.js'></script>
+<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-0.0.3.js'></script>
 ```
 
 This library can also be installed via npm or bower:
