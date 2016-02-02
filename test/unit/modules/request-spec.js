@@ -68,7 +68,7 @@ describe('Request methods', function(){
     it('should make a GET request to a saved query endpoint, returning a response when successful', function(done){
       this.timeout(300 * 1000);
       this.client
-        .query('saved', 'saved-query-test/result')
+        .query('saved', 'saved-query-test')
         .then(function(res){
           assert.isObject(res);
           assert.isObject(res.query);
@@ -80,12 +80,23 @@ describe('Request methods', function(){
     it('should make a GET request to a saved query endpoint, returning an error when unsuccessful', function(done){
       this.timeout(300 * 1000);
       this.client
-        .query('saved', 'does-not-exist/result')
+        .query('saved', 'does-not-exist')
         .then(done)
         .catch(function(err){
           done();
         });
     });
+
+    it('should return an error when incorrect arguments are provided', function(done){
+      this.timeout(300 * 1000);
+      this.client
+        .query('saved/saved-query-test')
+        .then(done)
+        .catch(function(err){
+          done();
+        });
+    });
+
 
   });
 

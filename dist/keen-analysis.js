@@ -17,13 +17,10 @@ K.prototype.readKey = function(str){
   return this;
 };
 K.prototype.query = function(a, b){
-  if (a && !b) {
-    return this
-      .get(this.url('queries', a))
-      .auth(this.readKey())
-      .send();
-  }
-  else if (a && b && typeof b === 'string') {
+  if (a && b && typeof b === 'string') {
+    if (b.indexOf('/result') < 0) {
+      b += '/result';
+    }
     return this
       .get(this.url('queries', a, b))
       .auth(this.readKey())
@@ -38,6 +35,12 @@ K.prototype.query = function(a, b){
       .then(function(res){
         return extend({ query: q }, res);
       });
+  }
+  else if (a && !b) {
+    return Promise.reject({
+      error_code: 'SDKError',
+      message: ".query() called with incorrect arguments"
+    });
   }
 };
 K.Query = Query;
