@@ -12,6 +12,7 @@ var aws = require('gulp-awspublish')
     squash = require('gulp-remove-empty-lines'),
     strip = require('gulp-strip-comments'),
     through2 = require('through2'),
+    uglify = require('gulp-uglify'),
     util = require('gulp-util');
 
 gulp.task('default', ['build', 'connect', 'watch']);
@@ -39,6 +40,7 @@ gulp.task('build:browserify', function(){
 gulp.task('build:minify', ['build:browserify'], function(){
   return gulp.src(['./dist/' + pkg.name + '.js'])
     .pipe(compress({ type: 'js' }))
+    .pipe(uglify())
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest('./dist/'));
 });
