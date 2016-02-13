@@ -31,10 +31,7 @@ K.prototype.query = function(a, b){
     return this
       .post(this.url('queries', a))
       .auth(this.readKey())
-      .send(b)
-      .then(function(res){
-        return extend({ query: q }, res);
-      });
+      .send(q);
   }
   else if (a && !b) {
     return Promise.reject({
@@ -58,7 +55,7 @@ K.prototype.run = function(q, callback){
       promises.push(self.query('saved', query + '/result'));
     }
     else if (query instanceof K.Query) {
-      promises.push(self.query(query.analysis, query.params));
+      promises.push(self.query(query.analysis, extend({ analysis_type: query.analysis }, query.params)));
     }
   });
   if (promises.length > 1) {
@@ -170,16 +167,27 @@ request.prototype.send = function(obj){
   var self = this,
       httpHandler,
       httpOptions;
-  this.config.params = (obj && typeof obj === 'object') ? obj : undefined;
+  this.config.params = (obj && typeof obj === 'object') ? obj : {};
   httpHandler = httpHandlers[this.config['method']],
   httpOptions = extend({}, this.config);
+  if (typeof httpOptions.params.analysis_type === 'undefined') {
+    if (httpOptions.url.indexOf('/queries/') > -1
+      && httpOptions.url.indexOf('/saved/') < 0) {
+        httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
+    }
+  }
   return new Promise(function(resolve, reject, onCancel) {
     var httpRequest = httpHandler(httpOptions, function(err, res){
+      var augmentedResponse = res;
       if (err) {
         reject(err);
       }
       else {
-        resolve(res);
+        if (typeof httpOptions.params.event_collection !== 'undefined'
+          && typeof res.query === 'undefined') {
+            augmentedResponse = extend({ query: httpOptions.params }, res);
+        }
+        resolve(augmentedResponse);
       }
     });
     onCancel(function(){
@@ -190,6 +198,10 @@ request.prototype.send = function(obj){
     return httpRequest;
   });
 };
+function getAnalysisType(str){
+  var split = str.split('/queries/');
+  return split[split.length-1];
+}
 },{"./utils/http-server":3,"./utils/promise":4,"keen-tracking/lib/utils/each":22,"keen-tracking/lib/utils/extend":23,"keen-tracking/lib/utils/json":24}],3:[function(require,module,exports){
 var each = require('keen-tracking/lib/utils/each'),
     json = require('keen-tracking/lib/utils/json'),
@@ -396,7 +408,9 @@ function sendJsonp(config, callback){
 },{"./serialize":5,"keen-tracking/lib/utils/each":22,"keen-tracking/lib/utils/json":24}],4:[function(require,module,exports){
 var Bluebird = require('bluebird/js/browser/bluebird.core');
 Bluebird.config({
-  cancellation: true
+  cancellation: true,
+  longStackTraces: false,
+  warnings: false
 });
 module.exports = Bluebird;
 },{"bluebird/js/browser/bluebird.core":6}],5:[function(require,module,exports){
