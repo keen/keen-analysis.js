@@ -11,3 +11,7 @@ config-sauce.js
 
 dist
 test
+
+CHANGELOG.md
+bower.json
+demo.js
