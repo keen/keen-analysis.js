@@ -1,6 +1,6 @@
 {
   "name": "keen-analysis",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Data Analysis SDK for Keen IO",
   "main": "lib/index.js",
   "browser": {
