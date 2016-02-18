@@ -1,3 +1,11 @@
+<a name="0.1.0"></a>
+# 0.1.0 Bluebird
+
+**New:**
+* Internal promises are now handled by bluebird.js (core)
+* HTTP requests now support cancelation (via a `.cancel()` method) which can be called on active requests
+
+
 <a name="0.0.3"></a>
 # 0.0.3 Fixed query handling
 
