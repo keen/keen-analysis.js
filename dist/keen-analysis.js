@@ -132,31 +132,25 @@ var each = require('keen-tracking/lib/utils/each'),
     json = require('keen-tracking/lib/utils/json');
 var httpHandlers = require('./utils/http-server');
 module.exports = {
-  'get'  : request('GET'),
-  'post' : request('POST'),
-  'put'  : request('PUT'),
-  'del'  : request('DELETE')
+  'get'  : new request('GET'),
+  'post' : new request('POST'),
+  'put'  : new request('PUT'),
+  'del'  : new request('DELETE')
 };
 function request(method){
-  var self;
-  if (this instanceof request === false) {
-    return new request(method);
-  }
-  this.config = {
-    'api_key' : '',
-    'method'  : method,
-    'params'  : undefined,
-    'timeout' : 300 * 1000,
-    'url'     : ''
-  };
-  self = this;
   return function(str){
-    self.config.url = str;
-    return self;
-  }
+    this.config = {
+      'api_key' : undefined,
+      'method'  : method,
+      'params'  : undefined,
+      'timeout' : 300 * 1000,
+      'url'     : str
+    };
+    return this;
+  }.bind(this);
 }
 request.prototype.auth = function(str){
-  this.config.api_key = typeof str === 'string' ? str : null;
+  this.config.api_key = typeof str === 'string' ? str : undefined;
   return this;
 };
 request.prototype.timeout = function(num){
@@ -164,8 +158,7 @@ request.prototype.timeout = function(num){
   return this;
 };
 request.prototype.send = function(obj){
-  var self = this,
-      httpHandler,
+  var httpHandler,
       httpOptions;
   this.config.params = (obj && typeof obj === 'object') ? obj : {};
   httpHandler = httpHandlers[this.config['method']],
@@ -310,9 +303,12 @@ function sendXhr(method, config, callback){
     }
   }
   else {
-    url += '?api_key=' + config.api_key;
+    url += '?';
+    if (config.api_key) {
+      url += 'api_key=' + config.api_key + '&';
+    }
     if (config.params) {
-      url += '&' + serialize(config.params);
+      url += serialize(config.params);
     }
     xhr.open(method, url, true);
     xhr.send();
@@ -414,7 +410,8 @@ Bluebird.config({
 });
 module.exports = Bluebird;
 },{"bluebird/js/browser/bluebird.core":6}],5:[function(require,module,exports){
-var each = require('keen-tracking/lib/utils/each');
+var each = require('keen-tracking/lib/utils/each'),
+    json = require('keen-tracking/lib/utils/json');
 module.exports = function(data){
   var query = [];
   each(data, function(value, key){
@@ -425,7 +422,7 @@ module.exports = function(data){
   });
   return query.join('&');
 };
-},{"keen-tracking/lib/utils/each":22}],6:[function(require,module,exports){
+},{"keen-tracking/lib/utils/each":22,"keen-tracking/lib/utils/json":24}],6:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)

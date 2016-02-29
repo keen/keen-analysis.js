@@ -1,3 +1,4 @@
+var pkg = require('./package.json');
 var moment = require('moment');
 
 module.exports = function(config){
@@ -78,7 +79,7 @@ module.exports = function(config){
     sauceLabs: {
       // username:  process.env.SAUCE_USERNAME,
       // accessKey: process.env.SAUCE_ACCESS_KEY,
-      testName: 'keen-analysis.js:' + moment().format(' ddd, MMM Do, h:mm:ss a'),
+      testName: pkg.name + '.js: ' + moment().format(' ddd, MMM Do, h:mm:ss a'),
       recordVideo: true,
       recordScreenshots: true,
       public: 'public'

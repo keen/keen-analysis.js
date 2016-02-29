@@ -37,7 +37,8 @@ describe('HTTP methods', function(){
         .auth(this.client.readKey())
         .send({
           event_collection: 'pageview',
-          timeframe: 'this_12_months'
+          timeframe: 'this_12_months',
+          timezone: 0
         })
         .then(function(res){
           done();
