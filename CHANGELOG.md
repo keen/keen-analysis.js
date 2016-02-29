@@ -1,3 +1,11 @@
+<a name="0.1.1"></a>
+# 0.1.1 Fix request handling
+
+**New:**
+* JSON module in `/lib/utils/serialize.js` is now properly defined (#4)
+* Request objects are not correctly constructed to resolve issue where stray `?api_key=` was added to basic GET requests (#5)
+
+
 <a name="0.1.0"></a>
 # 0.1.0 Bluebird
 
