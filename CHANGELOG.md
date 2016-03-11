@@ -1,3 +1,10 @@
+<a name="1.0.0"></a>
+# 1.0.0 Remove keen-tracking.js
+
+**Change:**
+* Important update: [keen-tracking.js](https://github.com/keen/keen-tracking.js) is no longer built into this SDK (#7). This is an intentional decision to prevent publicly hosted releases of this essential SDK from being blacklisted and blocked by AdBlockers. Learn more about installing keen-tracking.js [here](https://github.com/keen/keen-tracking.js#install-the-library).
+
+
 <a name="0.1.1"></a>
 # 0.1.1 Fix request handling
 

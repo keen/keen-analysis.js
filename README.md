@@ -2,6 +2,8 @@
 
 This project contains the most reliable and efficient data analysis functionality available for Keen IO, and will soon be built directly into [keen-js](https://github.com/keen/keen-js), replacing and upgrading the current analysis capabilities of that library.
 
+Looking for tracking capabilities? Check out [keen-tracking.js](https://github.com/keen/keen-tracking.js).
+
 **What's new:**
 
 * Asynchronous requests now return Promises, powered by [Bluebird (core)](https://github.com/petkaantonov/bluebird); a fully featured promise library with focus on innovative features and performance
@@ -95,7 +97,7 @@ Need a hand with something? Shoot us an email at [team@keen.io](mailto:team@keen
 Include [keen-analysis.js](dist/keen-analysis.js) within your page or project.
 
 ```html
-<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-0.1.1.js'></script>
+<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-1.0.0.js'></script>
 ```
 
 This library can also be installed via npm or bower:
