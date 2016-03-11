@@ -8,11 +8,6 @@ var request = require('./request');
 (function(env){
   K.resources.queries = '{protocol}://{host}/3.0/projects/{projectId}/queries';
   extend(K.prototype, request);
-  K.prototype.masterKey = function(str){
-    if (!arguments.length) return this.config.masterKey;
-    this.config.masterKey = str ? String(str) : null;
-    return this;
-  };
   K.prototype.readKey = function(str){
     if (!arguments.length) return this.config.readKey;
     this.config.readKey = str ? String(str) : null;
@@ -3675,20 +3670,20 @@ var each = require('./utils/each'),
 var Emitter = require('component-emitter');
 (function(env){
   var initialKeen = typeof env.Keen !== 'undefined' ? env.Keen : undefined;
-  function Core(props){
-    if (this instanceof Core === false) {
-      return new Core(props);
+  function Client(props){
+    if (this instanceof Client === false) {
+      return new Client(props);
     }
     this.configure(props);
-    if (Core.debug) {
-      this.on('error', Core.log);
+    if (Client.debug) {
+      this.on('error', Client.log);
     }
     this.emit('ready');
-    Core.emit('client', this);
+    Client.emit('client', this);
   }
-  Emitter(Core);
-  Emitter(Core.prototype);
-  extend(Core, {
+  Emitter(Client);
+  Emitter(Client.prototype);
+  extend(Client, {
     debug: false,
     enabled: true,
     loaded: false,
@@ -3705,16 +3700,16 @@ var Emitter = require('component-emitter');
     },
     version: '__VERSION__'
   });
-  Core.log = function(str){
-    if (Core.debug && typeof console === 'object') {
+  Client.log = function(str){
+    if (Client.debug && typeof console === 'object') {
       console.log('[Keen]', str);
     }
   };
-  Core.noConflict = function(){
+  Client.noConflict = function(){
     env.Keen = initialKeen;
-    return Core;
+    return Client;
   };
-  Core.prototype.configure = function(obj){
+  Client.prototype.configure = function(obj){
     var config = obj || {};
     this.config = this.config || {
       projectId    : undefined,
@@ -3722,7 +3717,7 @@ var Emitter = require('component-emitter');
       host         : 'api.keen.io',
       protocol     : 'https',
       requestType  : 'jsonp',
-      resources    : extend({}, Core.resources)
+      resources    : extend({}, Client.resources)
     };
     if ('undefined' !== typeof document && document.all) {
       config.protocol = (document.location.protocol !== 'https:') ? 'http' : 'https';
@@ -3733,12 +3728,17 @@ var Emitter = require('component-emitter');
     extend(this.config, config);
     return this;
   };
-  Core.prototype.projectId = function(str){
+  Client.prototype.masterKey = function(str){
+    if (!arguments.length) return this.config.masterKey;
+    this.config.masterKey = str ? String(str) : null;
+    return this;
+  };
+  Client.prototype.projectId = function(str){
     if (!arguments.length) return this.config.projectId;
     this.config.projectId = (str ? String(str) : null);
     return this;
   };
-  Core.prototype.resources = function(obj){
+  Client.prototype.resources = function(obj){
     if (!arguments.length) return this.config.resources;
     var self = this;
     if (typeof obj === 'object') {
@@ -3748,9 +3748,9 @@ var Emitter = require('component-emitter');
     }
     return self;
   };
-  Core.prototype.url = function(name){
+  Client.prototype.url = function(name){
     var args = Array.prototype.slice.call(arguments, 1),
-        baseUrl = Core.resources.base || '{protocol}://{host}',
+        baseUrl = Client.resources.base || '{protocol}://{host}',
         path;
     if (name && typeof name === 'string') {
       if (this.config.resources[name]) {
@@ -3783,14 +3783,14 @@ var Emitter = require('component-emitter');
     return path;
   };
   if (env) {
-    env.Keen = Core;
+    env.Keen = Client;
   }
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = Core;
+    module.exports = Client;
   }
   if (typeof define !== 'undefined' && define.amd) {
-    define('keen-core', [], function(){
-      return Core;
+    define('keen-Client', [], function(){
+      return Client;
     });
   }
 }).call(this, typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {});
