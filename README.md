@@ -113,7 +113,6 @@ $ bower install keen-analysis
 The client instance is the core of the library and will be required for all API-related functionality. The client variable defined below will also be used throughout this document.
 
 ```javascript
-// Extends keen-tracking.js client
 var client = new Keen({
     projectId: 'YOUR_PROJECT_ID',
     readKey: 'YOUR_READ_KEY'
@@ -190,7 +189,7 @@ client
   });
 ```
 
-As an added convenience, API URLs can be generated using the `client.url()` method from [keen-tracking.js](https://github.com/keen/keen-tracking.js).
+As an added convenience, API URLs can be generated using the `client.url()`.
 
 ### Example GET request
 
