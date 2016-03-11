@@ -3666,7 +3666,8 @@ process.umask = function() { return 0; };
 (function (global){
 var each = require('./utils/each'),
     extend = require('./utils/extend'),
-    parseParams = require('./utils/parse-params');
+    parseParams = require('./utils/parse-params'),
+    serialize = require('./utils/serialize');
 var Emitter = require('component-emitter');
 (function(env){
   var initialKeen = typeof env.Keen !== 'undefined' ? env.Keen : undefined;
@@ -3696,7 +3697,8 @@ var Emitter = require('component-emitter');
     utils: {
       'each'        : each,
       'extend'      : extend,
-      'parseParams' : parseParams
+      'parseParams' : parseParams,
+      'serialize'   : serialize
     },
     version: '__VERSION__'
   });
@@ -3795,7 +3797,7 @@ var Emitter = require('component-emitter');
   }
 }).call(this, typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {});
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./utils/each":8,"./utils/extend":9,"./utils/parse-params":10,"component-emitter":12}],8:[function(require,module,exports){
+},{"./utils/each":8,"./utils/extend":9,"./utils/parse-params":10,"./utils/serialize":11,"component-emitter":12}],8:[function(require,module,exports){
 module.exports = each;
 function each(o, cb, s){
   var n;
