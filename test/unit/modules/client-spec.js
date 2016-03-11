@@ -26,17 +26,4 @@ describe('Client accessors', function(){
 
   });
 
-  describe('.masterKey()', function(){
-
-    it('should get the correct masterKey value', function(){
-      assert.equal(this.client.masterKey(), helpers.client.masterKey);
-    });
-
-    it('should set a masterKey value', function(){
-      this.client.masterKey('123');
-      assert.equal(this.client.config.masterKey, '123');
-    });
-
-  });
-
 });

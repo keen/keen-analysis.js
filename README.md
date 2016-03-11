@@ -2,9 +2,10 @@
 
 This project contains the most reliable and efficient data analysis functionality available for Keen IO, and will soon be built directly into [keen-js](https://github.com/keen/keen-js), replacing and upgrading the current analysis capabilities of that library.
 
+Looking for tracking capabilities? Check out [keen-tracking.js](https://github.com/keen/keen-tracking.js).
+
 **What's new:**
 
-* Includes and extends [keen-tracking.js](https://github.com/keen/keen-tracking.js) functionality
 * Asynchronous requests now return Promises, powered by [Bluebird (core)](https://github.com/petkaantonov/bluebird); a fully featured promise library with focus on innovative features and performance
 * Breaking changes from [keen-js](https://github.com/keen/keen-js): [learn more about upgrading](#upgrading-from-keen-js)
 
@@ -22,11 +23,56 @@ If you haven't done so already, login to Keen IO to create a project. The Projec
 <a name="upgrading-from-keen-js"></a>
 **Upgrading from keen-js:**
 
-There are several breaking changes from [keen-js](https://github.com/keen/keen-js). Since this library includes and extends [keen-tracking.js](https://github.com/keen/keen-tracking.js), please review those [upgrade notes](https://github.com/keen/keen-tracking.js/blob/master/README.md#upgrading-from-keen-js) as well.
+There are several breaking changes from [keen-js](https://github.com/keen/keen-js).
 
 * **All new HTTP methods:** [keen-js](https://github.com/keen/keen-js) supports generic HTTP methods (`.get()`, `.post()`, `.put()`, and `.del()`) for interacting with various API resources. The new Promise-backed design of this SDK necessitated a full rethinking of how these methods behave.
 * **camelCase conversion:** previously, query parameters could be provided to a `Keen.Query` object in camelCase format, and would be converted to the underscore format that the API requires. Eg: `eventCollection` would be converted to `event_collection` before being sent to the API. This pattern has caused plenty of confusion, so we have axed this conversion entirely. All query parameters must be supplied in the format outlined by the [API reference](https://keen.io/docs/api) (`event_collection`).
 * **`Keen.Request` object has been removed:** this object is no longer necessary for managing query requests.
+* **Redesigned implementation of `client.url()`:** This method previously included `https://api.keen.io/3.0/projects/PROJECT_ID` plus a `path` argument ('/events/whatever'). This design severely limited its utility, so we've revamped this method.
+
+This method now references an internal collection of resource paths, and constructs URLs using client configuration properties like `host` and `projectId`:
+
+```javascript
+var url = client.url('projectId');
+// Renders {protocol}://{host}/3.0/projects/{projectId}
+// Returns https://api.keen.io/3.0/projects/PROJECT_ID
+```
+
+Default resources:
+
+* 'base': '`{protocol}`://`{host}`',
+* 'version': '`{protocol}`://`{host}`/3.0',
+* 'projects': '`{protocol}`://`{host}`/3.0/projects',
+* 'projectId': '`{protocol}`://`{host}`/3.0/projects/`{projectId}`',
+* 'queries': '`{protocol}`://`{host}`/3.0/projects/`{projectId}`/queries'
+
+Non-matching strings will be appended to the `base` resource, like so:
+
+```javascript
+var url = client.url('/3.0/projects');
+// Returns https://api.keen.io/3.0/projects
+```
+
+You can also pass in an object to append a serialized query string to the result, like so:
+
+```javascript
+var url = client.url('events', { api_key: 'YOUR_API_KEY' });
+// Returns https://api.keen.io/3.0/projects/PROJECT_ID/events?api_key=YOUR_API_KEY
+```
+
+Resources can be returned or added with the `client.resources()` method, like so:
+
+```javascript
+client.resources()
+// Returns client.config.resources object
+
+client.resources({
+  'new': '{protocol}://analytics.mydomain.com/my-custom-endpoint/{projectId}'
+});
+client.url('new');
+// Returns 'https://analytics.mydomain.com/my-custom-endpoint/PROJECT_ID'
+```
+
 
 <a name="additional-resources"></a>
 **Additional resources:**
@@ -51,7 +97,7 @@ Need a hand with something? Shoot us an email at [team@keen.io](mailto:team@keen
 Include [keen-analysis.js](dist/keen-analysis.js) within your page or project.
 
 ```html
-<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-0.1.1.js'></script>
+<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-1.0.0.js'></script>
 ```
 
 This library can also be installed via npm or bower:
@@ -69,7 +115,6 @@ $ bower install keen-analysis
 The client instance is the core of the library and will be required for all API-related functionality. The client variable defined below will also be used throughout this document.
 
 ```javascript
-// Extends keen-tracking.js client
 var client = new Keen({
     projectId: 'YOUR_PROJECT_ID',
     readKey: 'YOUR_READ_KEY'
@@ -146,7 +191,7 @@ client
   });
 ```
 
-As an added convenience, API URLs can be generated using the `client.url()` method from [keen-tracking.js](https://github.com/keen/keen-tracking.js).
+As an added convenience, API URLs can be generated using the `client.url()`.
 
 ### Example GET request
 
