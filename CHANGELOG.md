@@ -1,3 +1,10 @@
+<a name="1.0.1"></a>
+# 1.0.1 Update to keen-core.js@0.0.3
+
+**New:**
+* Minor update imports keen-core.js@0.0.3 with `Keen.ready(fn)` handler and an internal `domReady` function
+
+
 <a name="1.0.0"></a>
 # 1.0.0 Remove keen-tracking.js
 

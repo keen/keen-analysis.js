@@ -1,6 +1,6 @@
 {
   "name": "keen-analysis",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Data Analysis SDK for Keen IO",
   "main": "lib/index.js",
   "browser": {
@@ -21,7 +21,7 @@
   "homepage": "https://github.com/keen/keen-analysis.js#readme",
   "dependencies": {
     "bluebird": "^3.2.1",
-    "keen-core": "0.0.2"
+    "keen-core": "0.0.3"
   },
   "devDependencies": {
     "browserify": "^12.0.1",
