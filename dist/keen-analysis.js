@@ -3711,6 +3711,14 @@ var Emitter = require('component-emitter');
     env.Keen = initialKeen;
     return Client;
   };
+  Client.ready = function(fn){
+    if (Client.loaded) {
+      fn();
+    }
+    else {
+      Client.once('ready', fn);
+    }
+  };
   Client.prototype.configure = function(obj){
     var config = obj || {};
     this.config = this.config || {
@@ -3784,17 +3792,41 @@ var Emitter = require('component-emitter');
     });
     return path;
   };
+  domReady(function(){
+    Client.loaded = true;
+    Client.emit('ready');
+  });
+  function domReady(fn){
+    if (Client.loaded || typeof document === 'undefined') {
+      fn();
+      return;
+    }
+    if(document.readyState == null && document.addEventListener){
+      document.addEventListener('DOMContentLoaded', function DOMContentLoaded(){
+        document.removeEventListener('DOMContentLoaded', DOMContentLoaded, false);
+        document.readyState = 'complete';
+      }, false);
+      document.readyState = 'loading';
+    }
+    testDom(fn);
+  }
+  function testDom(fn){
+    if (/in/.test(document.readyState)) {
+      setTimeout(function(){
+        testDom(fn);
+      }, 9);
+    }
+    else {
+      fn();
+    }
+  }
   if (env) {
     env.Keen = Client;
   }
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = Client;
   }
-  if (typeof define !== 'undefined' && define.amd) {
-    define('keen-core', [], function(){
-      return Client;
-    });
-  }
+  /* RequireJS defintion not necessary */
 }).call(this, typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {});
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./utils/each":8,"./utils/extend":9,"./utils/parse-params":10,"./utils/serialize":11,"component-emitter":12}],8:[function(require,module,exports){
