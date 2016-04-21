@@ -32,6 +32,13 @@ describe('Request methods', function(){
     });
   });
 
+  describe('.headers()', function(){
+    it('should set the given headers value', function(){
+      var req = this.client.headers({'x-custom-header':'123'}).get('/test')
+      assert.equal(req.config.headers['x-custom-header'], '123');
+    });
+  });
+
   describe('.query()', function(){
 
     it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', function(done){
