@@ -7,7 +7,7 @@
     "./lib/utils/http-server.js": "./lib/utils/http-browser.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test:unit"
   },
   "repository": {
     "type": "git",
