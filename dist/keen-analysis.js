@@ -152,13 +152,30 @@ function request(method){
       'method'  : method,
       'params'  : undefined,
       'timeout' : 300 * 1000,
-      'url'     : str
+      'url'     : str,
+      'headers' : {
+        'Authorization' : '',
+        'Content-type'  : 'application/json'
+      }
     };
     return this;
   }.bind(this);
 }
 request.prototype.auth = function(str){
-  this.config.api_key = typeof str === 'string' ? str : undefined;
+  if (typeof str === 'string') {
+    this.config.api_key = typeof str === 'string' ? str : undefined;
+    this.headers({
+      'Authorization': str
+    });
+  }
+  return this;
+};
+request.prototype.headers = function(obj){
+  if (typeof obj === 'object') {
+    each(obj, function(value, key){
+      this.config['headers'][key] = value;
+    }.bind(this));
+  }
   return this;
 };
 request.prototype.timeout = function(num){
@@ -300,8 +317,11 @@ function sendXhr(method, config, callback){
   };
   if (method !== 'GET') {
     xhr.open(method, url, true);
-    xhr.setRequestHeader('Authorization', config.api_key);
-    xhr.setRequestHeader('Content-type', 'application/json');
+    each(config.headers, function(value, key){
+      if (typeof value === 'string') {
+        xhr.setRequestHeader(key, value);
+      }
+    });
     if (config.params) {
       xhr.send( JSON.stringify(config.params) );
     }
