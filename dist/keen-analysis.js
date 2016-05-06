@@ -338,6 +338,11 @@ function sendXhr(method, config, callback){
       url += serialize(config.params);
     }
     xhr.open(method, url, true);
+    each(config.headers, function(value, key){
+      if (typeof value === 'string') {
+        xhr.setRequestHeader(key, value);
+      }
+    });
     xhr.send();
   }
   return xhr;
