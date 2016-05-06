@@ -1,3 +1,10 @@
+<a name="1.1.0"></a>
+# 1.1.0 Support custom headers
+
+**New:**
+* A new `.headers()` method has been added to the request chain to set custom headers and update/remove default headers
+
+
 <a name="1.0.1"></a>
 # 1.0.1 Update to keen-core.js@0.0.3
 

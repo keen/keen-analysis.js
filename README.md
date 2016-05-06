@@ -97,7 +97,7 @@ Need a hand with something? Shoot us an email at [team@keen.io](mailto:team@keen
 Include [keen-analysis.js](dist/keen-analysis.js) within your page or project.
 
 ```html
-<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-1.0.1.js'></script>
+<script src='//d26b395fwzu5fz.cloudfront.net/keen-analysis-1.1.0.js'></script>
 ```
 
 This library can also be installed via npm or bower:
@@ -170,6 +170,7 @@ The following HTTP methods are exposed on the client instance:
 These HTTP methods take a URL (string) as a single argument and return an internal request object with several methods that configure and execute the request, finally returning a promise for the asynchronous response. These methods include:
 
 * `.auth(string)`: sets the API_KEY as an Authorization header
+* `.headers(object)`: sets headers to apply to the request
 * `.timeout(number)`: sets a timeout value (default is 300 seconds)
 * `.send()`: handles an optional object of parameters, executes the request and returns a promise
 
