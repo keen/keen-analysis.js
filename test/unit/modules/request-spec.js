@@ -32,6 +32,13 @@ describe('Request methods', function(){
     });
   });
 
+  describe('.headers()', function(){
+    it('should set the given headers value', function(){
+      var req = this.client.get('./').headers({'x-custom-header':'123'});
+      assert.equal(req.config.headers['x-custom-header'], '123');
+    });
+  });
+
   describe('.query()', function(){
 
     it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', function(done){
@@ -68,7 +75,7 @@ describe('Request methods', function(){
     it('should make a GET request to a saved query endpoint, returning a response when successful', function(done){
       this.timeout(300 * 1000);
       this.client
-        .query('saved', 'saved-query-test')
+        .query('saved', 'clicks')
         .then(function(res){
           assert.isObject(res);
           assert.isObject(res.query);
@@ -90,7 +97,7 @@ describe('Request methods', function(){
     it('should return an error when incorrect arguments are provided', function(done){
       this.timeout(300 * 1000);
       this.client
-        .query('saved/saved-query-test')
+        .query('saved/clicks')
         .then(done)
         .catch(function(err){
           done();

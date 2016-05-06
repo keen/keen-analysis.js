@@ -1,13 +1,13 @@
 {
   "name": "keen-analysis",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Data Analysis SDK for Keen IO",
   "main": "lib/index.js",
   "browser": {
     "./lib/utils/http-server.js": "./lib/utils/http-browser.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test:unit"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,7 @@
   "devDependencies": {
     "browserify": "^12.0.1",
     "del": "^2.1.0",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-awspublish": "^3.0.1",
     "gulp-connect": "^2.2.0",
     "gulp-mocha": "^2.2.0",
