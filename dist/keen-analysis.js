@@ -3717,7 +3717,7 @@ process.umask = function() { return 0; };
     debug: false,
     enabled: true,
     loaded: false,
-    version: '__VERSION__'
+    version: '1.2.0'
   });
   Client.helpers = Client.helpers || {};
   Client.resources = Client.resources || {};

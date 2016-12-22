@@ -9,6 +9,7 @@ var aws = require('gulp-awspublish')
     mocha = require('gulp-mocha'),
     mochaPhantomJS = require('gulp-mocha-phantomjs'),
     rename = require('gulp-rename'),
+    replace = require('gulp-replace'),
     squash = require('gulp-remove-empty-lines'),
     strip = require('gulp-strip-comments'),
     through2 = require('through2'),
@@ -33,6 +34,7 @@ gulp.task('build:browserify', function(){
     }))
     .pipe(strip({ line: true }))
     .pipe(squash())
+    .pipe(replace('__VERSION__', pkg.version))
     .pipe(rename(pkg.name + '.js'))
     .pipe(gulp.dest('./dist/'));
 });
@@ -80,6 +82,7 @@ gulp.task('test:browserify', function(){
     }))
     .pipe(strip({ line: true }))
     .pipe(squash())
+    .pipe(replace('__VERSION__', pkg.version))
     .pipe(rename('browserified-tests.js'))
     .pipe(gulp.dest('./test/unit/build'));
 });
