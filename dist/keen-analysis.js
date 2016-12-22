@@ -1,19 +1,21 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
-var K = require('keen-core');
-var Promise = require('./utils/promise');
-var each = require('keen-core/lib/utils/each'),
-    extend = require('keen-core/lib/utils/extend');
-var request = require('./request');
 (function(env){
-  K.resources.queries = '{protocol}://{host}/3.0/projects/{projectId}/queries';
-  extend(K.prototype, request);
-  K.prototype.readKey = function(str){
+  var KeenLibrary = require('keen-core');
+  var Promise = require('./utils/promise');
+  var each = require('keen-core/lib/utils/each'),
+      extend = require('keen-core/lib/utils/extend');
+  var request = require('./request');
+  extend(KeenLibrary.resources, {
+    'queries': '{protocol}://{host}/3.0/projects/{projectId}/queries'
+  });
+  extend(KeenLibrary.prototype, request);
+  KeenLibrary.prototype.readKey = function(str){
     if (!arguments.length) return this.config.readKey;
     this.config.readKey = str ? String(str) : null;
     return this;
   };
-  K.prototype.query = function(a, b){
+  KeenLibrary.prototype.query = function(a, b){
     if (a && b && typeof b === 'string') {
       if (b.indexOf('/result') < 0) {
         b += '/result';
@@ -37,8 +39,8 @@ var request = require('./request');
       });
     }
   };
-  K.Query = Query;
-  K.prototype.run = function(q, callback){
+  KeenLibrary.Query = Query;
+  KeenLibrary.prototype.run = function(q, callback){
     var self = this,
         cb = callback,
         queries,
@@ -51,7 +53,7 @@ var request = require('./request');
       if (typeof query === 'string') {
         promises.push(self.query('saved', query + '/result'));
       }
-      else if (query instanceof K.Query) {
+      else if (query instanceof KeenLibrary.Query) {
         promises.push(self.query(query.analysis, extend({ analysis_type: query.analysis }, query.params)));
       }
     });
@@ -121,20 +123,18 @@ var request = require('./request');
     });
     return this;
   };
-  if (env) {
-    env.Keen = K;
-  }
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = K;
+    module.exports = KeenLibrary;
   }
   if (typeof define !== 'undefined' && define.amd) {
     define('keen-analysis', [], function(){
-      return K;
+      return KeenLibrary;
     });
   }
+  env.Keen = KeenLibrary.extendLibrary(KeenLibrary);
 }).call(this, typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {});
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./request":2,"./utils/promise":4,"keen-core":7,"keen-core/lib/utils/each":8,"keen-core/lib/utils/extend":9}],2:[function(require,module,exports){
+},{"./request":2,"./utils/promise":4,"keen-core":8,"keen-core/lib/utils/each":9,"keen-core/lib/utils/extend":10}],2:[function(require,module,exports){
 var Promise = require('./utils/promise');
 var each = require('keen-core/lib/utils/each'),
     extend = require('keen-core/lib/utils/extend'),
@@ -220,7 +220,7 @@ function getAnalysisType(str){
   var split = str.split('/queries/');
   return split[split.length-1];
 }
-},{"./utils/http-server":3,"./utils/promise":4,"keen-core/lib/utils/each":8,"keen-core/lib/utils/extend":9}],3:[function(require,module,exports){
+},{"./utils/http-server":3,"./utils/promise":4,"keen-core/lib/utils/each":9,"keen-core/lib/utils/extend":10}],3:[function(require,module,exports){
 var each = require('keen-core/lib/utils/each'),
     serialize = require('keen-core/lib/utils/serialize');
 module.exports = {
@@ -433,7 +433,7 @@ function sendJsonp(config, callback){
     parent.removeChild(script);
   }
 }
-},{"keen-core/lib/utils/each":8,"keen-core/lib/utils/serialize":11}],4:[function(require,module,exports){
+},{"keen-core/lib/utils/each":9,"keen-core/lib/utils/serialize":12}],4:[function(require,module,exports){
 var Bluebird = require('bluebird/js/browser/bluebird.core');
 Bluebird.config({
   cancellation: true,
@@ -3688,14 +3688,15 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 },{}],7:[function(require,module,exports){
+/** * Expose `Emitter`. */if (typeof module !== 'undefined') {  module.exports = Emitter;}/** * Initialize a new `Emitter`. * * @api public */function Emitter(obj) {  if (obj) return mixin(obj);};/** * Mixin the emitter properties. * * @param {Object} obj * @return {Object} * @api private */function mixin(obj) {  for (var key in Emitter.prototype) {    obj[key] = Emitter.prototype[key];  }  return obj;}/** * Listen on the given `event` with `fn`. * * @param {String} event * @param {Function} fn * @return {Emitter} * @api public */Emitter.prototype.on =Emitter.prototype.addEventListener = function(event, fn){  this._callbacks = this._callbacks || {};  (this._callbacks['$' + event] = this._callbacks['$' + event] || [])    .push(fn);  return this;};/** * Adds an `event` listener that will be invoked a single * time then automatically removed. * * @param {String} event * @param {Function} fn * @return {Emitter} * @api public */Emitter.prototype.once = function(event, fn){  function on() {    this.off(event, on);    fn.apply(this, arguments);  }  on.fn = fn;  this.on(event, on);  return this;};/** * Remove the given callback for `event` or all * registered callbacks. * * @param {String} event * @param {Function} fn * @return {Emitter} * @api public */Emitter.prototype.off =Emitter.prototype.removeListener =Emitter.prototype.removeAllListeners =Emitter.prototype.removeEventListener = function(event, fn){  this._callbacks = this._callbacks || {};  if (0 == arguments.length) {    this._callbacks = {};    return this;  }  var callbacks = this._callbacks['$' + event];  if (!callbacks) return this;  if (1 == arguments.length) {    delete this._callbacks['$' + event];    return this;  }  var cb;  for (var i = 0; i < callbacks.length; i++) {    cb = callbacks[i];    if (cb === fn || cb.fn === fn) {      callbacks.splice(i, 1);      break;    }  }  return this;};/** * Emit `event` with the given args. * * @param {String} event * @param {Mixed} ... * @return {Emitter} */Emitter.prototype.emit = function(event){  this._callbacks = this._callbacks || {};  var args = [].slice.call(arguments, 1)    , callbacks = this._callbacks['$' + event];  if (callbacks) {    callbacks = callbacks.slice(0);    for (var i = 0, len = callbacks.length; i < len; ++i) {      callbacks[i].apply(this, args);    }  }  return this;};/** * Return array of callbacks for `event`. * * @param {String} event * @return {Array} * @api public */Emitter.prototype.listeners = function(event){  this._callbacks = this._callbacks || {};  return this._callbacks['$' + event] || [];};/** * Check if this emitter has `event` handlers. * * @param {String} event * @return {Boolean} * @api public */Emitter.prototype.hasListeners = function(event){  return !! this.listeners(event).length;};},{}],8:[function(require,module,exports){
 (function (global){
-var each = require('./utils/each'),
-    extend = require('./utils/extend'),
-    parseParams = require('./utils/parse-params'),
-    serialize = require('./utils/serialize');
-var Emitter = require('component-emitter');
 (function(env){
-  var previousKeen = typeof env.Keen !== 'undefined' ? env.Keen : undefined;
+  var previousKeen = env.Keen || undefined;
+  var each = require('./utils/each'),
+      extend = require('./utils/extend'),
+      parseParams = require('./utils/parse-params'),
+      serialize = require('./utils/serialize');
+  var Emitter = require('component-emitter');
   function Client(props){
     if (this instanceof Client === false) {
       return new Client(props);
@@ -3707,23 +3708,18 @@ var Emitter = require('component-emitter');
     this.emit('ready');
     Client.emit('client', this);
   }
+  if (previousKeen && typeof previousKeen.resources === 'undefined') {
+    Client.legacyVersion = previousKeen;
+  }
   Emitter(Client);
   Emitter(Client.prototype);
-  if (previousKeen) {
-    extend(Client, previousKeen);
-    if (typeof previousKeen.resources === 'object') {
-      extend(Client.prototype, previousKeen.prototype);
-    }
-    else {
-      Client.legacyVersion = previousKeen;
-    }
-  }
   extend(Client, {
     debug: false,
     enabled: true,
     loaded: false,
     version: '__VERSION__'
   });
+  Client.helpers = Client.helpers || {};
   Client.resources = Client.resources || {};
   extend(Client.resources, {
     'base'      : '{protocol}://{host}',
@@ -3738,13 +3734,31 @@ var Emitter = require('component-emitter');
     'parseParams' : parseParams,
     'serialize'   : serialize
   });
+  Client.extendLibrary = function(target, source) {
+    var previous = previousKeen || source;
+    if (typeof previous !== 'undefined') {
+      each(previous, function(value, key) {
+        if (typeof value === 'object') {
+          target[key] = target[key] || {};
+          extend(target[key], value);
+        }
+        else {
+          target[key] = target[key] || value;
+        }
+      });
+      extend(target.prototype, previous.prototype);
+    }
+    return target;
+  };
   Client.log = function(str){
     if (Client.debug && typeof console === 'object') {
       console.log('[Keen]', str);
     }
   };
   Client.noConflict = function(){
-    env.Keen = Client.legacyVersion || previousKeen;
+    if (typeof env.Keen !== 'undefined') {
+      env.Keen = Client.legacyVersion || previousKeen;
+    }
     return Client;
   };
   Client.ready = function(fn){
@@ -3856,13 +3870,13 @@ var Emitter = require('component-emitter');
       fn();
     }
   }
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = Client;
+  function isUndefined(target) {
+    return typeof target === 'undefined';
   }
-  /* RequireJS defintion not necessary */
+  module.exports = Client;
 }).call(this, typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {});
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./utils/each":8,"./utils/extend":9,"./utils/parse-params":10,"./utils/serialize":11,"component-emitter":12}],8:[function(require,module,exports){
+},{"./utils/each":9,"./utils/extend":10,"./utils/parse-params":11,"./utils/serialize":12,"component-emitter":7}],9:[function(require,module,exports){
 module.exports = each;
 function each(o, cb, s){
   var n;
@@ -3887,7 +3901,7 @@ function each(o, cb, s){
   }
   return 1;
 }
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = extend;
 function extend(target){
   for (var i = 1; i < arguments.length; i++) {
@@ -3897,7 +3911,7 @@ function extend(target){
   }
   return target;
 };
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = parseParams;
 function parseParams(str){
   var urlParams = {},
@@ -3911,7 +3925,7 @@ function parseParams(str){
   }
   return urlParams;
 };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var each = require('./each'),
     extend = require('./extend');
 module.exports = serialize;
@@ -3925,5 +3939,4 @@ function serialize(data){
   });
   return query.join('&');
 }
-},{"./each":8,"./extend":9}],12:[function(require,module,exports){
-/** * Expose `Emitter`. */if (typeof module !== 'undefined') {  module.exports = Emitter;}/** * Initialize a new `Emitter`. * * @api public */function Emitter(obj) {  if (obj) return mixin(obj);};/** * Mixin the emitter properties. * * @param {Object} obj * @return {Object} * @api private */function mixin(obj) {  for (var key in Emitter.prototype) {    obj[key] = Emitter.prototype[key];  }  return obj;}/** * Listen on the given `event` with `fn`. * * @param {String} event * @param {Function} fn * @return {Emitter} * @api public */Emitter.prototype.on =Emitter.prototype.addEventListener = function(event, fn){  this._callbacks = this._callbacks || {};  (this._callbacks['$' + event] = this._callbacks['$' + event] || [])    .push(fn);  return this;};/** * Adds an `event` listener that will be invoked a single * time then automatically removed. * * @param {String} event * @param {Function} fn * @return {Emitter} * @api public */Emitter.prototype.once = function(event, fn){  function on() {    this.off(event, on);    fn.apply(this, arguments);  }  on.fn = fn;  this.on(event, on);  return this;};/** * Remove the given callback for `event` or all * registered callbacks. * * @param {String} event * @param {Function} fn * @return {Emitter} * @api public */Emitter.prototype.off =Emitter.prototype.removeListener =Emitter.prototype.removeAllListeners =Emitter.prototype.removeEventListener = function(event, fn){  this._callbacks = this._callbacks || {};  if (0 == arguments.length) {    this._callbacks = {};    return this;  }  var callbacks = this._callbacks['$' + event];  if (!callbacks) return this;  if (1 == arguments.length) {    delete this._callbacks['$' + event];    return this;  }  var cb;  for (var i = 0; i < callbacks.length; i++) {    cb = callbacks[i];    if (cb === fn || cb.fn === fn) {      callbacks.splice(i, 1);      break;    }  }  return this;};/** * Emit `event` with the given args. * * @param {String} event * @param {Mixed} ... * @return {Emitter} */Emitter.prototype.emit = function(event){  this._callbacks = this._callbacks || {};  var args = [].slice.call(arguments, 1)    , callbacks = this._callbacks['$' + event];  if (callbacks) {    callbacks = callbacks.slice(0);    for (var i = 0, len = callbacks.length; i < len; ++i) {      callbacks[i].apply(this, args);    }  }  return this;};/** * Return array of callbacks for `event`. * * @param {String} event * @return {Array} * @api public */Emitter.prototype.listeners = function(event){  this._callbacks = this._callbacks || {};  return this._callbacks['$' + event] || [];};/** * Check if this emitter has `event` handlers. * * @param {String} event * @return {Boolean} * @api public */Emitter.prototype.hasListeners = function(event){  return !! this.listeners(event).length;};},{}]},{},[1]);
+},{"./each":9,"./extend":10}]},{},[1]);
