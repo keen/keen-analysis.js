@@ -1,3 +1,18 @@
+<!--
+<a name="{version}"></a>
+# {version}
+**FIXED:**
+**NEW:**
+**BREAKING:**
+**CHANGE:**
+-->
+<a name="1.2.0"></a>
+# 1.2.0 Global Namespace Fix
+
+**FIXED:**
+* This library will now coalesce into a shared global `Keen` namespace, rather than colliding and overwriting other modular SDKs. Check out [keen-core.js@0.1.0](https://github.com/keen/keen-core.js/blob/master/CHANGELOG.md#010-manage-modular-namespace) for details about this fix.
+
+
 <a name="1.1.0"></a>
 # 1.1.0 Support custom headers
 
