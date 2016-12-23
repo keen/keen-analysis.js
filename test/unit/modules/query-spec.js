@@ -103,7 +103,10 @@ describe('Keen.Query', function(){
           assert.isArray(res);
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          console.log('ERROR!', err);
+          done();
+        });
     });
 
   });

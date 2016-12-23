@@ -27,7 +27,9 @@ describe('HTTP methods', function(){
         .then(function(res){
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          done();
+        });
     });
 
     it('should make a GET request with data to an API endpoint', function(done){
@@ -43,7 +45,9 @@ describe('HTTP methods', function(){
         .then(function(res){
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          done();
+        });
     });
 
   });
@@ -62,7 +66,9 @@ describe('HTTP methods', function(){
         .then(function(res){
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          done();
+        });
     });
 
   });
