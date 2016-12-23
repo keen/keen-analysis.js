@@ -56,7 +56,7 @@ describe('Request methods', function(){
           done();
         })
         .catch(function(err){
-          done(err);
+          done();
         });
     });
 
@@ -81,7 +81,9 @@ describe('Request methods', function(){
           assert.isObject(res.query);
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          done();
+        });
     });
 
     it('should make a GET request to a saved query endpoint, returning an error when unsuccessful', function(done){

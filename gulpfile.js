@@ -24,7 +24,7 @@ gulp.task('default', ['build', 'connect', 'watch']);
 gulp.task('build', ['build:browserify', 'build:minify', 'test:browserify']);
 
 gulp.task('build:browserify', function(){
-  return gulp.src('./lib/index.js')
+  return gulp.src('./lib/browser.js')
     .pipe(through2.obj(function(file, enc, next){
       browserify(file.path)
         .bundle(function(err, res){
@@ -66,10 +66,6 @@ gulp.task('watch', ['build'], function() {
 // --------------------------------
 
 gulp.task('test:unit', ['test:phantom', 'test:mocha']);
-
-// gulp.task('test:clean', function(callback){
-//   del(['./test/unit/build'], callback);
-// });
 
 gulp.task('test:browserify', function(){
   return gulp.src('./test/unit/index.js')
