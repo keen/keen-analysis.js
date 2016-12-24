@@ -6,6 +6,13 @@
 **BREAKING:**
 **CHANGE:**
 -->
+<a name="1.2.2"></a>
+# 1.1.1 Fix Resource Mapping
+
+**NEW:**
+* This patch installs `keen-core@0.1.2` and removes the internal `queries` resource mapping (now in keen-core) to fix an issue with prototype inheritance and state.
+
+
 <a name="1.2.1"></a>
 # 1.2.1 Global Namespace Fix (Pt2)
 

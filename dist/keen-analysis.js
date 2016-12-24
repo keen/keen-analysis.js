@@ -17,9 +17,6 @@ var Promise = require('./utils/promise');
 var each = require('keen-core/lib/utils/each'),
     extend = require('keen-core/lib/utils/extend');
 var request = require('./request');
-extend(KeenLibrary.resources, {
-  'queries': '{protocol}://{host}/3.0/projects/{projectId}/queries'
-});
 extend(KeenLibrary.prototype, request);
 KeenLibrary.prototype.readKey = function(str){
   if (!arguments.length) return this.config.readKey;
@@ -3718,7 +3715,7 @@ process.umask = function() { return 0; };
     debug: false,
     enabled: true,
     loaded: false,
-    version: '1.2.1'
+    version: '1.2.2'
   });
   Client.helpers = Client.helpers || {};
   Client.resources = Client.resources || {};
@@ -3726,7 +3723,9 @@ process.umask = function() { return 0; };
     'base'      : '{protocol}://{host}',
     'version'   : '{protocol}://{host}/3.0',
     'projects'  : '{protocol}://{host}/3.0/projects',
-    'projectId' : '{protocol}://{host}/3.0/projects/{projectId}'
+    'projectId' : '{protocol}://{host}/3.0/projects/{projectId}',
+    'events'    : '{protocol}://{host}/3.0/projects/{projectId}/events',
+    'queries'   : '{protocol}://{host}/3.0/projects/{projectId}/queries'
   });
   Client.utils = Client.utils || {};
   extend(Client.utils, {
@@ -3811,7 +3810,7 @@ process.umask = function() { return 0; };
   };
   Client.prototype.url = function(name){
     var args = Array.prototype.slice.call(arguments, 1),
-        baseUrl = Client.resources.base || '{protocol}://{host}',
+        baseUrl = this.config.resources.base || '{protocol}://{host}',
         path;
     if (name && typeof name === 'string') {
       if (this.config.resources[name]) {
