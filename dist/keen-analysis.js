@@ -33,6 +33,12 @@ KeenLibrary.prototype.query = function(a, b){
       .auth(this.readKey())
       .send();
   }
+  else if (a === 'dataset' && typeof b === 'object') {
+    return this
+      .get(this.url('datasets', b.name, 'results'))
+      .auth(this.readKey())
+      .send(b);
+  }
   else if (a && b && typeof b === 'object') {
     var q = extend({ analysis_type: a }, b);
     return this
@@ -286,15 +292,22 @@ function sendXhr(method, config, callback){
     var response;
     if (xhr.readyState == 4) {
       if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          response = JSON.parse( xhr.responseText );
-          if (cb && response) {
-            cb(null, response);
+        if (xhr.status === 204) {
+          if (cb) {
+            cb(null, xhr);
           }
         }
-        catch (e) {
-          if (cb) {
-            cb(xhr, null);
+        else {
+          try {
+            response = JSON.parse( xhr.responseText );
+            if (cb && response) {
+              cb(null, response);
+            }
+          }
+          catch (e) {
+            if (cb) {
+              cb(xhr, null);
+            }
           }
         }
       }
@@ -3715,7 +3728,7 @@ process.umask = function() { return 0; };
     debug: false,
     enabled: true,
     loaded: false,
-    version: '1.2.2'
+    version: '1.3.0'
   });
   Client.helpers = Client.helpers || {};
   Client.resources = Client.resources || {};
@@ -3725,7 +3738,8 @@ process.umask = function() { return 0; };
     'projects'  : '{protocol}://{host}/3.0/projects',
     'projectId' : '{protocol}://{host}/3.0/projects/{projectId}',
     'events'    : '{protocol}://{host}/3.0/projects/{projectId}/events',
-    'queries'   : '{protocol}://{host}/3.0/projects/{projectId}/queries'
+    'queries'   : '{protocol}://{host}/3.0/projects/{projectId}/queries',
+    'datasets'  : '{protocol}://{host}/3.0/projects/{projectId}/datasets'
   });
   Client.utils = Client.utils || {};
   extend(Client.utils, {
@@ -3779,7 +3793,7 @@ process.umask = function() { return 0; };
       requestType  : 'jsonp',
       resources    : extend({}, Client.resources)
     };
-    if (typeof window !== 'undefined' && window.navigator.userAgent.indexOf('MSIE') > -1) {
+    if (typeof window !== 'undefined' && window.navigator && window.navigator.userAgent && window.navigator.userAgent.indexOf('MSIE') > -1) {
       config.protocol = document.location.protocol.replace(':', '');
     }
     if (config.host) {

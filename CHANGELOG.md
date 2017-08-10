@@ -14,6 +14,7 @@
 
 **FIXED:**
 * Syntax errors caused by a malformed JSON response are now caught properly (#22).
+* Successful delete responses (`204`s) are no longer handled as errors (#14).
 
 
 <a name="1.2.2"></a>
