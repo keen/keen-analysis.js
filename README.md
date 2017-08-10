@@ -45,6 +45,7 @@ Default resources:
 * 'projects': '`{protocol}`://`{host}`/3.0/projects',
 * 'projectId': '`{protocol}`://`{host}`/3.0/projects/`{projectId}`',
 * 'queries': '`{protocol}`://`{host}`/3.0/projects/`{projectId}`/queries'
+* 'datasets': '`{protocol}`://`{host}`/3.0/projects/`{projectId}`/datasets'
 
 Non-matching strings will be appended to the `base` resource, like so:
 
