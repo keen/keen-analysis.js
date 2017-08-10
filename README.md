@@ -158,6 +158,25 @@ client
   });
 ```
 
+### Cached datasets
+
+Note the special param `name` to specify the name of the cached dataset that you have already created.
+
+```javascript
+client
+  .query('dataset', {
+    name: 'my-cached-dataset',
+    index_by: 'customer.id',
+    timeframe: 'this_7_days'
+  })
+  .then(function(res){
+    // do something with the result
+  })
+  .catch(function(err){
+    // catch and handle errors
+  });
+```
+
 ## Access API Resources
 
 The following HTTP methods are exposed on the client instance:
