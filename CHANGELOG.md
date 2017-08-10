@@ -6,8 +6,18 @@
 **BREAKING:**
 **CHANGE:**
 -->
+<a name="1.3.0"></a>
+# 1.3.0 Support for Cached Datasets
+
+**NEW:**
+* This patch installs `keen-core@0.2.0` and updates the `client.query()` method to support fetching results from Cached Datasets (#21).
+
+**FIXED:**
+* Syntax errors caused by a malformed JSON response are now caught properly (#22).
+
+
 <a name="1.2.2"></a>
-# 1.1.1 Fix Resource Mapping
+# 1.2.2 Fix Resource Mapping
 
 **NEW:**
 * This patch installs `keen-core@0.1.2` and removes the internal `queries` resource mapping (now in keen-core) to fix an issue with prototype inheritance and state.
