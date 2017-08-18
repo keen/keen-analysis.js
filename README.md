@@ -51,7 +51,7 @@ client
     // Handle results
   })
   .catch(err => {
-    // Hanlde errors
+    // Handle errors
   });
 ```
 
@@ -74,7 +74,7 @@ client
     // Handle results
   })
   .catch(err => {
-    // Hanlde errors
+    // Handle errors
   });
 ```
 
@@ -100,7 +100,7 @@ client
     // Handle results
   })
   .catch(err => {
-    // Hanlde errors
+    // Handle errors
   });
 ```
 
