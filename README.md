@@ -32,7 +32,7 @@ If any of this is confusing, that's our fault and we would love to help. Join ou
 
 ### Setup and Running a Query
 
-Create a new `client` instance with your Project ID and Read Key. This client instance is the core of the library and will be required for all API-related functionality.
+Create a new `client` instance with your Project ID and Read Key, and use the `.query()` method to execute an ad-hoc query. This client instance is the core of the library and will be required for all API-related functionality.
 
 ```javascript
 import Keen from 'keen-analysis';
