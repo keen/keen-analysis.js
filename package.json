@@ -7,6 +7,7 @@
     "./lib/utils/http-server.js": "./lib/utils/http-browser.js"
   },
   "scripts": {
+    "build": "rollup lib/index.js --format umd --name keen-analysis --output dist/keen-analysis.js",
     "test": "gulp test:unit"
   },
   "repository": {
@@ -50,6 +51,7 @@
     "moment": "^2.10.6",
     "proclaim": "^3.4.0",
     "requirejs": "^2.1.22",
+    "rollup": "^0.50.0",
     "through2": "^2.0.0"
   }
 }
