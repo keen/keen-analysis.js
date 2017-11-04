@@ -1,5 +1,5 @@
 var helpers = require('../helpers/client-config');
-var KeenClient = require('../../../lib/index');
+var KeenClient = require('../../..')
 
 describe('HTTP methods', function(){
 

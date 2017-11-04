@@ -1,7 +1,7 @@
 var assert = require('proclaim');
 var helpers = require('../helpers/client-config');
 
-var KeenClient = require('../../../lib/index');
+var KeenClient = require('../../..')
 
 describe('Request methods', function(){
 
