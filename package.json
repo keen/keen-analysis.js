@@ -6,10 +6,10 @@
   "scripts": {
     "build": "npm run build:server && npm run build:browser && npm run build:minify",
     "build:browser": "rollup --config rollup.config.js",
-    "build:test": "rollup --config rollup.test.config.js",
     "build:server": "babel lib --out-dir dist",
     "build:minify": "uglifyjs dist/browser.js --output dist/browser.min.js --compress --mangle",
-    "test": "npm run test:mocha && npm run test:phantom",
+    "test": "npm run build:server && npm run test:rollup && npm run test:mocha && npm run test:phantom",
+    "test:rollup": "rollup --config rollup.test.config.js",
     "test:mocha": "mocha --reporter nyan --timeout 300000 test/unit/build/index.js",
     "test:phantom": "mocha-phantomjs --timeout 300000 ./test/unit/index.html -p $(which phantomjs)"
   },
