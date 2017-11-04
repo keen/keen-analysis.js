@@ -1,0 +1,9 @@
+{
+  "files.exclude": {
+    "node_modules": "explorerExcludedFiles",
+    "test/unit/build/*": "explorerExcludedFiles",
+    ".awspublish-keen-js": "explorerExcludedFiles",
+    ".DS_Store": "explorerExcludedFiles",
+    "demo.js": "explorerExcludedFiles"
+  }
+}

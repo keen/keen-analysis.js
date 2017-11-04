@@ -1,35 +1,44 @@
-import each from 'keen-core/lib/utils/each';
-import serialize from 'keen-core/lib/utils/serialize';
+'use strict';
 
-export var GET    = get
-export var POST   = post
-export var PUT    = put
-export var DELETE = del
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
 
+var _each = require('keen-core/lib/utils/each');
+
+var _each2 = _interopRequireDefault(_each);
+
+var _serialize = require('keen-core/lib/utils/serialize');
+
+var _serialize2 = _interopRequireDefault(_serialize);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var GET = exports.GET = get;
+var POST = exports.POST = post;
+var PUT = exports.PUT = put;
+var DELETE = exports.DELETE = del;
 
 // HTTP Handlers
 // ------------------------------
 
-function get(config, callback){
+function get(config, callback) {
   if (xhrObject()) {
     return sendXhr('GET', config, callback);
-  }
-  else if (xdrObject()){
+  } else if (xdrObject()) {
     return sendXdr('GET', config, callback);
-  }
-  else {
+  } else {
     return sendJsonp(config, callback);
   }
 }
 
-function post(config, callback){
+function post(config, callback) {
   if (xhrObject()) {
     return sendXhr('POST', config, callback);
-  }
-  else if (xdrObject()){
+  } else if (xdrObject()) {
     return sendXdr('POST', config, callback);
-  }
-  else {
+  } else {
     callback('XHR POST not supported', null);
   }
 }
@@ -37,8 +46,7 @@ function post(config, callback){
 function put(config, callback) {
   if (xhrObject()) {
     return sendXhr('PUT', config, callback);
-  }
-  else {
+  } else {
     callback('XHR PUT not supported', null);
   }
 }
@@ -46,12 +54,10 @@ function put(config, callback) {
 function del(config, callback) {
   if (xhrObject()) {
     return sendXhr('DELETE', config, callback);
-  }
-  else {
+  } else {
     callback('XHR DELETE not supported', null);
   }
 }
-
 
 // XMLHttpRequest Support
 // ------------------------------
@@ -59,24 +65,32 @@ function del(config, callback) {
 function xhrObject() {
   var root = 'undefined' == typeof window ? this : window;
   if (root.XMLHttpRequest && ('file:' != root.location.protocol || !root.ActiveXObject)) {
-    return new XMLHttpRequest;
+    return new XMLHttpRequest();
   } else {
-    try { return new ActiveXObject('Microsoft.XMLHTTP'); } catch(e) {}
-    try { return new ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch(e) {}
-    try { return new ActiveXObject('Msxml2.XMLHTTP.3.0'); } catch(e) {}
-    try { return new ActiveXObject('Msxml2.XMLHTTP'); } catch(e) {}
+    try {
+      return new ActiveXObject('Microsoft.XMLHTTP');
+    } catch (e) {}
+    try {
+      return new ActiveXObject('Msxml2.XMLHTTP.6.0');
+    } catch (e) {}
+    try {
+      return new ActiveXObject('Msxml2.XMLHTTP.3.0');
+    } catch (e) {}
+    try {
+      return new ActiveXObject('Msxml2.XMLHTTP');
+    } catch (e) {}
   }
   return false;
 }
 
-function sendXhr(method, config, callback){
+function sendXhr(method, config, callback) {
   var xhr = xhrObject(),
       cb = callback,
       url = config.url;
 
   callback = null;
 
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     var response;
     if (xhr.readyState == 4) {
       if (xhr.status >= 200 && xhr.status < 300) {
@@ -84,29 +98,25 @@ function sendXhr(method, config, callback){
           if (cb) {
             cb(null, xhr);
           }
-        }
-        else {
+        } else {
           try {
-            response = JSON.parse( xhr.responseText );
+            response = JSON.parse(xhr.responseText);
             if (cb && response) {
               cb(null, response);
             }
-          }
-          catch (e) {
+          } catch (e) {
             if (cb) {
               cb(xhr, null);
             }
           }
         }
-      }
-      else {
+      } else {
         try {
-          response = JSON.parse( xhr.responseText );
+          response = JSON.parse(xhr.responseText);
           if (cb && response) {
             cb(response, null);
           }
-        }
-        catch (e) {
+        } catch (e) {
           if (cb) {
             cb(xhr, null);
           }
@@ -117,28 +127,26 @@ function sendXhr(method, config, callback){
 
   if (method !== 'GET') {
     xhr.open(method, url, true);
-    each(config.headers, function(value, key){
+    (0, _each2.default)(config.headers, function (value, key) {
       if (typeof value === 'string') {
         xhr.setRequestHeader(key, value);
       }
     });
     if (config.params) {
-      xhr.send( JSON.stringify(config.params) );
-    }
-    else {
+      xhr.send(JSON.stringify(config.params));
+    } else {
       xhr.send();
     }
-  }
-  else {
+  } else {
     url += '?';
     if (config.api_key) {
       url += 'api_key=' + config.api_key + '&';
     }
     if (config.params) {
-      url += serialize(config.params);
+      url += (0, _serialize2.default)(config.params);
     }
     xhr.open(method, url, true);
-    each(config.headers, function(value, key){
+    (0, _each2.default)(config.headers, function (value, key) {
       if (typeof value === 'string') {
         xhr.setRequestHeader(key, value);
       }
@@ -148,7 +156,6 @@ function sendXhr(method, config, callback){
 
   return xhr;
 }
-
 
 // XDomainRequest Support
 // ------------------------------
@@ -176,7 +183,7 @@ function sendXdr(method, config, callback) {
       handleResponse(xdr, null);
     };
 
-    xdr.onload = function() {
+    xdr.onload = function () {
       var response = JSON.parse(xdr.responseText);
       handleResponse(null, response);
     };
@@ -185,15 +192,14 @@ function sendXdr(method, config, callback) {
 
     setTimeout(function () {
       if (config['params']) {
-        xdr.send( serialize(config['params']) );
-      }
-      else {
+        xdr.send((0, _serialize2.default)(config['params']));
+      } else {
         xdr.send();
       }
     }, 0);
   }
 
-  function handleResponse(a, b){
+  function handleResponse(a, b) {
     if (cb && typeof cb === 'function') {
       cb(a, b);
       callback = cb = void 0;
@@ -203,11 +209,10 @@ function sendXdr(method, config, callback) {
   return xdr;
 }
 
-
 // JSON-P Support
 // ------------------------------
 
-function sendJsonp(config, callback){
+function sendJsonp(config, callback) {
   var url = config.url,
       cb = callback,
       timestamp = new Date().getTime(),
@@ -221,7 +226,7 @@ function sendJsonp(config, callback){
     callbackName += 'a';
   }
 
-  window[callbackName] = function(response) {
+  window[callbackName] = function (response) {
     if (loaded === true) {
       return;
     }
@@ -229,18 +234,18 @@ function sendJsonp(config, callback){
   };
 
   if (config.params) {
-    url += serialize(config.params);
+    url += (0, _serialize2.default)(config.params);
   }
 
   // Early IE (no onerror event)
-  script.onreadystatechange = function() {
+  script.onreadystatechange = function () {
     if (loaded === false && this.readyState === 'loaded') {
       handleResponse('An error occurred', null);
     }
   };
 
   // Not IE
-  script.onerror = function() {
+  script.onerror = function () {
     // on IE9 both onerror and onreadystatechange are called
     if (loaded === false) {
       handleResponse('An error occurred', null);
@@ -250,7 +255,7 @@ function sendJsonp(config, callback){
   script.src = url + '&jsonp=' + callbackName;
   parent.appendChild(script);
 
-  function handleResponse(a, b){
+  function handleResponse(a, b) {
     loaded = true;
     if (cb && typeof cb === 'function') {
       cb(a, b);
@@ -259,8 +264,7 @@ function sendJsonp(config, callback){
     window[callbackName] = undefined;
     try {
       delete window[callbackName];
-    } catch(e){};
+    } catch (e) {};
     parent.removeChild(script);
   }
-
 }

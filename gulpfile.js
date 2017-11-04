@@ -2,46 +2,57 @@ var gulp = require('gulp'),
     pkg = require('./package.json');
 
 var aws = require('gulp-awspublish')
-    browserify = require('browserify'),
+    rollup = require('rollup-stream'),
+    commonjs = require('rollup-plugin-commonjs'),
+    resolve = require('rollup-plugin-node-resolve'),
+    babel = require('rollup-plugin-babel'),
+    source = require('vinyl-source-stream'),
+    buffer = require('vinyl-buffer'),
     connect = require('gulp-connect'),
-    compress = require('gulp-yuicompressor'),
     karma = require('karma').Server,
     mocha = require('gulp-mocha'),
     mochaPhantomJS = require('gulp-mocha-phantomjs'),
     rename = require('gulp-rename'),
     replace = require('gulp-replace'),
-    squash = require('gulp-remove-empty-lines'),
-    strip = require('gulp-strip-comments'),
-    through2 = require('through2'),
     uglify = require('gulp-uglify'),
     util = require('gulp-util');
 
 gulp.task('default', ['build', 'connect', 'watch']);
 
+function bundle(options) {
+  return rollup({
+    input: options.input,
+    format: 'umd',
+    name: options.name,
+    plugins: [
+      resolve(),
+      commonjs({
+        include: 'node_modules/**',
+      }),
+      babel(),
+    ]
+  })
+  .pipe(source(pkg.name + '.js'))
+  .pipe(buffer())
+}
+
 // Development tasks
 // --------------------------------
 
-gulp.task('build', ['build:browserify', 'build:minify', 'test:browserify']);
+gulp.task('build', ['build:rollup', 'build:minify', 'test:rollup']);
 
-gulp.task('build:browserify', function(){
-  return gulp.src('./lib/browser.js')
-    .pipe(through2.obj(function(file, enc, next){
-      browserify(file.path)
-        .bundle(function(err, res){
-          file.contents = res;
-          next(null, file);
-        });
-    }))
-    .pipe(strip({ line: true }))
-    .pipe(squash())
+gulp.task('build:rollup', function(){
+  return bundle({
+    input: './lib/browser.js',
+    name: pkg.name + '.js'
+  })
     .pipe(replace('__VERSION__', pkg.version))
     .pipe(rename(pkg.name + '.js'))
     .pipe(gulp.dest('./dist/'));
 });
 
-gulp.task('build:minify', ['build:browserify'], function(){
+gulp.task('build:minify', ['build:rollup'], function(){
   return gulp.src(['./dist/' + pkg.name + '.js'])
-    .pipe(compress({ type: 'js' }))
     .pipe(uglify())
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest('./dist/'));
@@ -59,7 +70,7 @@ gulp.task('watch', ['build'], function() {
     'lib/**/*.js',
     'gulpfile.js',
     'test/**/*.js'
-  ], ['build', 'test:browserify']);
+  ], ['build', 'test:rollup']);
 });
 
 // Test tasks
@@ -67,23 +78,17 @@ gulp.task('watch', ['build'], function() {
 
 gulp.task('test:unit', ['test:phantom', 'test:mocha']);
 
-gulp.task('test:browserify', function(){
-  return gulp.src('./test/unit/index.js')
-    .pipe(through2.obj(function(file, enc, next){
-      browserify(file.path)
-        .bundle(function(err, res){
-            file.contents = res;
-            next(null, file);
-        });
-    }))
-    .pipe(strip({ line: true }))
-    .pipe(squash())
+gulp.task('test:rollup', function(){
+  return bundle({
+    input: './test/unit/index.js',
+    name: 'browserified-tests.js'
+  })
     .pipe(replace('__VERSION__', pkg.version))
     .pipe(rename('browserified-tests.js'))
     .pipe(gulp.dest('./test/unit/build'));
 });
 
-gulp.task('test:mocha', ['test:browserify'], function () {
+gulp.task('test:mocha', ['test:rollup'], function () {
   return gulp.src('./test/unit/index.js', { read: false })
     .pipe(mocha({
       reporter: 'nyan',
@@ -91,7 +96,7 @@ gulp.task('test:mocha', ['test:browserify'], function () {
     }));
 });
 
-gulp.task('test:phantom', ['test:browserify'], function () {
+gulp.task('test:phantom', ['test:rollup'], function () {
   return gulp.src('./test/unit/index.html')
     .pipe(mochaPhantomJS({
       mocha: {
@@ -107,14 +112,14 @@ gulp.task('test:phantom', ['test:browserify'], function () {
     });
 });
 
-gulp.task('test:karma', ['build', 'test:browserify'], function (done){
+gulp.task('test:karma', ['build', 'test:rollup'], function (done){
   new karma({
     configFile: __dirname + '/config-karma.js',
     singleRun: true
   }, done).start();
 });
 
-gulp.task('test:sauce', ['build', 'test:browserify'], function(done){
+gulp.task('test:sauce', ['build', 'test:rollup'], function(done){
   new karma({
     configFile: __dirname + '/config-sauce.js',
     singleRun: true
