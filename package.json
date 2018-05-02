@@ -7,7 +7,10 @@
     "./lib/utils/http-server.js": "./lib/utils/http-browser.js"
   },
   "scripts": {
-    "test": "gulp test:unit"
+    "test": "gulp test:unit",
+    "preversion": "gulp build && npm run test",
+    "version": "git add .",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
