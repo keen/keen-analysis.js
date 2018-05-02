@@ -3853,7 +3853,7 @@ module.exports = ret;
     debug: false,
     enabled: true,
     loaded: false,
-    version: '1.3.1'
+    version: '1.3.2'
   });
   Client.helpers = Client.helpers || {};
   Client.resources = Client.resources || {};
