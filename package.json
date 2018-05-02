@@ -13,7 +13,11 @@
     "type": "git",
     "url": "git+https://github.com/keen/keen-analysis.js.git"
   },
-  "author": "Dustin Larimer <dustin@keen.io>",
+  "author": "Keen IO <team@keen.io>",
+  "contributors": [
+    "Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)",
+    "Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/keen/keen-analysis.js/issues"
