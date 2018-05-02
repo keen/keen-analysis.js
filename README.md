@@ -11,7 +11,7 @@ $ npm install keen-analysis --save
 Or load it from our CDN:
 
 ```html
-<script src="https://d26b395fwzu5fz.cloudfront.net/keen-analysis-1.3.0.js"></script>
+<script src="https://d26b395fwzu5fz.cloudfront.net/keen-analysis-1.3.2.min.js"></script>
 ```
 
 ### Project ID & API Keys
@@ -35,7 +35,11 @@ If any of this is confusing, that's our fault and we would love to help. Join ou
 Create a new `client` instance with your Project ID and Read Key, and use the `.query()` method to execute an ad-hoc query. This client instance is the core of the library and will be required for all API-related functionality.
 
 ```javascript
+// browser/front-end
 import Keen from 'keen-analysis';
+
+// for Node.js/back-end
+// const Keen = require('keen-analysis');
 
 const client = new Keen({
   projectId: 'YOUR_PROJECT_ID',
@@ -131,8 +135,8 @@ const client = new Keen({
 });
 
 client
-  .post('https://api.keen.io/3.0/projects/YOUR_PROJECT_ID/queries/count')
-  .auth('YOUR_READ_KEY')
+  .post(`https://api.keen.io/3.0/projects/${client.projectId()}/queries/count`)
+  .auth(client.readKey())
   .send({
     event_collection: 'pageviews',
     timeframe: 'this_14_days'
@@ -154,7 +158,8 @@ import Keen from 'keen-analysis';
 
 const client = new Keen({
   projectId: 'YOUR_PROJECT_ID',
-  readKey: 'YOUR_READ_KEY'
+  readKey: 'YOUR_READ_KEY',
+  masterKey: 'YOUR_MASTER_KEY'
 });
 
 // Retrieve all saved queries
@@ -180,23 +185,21 @@ const client = new Keen({
   readKey: 'YOUR_READ_KEY'
 });
 
-// Create a saved query
+// Get average
 client
-  .post(client.url('queries', 'saved', 'new-saved-query'))
-  .auth(client.masterKey())
+  .post(client.url('queries', 'average'))
+  .auth(client.readKey())
   .send({
-    refresh_rate: 0,
-    query: {
-      analysis_type: 'count',
-      event_collection: 'pageviews'
-    },
-    metadata: {}
-    // ...
+    event_collection: 'purchases',
+   target_property: 'price',
+   timeframe: 'this_27_days'
   })
   .then(res => {
+    console.log(res);
     // Handle results
   })
   .catch(err => {
+    console.log(err);
     // Handle errors
   });
 ```
@@ -208,7 +211,7 @@ import Keen from 'keen-analysis';
 
 const client = new Keen({
   projectId: 'YOUR_PROJECT_ID',
-  readKey: 'YOUR_READ_KEY'
+  masterKey: 'YOUR_MASTER_KEY'
 });
 
 // Update a saved query
@@ -242,7 +245,7 @@ import Keen from 'keen-analysis';
 
 const client = new Keen({
   projectId: 'YOUR_PROJECT_ID',
-  readKey: 'YOUR_READ_KEY'
+  masterKey: 'YOUR_MASTER_KEY'
 });
 
 // Delete a saved query

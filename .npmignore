@@ -9,7 +9,6 @@ gulpfile.js
 config-karma.js
 config-sauce.js
 
-dist
 test
 
 CHANGELOG.md

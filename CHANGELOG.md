@@ -6,6 +6,18 @@
 **BREAKING:**
 **CHANGE:**
 -->
+<a name="1.3.2"></a>
+# 1.3.2 Fixes
+
+**FIXED:**
+* Updated Readme examples.
+
+<a name="1.3.1"></a>
+# 1.3.1 Fixes
+
+**FIXED:**
+* Successful delete responses (`204`s) are no longer handled as errors (#29).
+
 <a name="1.3.0"></a>
 # 1.3.0 Support for Cached Datasets
 
