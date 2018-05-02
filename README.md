@@ -11,7 +11,7 @@ $ npm install keen-analysis --save
 Or load it from our CDN:
 
 ```html
-<script src="https://d26b395fwzu5fz.cloudfront.net/keen-analysis-1.3.0.js"></script>
+<script src="https://d26b395fwzu5fz.cloudfront.net/keen-analysis-1.3.2.min.js"></script>
 ```
 
 ### Project ID & API Keys
