@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+  <script src="keen-analysis.js"></script>
+
+  <script>
+
+  Keen.ready(function(){
+    Keen.debug = true;
+		var client = new Keen({
+			projectId: '52f00ec205cd66404b000000',
+      readKey: 'f979d53e026bdbf1ba16f01ce168bc7bcf9d5308ba672fb14e1834793a9e705eefa04793f0f87fb76b1d49a6cc2747b96a8abae0e4569d70314099b3f7790f55e98c9ac482e3883aab86a4bb577c295dbbca4867e95e2e4b15038fac5d80957ded3e868e4e6e319d3aa9275abc22b16e',
+    });
+
+    client
+  .query('count', {
+    event_collection: 'pageviews',
+    timeframe: 'this_144_days'
+  })
+  .then(res => {
+    console.log(res);
+    // Handle results
+  })
+  .catch(err => {
+    console.log(err);
+    // Handle errors
+  });
+
+
+   const qq1 = new Keen.Query('count', {
+     event_collection: 'pageviews',
+     timeframe: 'this_1_days'
+   });
+
+   const qq2 = new Keen.Query('count', {
+     event_collection: 'pageviews',
+     timeframe: 'this_30_days'
+   });
+
+  client.run([qq1, qq2]).then(res => {
+    console.log(res);
+    // Handle results
+  })
+  .catch(err => {
+    console.log(err);
+    // Handle errors
+  });
+
+  });
+	</script>
+</body>
+</html>
