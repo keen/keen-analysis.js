@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("keen-core"));
+		module.exports = factory(require("url"), require("https"), require("keen-core"));
 	else if(typeof define === 'function' && define.amd)
-		define(["keen-core"], factory);
+		define(["url", "https", "keen-core"], factory);
 	else {
-		var a = typeof exports === 'object' ? factory(require("keen-core")) : factory(root["keen-core"]);
+		var a = typeof exports === 'object' ? factory(require("url"), require("https"), require("keen-core")) : factory(root["url"], root["https"], root["keen-core"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(global, function(__WEBPACK_EXTERNAL_MODULE__7__) {
+})(global, function(__WEBPACK_EXTERNAL_MODULE__5__, __WEBPACK_EXTERNAL_MODULE__6__, __WEBPACK_EXTERNAL_MODULE__10__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,11 +76,27 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+module.exports = extend;
+
+function extend(target){
+  for (var i = 1; i < arguments.length; i++) {
+    for (var prop in arguments[i]){
+      target[prop] = arguments[i][prop];
+    }
+  }
+  return target;
+};
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 module.exports = each;
@@ -113,22 +129,6 @@ function each(o, cb, s){
 
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = extend;
-
-function extend(target){
-  for (var i = 1; i < arguments.length; i++) {
-    for (var prop in arguments[i]){
-      target[prop] = arguments[i][prop];
-    }
-  }
-  return target;
-};
-
-
-/***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -140,7 +140,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.BlueBird = undefined;
 
-var _bluebird = __webpack_require__(6);
+var _bluebird = __webpack_require__(9);
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
@@ -157,338 +157,27 @@ exports.default = BlueBird;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var each = __webpack_require__(0),
-    extend = __webpack_require__(1);
-
-module.exports = serialize;
-
-function serialize(data){
-  var query = [];
-  each(data, function(value, key){
-    if ('string' !== typeof value) {
-      value = JSON.stringify(value);
-    }
-    query.push(key + '=' + encodeURIComponent(value));
-  });
-  return query.join('&');
-}
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
-
-var _each = __webpack_require__(0);
-
-var _each2 = _interopRequireDefault(_each);
-
-var _serialize = __webpack_require__(3);
-
-var _serialize2 = _interopRequireDefault(_serialize);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var GET = exports.GET = get;
-var POST = exports.POST = post;
-var PUT = exports.PUT = put;
-var DELETE = exports.DELETE = del;
-
-// HTTP Handlers
-// ------------------------------
-
-function get(config, callback) {
-  if (xhrObject()) {
-    return sendXhr('GET', config, callback);
-  } else if (xdrObject()) {
-    return sendXdr('GET', config, callback);
-  } else {
-    return sendJsonp(config, callback);
-  }
-}
-
-function post(config, callback) {
-  if (xhrObject()) {
-    return sendXhr('POST', config, callback);
-  } else if (xdrObject()) {
-    return sendXdr('POST', config, callback);
-  } else {
-    callback('XHR POST not supported', null);
-  }
-}
-
-function put(config, callback) {
-  if (xhrObject()) {
-    return sendXhr('PUT', config, callback);
-  } else {
-    callback('XHR PUT not supported', null);
-  }
-}
-
-function del(config, callback) {
-  if (xhrObject()) {
-    return sendXhr('DELETE', config, callback);
-  } else {
-    callback('XHR DELETE not supported', null);
-  }
-}
-
-// XMLHttpRequest Support
-// ------------------------------
-
-function xhrObject() {
-  var root = 'undefined' == typeof window ? this : window;
-  if (root.XMLHttpRequest && ('file:' != root.location.protocol || !root.ActiveXObject)) {
-    return new XMLHttpRequest();
-  } else {
-    try {
-      return new ActiveXObject('Microsoft.XMLHTTP');
-    } catch (e) {}
-    try {
-      return new ActiveXObject('Msxml2.XMLHTTP.6.0');
-    } catch (e) {}
-    try {
-      return new ActiveXObject('Msxml2.XMLHTTP.3.0');
-    } catch (e) {}
-    try {
-      return new ActiveXObject('Msxml2.XMLHTTP');
-    } catch (e) {}
-  }
-  return false;
-}
-
-function sendXhr(method, config, callback) {
-  var xhr = xhrObject();
-  var cb = callback;
-  var url = config.url;
-
-  xhr.onreadystatechange = function () {
-    var response = void 0;
-    if (xhr.readyState == 4) {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        if (xhr.status === 204) {
-          if (cb) {
-            cb(null, xhr);
-          }
-        } else {
-          try {
-            response = JSON.parse(xhr.responseText);
-            if (cb && response) {
-              cb(null, response);
-            }
-          } catch (e) {
-            if (cb) {
-              cb(xhr, null);
-            }
-          }
-        }
-      } else {
-        try {
-          response = JSON.parse(xhr.responseText);
-          if (cb && response) {
-            cb(response, null);
-          }
-        } catch (e) {
-          if (cb) {
-            cb(xhr, null);
-          }
-        }
-      }
-    }
-  };
-
-  if (method !== 'GET') {
-    xhr.open(method, url, true);
-    (0, _each2.default)(config.headers, function (value, key) {
-      if (typeof value === 'string') {
-        xhr.setRequestHeader(key, value);
-      }
-    });
-    if (config.params) {
-      xhr.send(JSON.stringify(config.params));
-    } else {
-      xhr.send();
-    }
-  } else {
-    url += '?';
-    if (config.api_key) {
-      url += 'api_key=' + config.api_key + '&';
-    }
-    if (config.params) {
-      url += (0, _serialize2.default)(config.params);
-    }
-    xhr.open(method, url, true);
-    (0, _each2.default)(config.headers, function (value, key) {
-      if (typeof value === 'string') {
-        xhr.setRequestHeader(key, value);
-      }
-    });
-    xhr.send();
-  }
-
-  return xhr;
-}
-
-// XDomainRequest Support
-// ------------------------------
-
-function xdrObject() {
-  var root = 'undefined' == typeof window ? this : window;
-  if (root.XDomainRequest) {
-    return new root.XDomainRequest();
-  }
-  return false;
-}
-
-function sendXdr(method, config, callback) {
-  var xdr = xdrObject();
-  var cb = callback;
-
-  if (xdr) {
-    xdr.timeout = config.timeout || 300 * 1000;
-
-    xdr.ontimeout = function () {
-      handleResponse(xdr, null);
-    };
-
-    xdr.onerror = function () {
-      handleResponse(xdr, null);
-    };
-
-    xdr.onload = function () {
-      var response = JSON.parse(xdr.responseText);
-      handleResponse(null, response);
-    };
-
-    xdr.open(method.toLowerCase(), config.url);
-
-    setTimeout(function () {
-      if (config['params']) {
-        xdr.send((0, _serialize2.default)(config['params']));
-      } else {
-        xdr.send();
-      }
-    }, 0);
-  }
-
-  function handleResponse(a, b) {
-    if (cb && typeof cb === 'function') {
-      cb(a, b);
-      callback = cb = void 0;
-    }
-  }
-
-  return xdr;
-}
-
-// JSON-P Support
-// ------------------------------
-
-function sendJsonp(config, callback) {
-  var url = config.url;
-  var cb = callback;
-  var timestamp = new Date().getTime();
-  var scriptTag = document.createElement('script');
-  var parent = document.getElementsByTagName('head')[0];
-  var callbackName = 'keenJSONPCallback';
-  var loaded = false;
-
-  callbackName += timestamp;
-  while (callbackName in window) {
-    callbackName += 'a';
-  }
-
-  window[callbackName] = function (response) {
-    if (loaded === true) {
-      return;
-    }
-    handleResponse(null, response);
-  };
-
-  if (config.params) {
-    url += (0, _serialize2.default)(config.params);
-  }
-
-  // Early IE (no onerror event)
-  scriptTag.onreadystatechange = function () {
-    if (loaded === false && this.readyState === 'loaded') {
-      handleResponse('An error occurred', null);
-    }
-  };
-
-  // Not IE
-  scriptTag.onerror = function () {
-    // on IE9 both onerror and onreadystatechange are called
-    if (loaded === false) {
-      handleResponse('An error occurred', null);
-    }
-  };
-
-  scriptTag.src = url + '&jsonp=' + callbackName;
-  parent.appendChild(scriptTag);
-
-  function handleResponse(a, b) {
-    loaded = true;
-    if (cb && typeof cb === 'function') {
-      cb(a, b);
-      callback = cb = void 0;
-    }
-    window[callbackName] = undefined;
-    try {
-      delete window[callbackName];
-    } catch (e) {};
-    parent.removeChild(scriptTag);
-  }
-}
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.del = exports.put = exports.post = exports.get = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-//  httpHandlers = require('./utils/http-server');
+exports.request = request;
+exports.getAnalysisType = getAnalysisType;
 
-
-var _promise = __webpack_require__(2);
-
-var _promise2 = _interopRequireDefault(_promise);
-
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _extend = __webpack_require__(1);
+var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _httpBrowser = __webpack_require__(4);
-
-var httpHandlers = _interopRequireWildcard(_httpBrowser);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var get = exports.get = new request('GET');
-var post = exports.post = new request('POST');
-var put = exports.put = new request('PUT');
-var del = exports.del = new request('DELETE');
 
 function request(method) {
   return function (str) {
@@ -531,7 +220,174 @@ request.prototype.timeout = function (num) {
   return this;
 };
 
-request.prototype.send = function (obj) {
+function getAnalysisType(str) {
+  var split = str.split('/queries/');
+  return split[split.length - 1];
+}
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var each = __webpack_require__(1),
+    extend = __webpack_require__(0);
+
+module.exports = serialize;
+
+function serialize(data){
+  var query = [];
+  each(data, function(value, key){
+    if ('string' !== typeof value) {
+      value = JSON.stringify(value);
+    }
+    query.push(key + '=' + encodeURIComponent(value));
+  });
+  return query.join('&');
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__5__;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__6__;
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
+
+var _https = __webpack_require__(6);
+
+var _https2 = _interopRequireDefault(_https);
+
+var _url = __webpack_require__(5);
+
+var _url2 = _interopRequireDefault(_url);
+
+var _extend = __webpack_require__(0);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _serialize = __webpack_require__(4);
+
+var _serialize2 = _interopRequireDefault(_serialize);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var GET = exports.GET = handleRequest;
+var POST = exports.POST = handleRequest;
+var PUT = exports.PUT = handleRequest;
+var DELETE = exports.DELETE = handleRequest;
+
+function handleRequest(config, callback) {
+  var parsedUrl = _url2.default.parse(config.url);
+
+  var options = {
+    host: parsedUrl['hostname'],
+    path: parsedUrl.path,
+    method: config['method'],
+    headers: config['headers']
+  };
+
+  var data = '';
+
+  if (config['method'] === 'GET') {
+    data = '';
+    options.path += '?api_key=' + config.api_key;
+    if (config.params) {
+      options.path += '&' + (0, _serialize2.default)(config.params);
+    }
+  } else {
+    data = config.params ? JSON.stringify(config.params) : '';
+    options['headers']['Content-Length'] = Buffer.byteLength(data);
+  }
+
+  var req = _https2.default.request(options, function (res) {
+    if (options.method === 'DELETE' && res.statusCode === 204) {
+      return callback(null, {});
+    }
+    var body = '';
+    res.on('data', function (d) {
+      body += d;
+    });
+    res.on('end', function () {
+      var parsedBody = void 0;
+      try {
+        parsedBody = JSON.parse(body);
+      } catch (error) {
+        return callback(error, null);
+      }
+      if (parsedBody.error_code) {
+        error = new Error(parsedBody.message || 'Unknown error occurred');
+        error.code = parsedBody.error_code;
+        callback(error, null);
+      } else {
+        callback(null, parsedBody);
+      }
+    });
+  });
+
+  req.on('error', callback);
+  req.write(data);
+  req.end();
+}
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.del = exports.put = exports.post = exports.get = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _promise = __webpack_require__(2);
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _each = __webpack_require__(1);
+
+var _each2 = _interopRequireDefault(_each);
+
+var _extend = __webpack_require__(0);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _httpServer = __webpack_require__(7);
+
+var httpHandlers = _interopRequireWildcard(_httpServer);
+
+var _request = __webpack_require__(3);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var get = exports.get = new _request.request('GET');
+var post = exports.post = new _request.request('POST');
+var put = exports.put = new _request.request('PUT');
+var del = exports.del = new _request.request('DELETE');
+
+_request.request.prototype.send = function (obj) {
   this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
   var httpHandler = httpHandlers[this.config['method']];
   var httpOptions = (0, _extend2.default)({}, this.config);
@@ -540,7 +396,7 @@ request.prototype.send = function (obj) {
   // for generic HTTP requests to known query resources
   if (typeof httpOptions.params.analysis_type === 'undefined') {
     if (httpOptions.url.indexOf('/queries/') > -1 && httpOptions.url.indexOf('/saved/') < 0) {
-      httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
+      httpOptions.params.analysis_type = (0, _request.getAnalysisType)(httpOptions.url);
     }
   }
 
@@ -566,13 +422,8 @@ request.prototype.send = function (obj) {
   });
 };
 
-function getAnalysisType(str) {
-  var split = str.split('/queries/');
-  return split[split.length - 1];
-}
-
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* @preserve
@@ -4216,13 +4067,13 @@ module.exports = ret;
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__7__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__10__;
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4235,7 +4086,7 @@ exports.KeenAnalysis = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _keenCore = __webpack_require__(7);
+var _keenCore = __webpack_require__(10);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
@@ -4243,23 +4094,15 @@ var _promise = __webpack_require__(2);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _extend = __webpack_require__(1);
+var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _request = __webpack_require__(5);
-
-var request = _interopRequireWildcard(_request);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-(0, _extend2.default)(_keenCore2.default.prototype, request);
 
 _keenCore2.default.prototype.readKey = function (str) {
   if (!arguments.length) return this.config.readKey;
@@ -4396,7 +4239,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = _keenCore2.default;
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4407,21 +4250,26 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Keen = undefined;
 
-var _index = __webpack_require__(8);
+var _index = __webpack_require__(11);
 
 var _index2 = _interopRequireDefault(_index);
 
+var _extend = __webpack_require__(0);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _requestServer = __webpack_require__(8);
+
+var request = _interopRequireWildcard(_requestServer);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+(0, _extend2.default)(_index2.default.prototype, request);
 
 var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 exports.default = Keen;
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(9);
-
 
 /***/ })
 /******/ ]);

@@ -1,5 +1,5 @@
 import helpers from '../helpers/client-config';
-import KeenClient from '../../../lib/index';
+import KeenClient from '../../../lib/browser';
 
 describe('Client accessors', () => {
   let client;

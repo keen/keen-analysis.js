@@ -1,5 +1,5 @@
 import helpers from '../helpers/client-config';
-import KeenClient from '../../../lib/index';
+import KeenClient from '../../../lib/browser';
 import XHRmock from 'xhr-mock';
 
 describe('HTTP methods', () => {
@@ -81,7 +81,7 @@ describe('HTTP methods', () => {
     it('should make a PUT request with data to an API endpoint', async () => {
 
       const requestUrl = client.url('queries', 'count');
-      const requestKey = client.masterKey();
+      const requestKey = 'dummy-master-key';
       const requestQuery = {
         event_collection: 'pageview',
         timeframe: 'this_12_months',

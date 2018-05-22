@@ -2,9 +2,10 @@ const path = require('path');
 
 const fileName = 'keen-analysis';
 
+const entry = ( process.env.TARGET !== 'node' ) ? './lib/browser.js' : './lib/server.js' ;
+
 module.exports = {
-  entry: ['./lib/browser.js',
-  ],
+  entry,
 
   target: process.env.TARGET ? `${process.env.TARGET}` : 'web',
 

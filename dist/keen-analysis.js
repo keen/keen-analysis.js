@@ -83,6 +83,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports) {
 
+module.exports = extend;
+
+function extend(target){
+  for (var i = 1; i < arguments.length; i++) {
+    for (var prop in arguments[i]){
+      target[prop] = arguments[i][prop];
+    }
+  }
+  return target;
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
 module.exports = each;
 
 function each(o, cb, s){
@@ -110,22 +126,6 @@ function each(o, cb, s){
   }
   return 1;
 }
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = extend;
-
-function extend(target){
-  for (var i = 1; i < arguments.length; i++) {
-    for (var prop in arguments[i]){
-      target[prop] = arguments[i][prop];
-    }
-  }
-  return target;
-};
 
 
 /***/ }),
@@ -356,7 +356,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.BlueBird = undefined;
 
-var _bluebird = __webpack_require__(10);
+var _bluebird = __webpack_require__(11);
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
@@ -373,8 +373,8 @@ exports.default = BlueBird;
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var each = __webpack_require__(0),
-    extend = __webpack_require__(1);
+var each = __webpack_require__(1),
+    extend = __webpack_require__(0);
 
 module.exports = serialize;
 
@@ -400,9 +400,81 @@ function serialize(data){
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.request = request;
+exports.getAnalysisType = getAnalysisType;
+
+var _each = __webpack_require__(1);
+
+var _each2 = _interopRequireDefault(_each);
+
+var _extend = __webpack_require__(0);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function request(method) {
+  return function (str) {
+    this.config = {
+      'api_key': undefined,
+      'method': method,
+      'params': undefined,
+      'timeout': 300 * 1000,
+      'url': str,
+      'headers': {
+        'Authorization': '',
+        'Content-type': 'application/json'
+      }
+    };
+    return this;
+  }.bind(this);
+}
+
+request.prototype.auth = function (str) {
+  if (typeof str === 'string') {
+    this.config.api_key = typeof str === 'string' ? str : undefined;
+    this.headers({
+      'Authorization': str
+    });
+  }
+  return this;
+};
+
+request.prototype.headers = function (obj) {
+  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+    (0, _each2.default)(obj, function (value, key) {
+      this.config['headers'][key] = value;
+    }.bind(this));
+  }
+  return this;
+};
+
+request.prototype.timeout = function (num) {
+  this.config.timeout = typeof num === 'number' ? num : 300 * 1000;
+  return this;
+};
+
+function getAnalysisType(str) {
+  var split = str.split('/queries/');
+  return split[split.length - 1];
+}
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
 
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
 
@@ -461,7 +533,7 @@ function del(config, callback) {
 
 function xhrObject() {
   var root = 'undefined' == typeof window ? this : window;
-  if (root.XMLHttpRequest && ('file:' != root.location.protocol || !root.ActiveXObject)) {
+  if (root.XMLHttpRequest && (!root.ActiveXObject || root.location && root.location.protocol && 'file:' !== root.location.protocol)) {
     return new XMLHttpRequest();
   } else {
     try {
@@ -665,7 +737,7 @@ function sendJsonp(config, callback) {
 }
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -678,76 +750,34 @@ exports.del = exports.put = exports.post = exports.get = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-//  httpHandlers = require('./utils/http-server');
-
-
 var _promise = __webpack_require__(4);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _extend = __webpack_require__(1);
+var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _httpBrowser = __webpack_require__(6);
+var _httpBrowser = __webpack_require__(7);
 
 var httpHandlers = _interopRequireWildcard(_httpBrowser);
+
+var _request = __webpack_require__(6);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var get = exports.get = new request('GET');
-var post = exports.post = new request('POST');
-var put = exports.put = new request('PUT');
-var del = exports.del = new request('DELETE');
+var get = exports.get = new _request.request('GET');
+var post = exports.post = new _request.request('POST');
+var put = exports.put = new _request.request('PUT');
+var del = exports.del = new _request.request('DELETE');
 
-function request(method) {
-  return function (str) {
-    this.config = {
-      'api_key': undefined,
-      'method': method,
-      'params': undefined,
-      'timeout': 300 * 1000,
-      'url': str,
-      'headers': {
-        'Authorization': '',
-        'Content-type': 'application/json'
-      }
-    };
-    return this;
-  }.bind(this);
-}
-
-request.prototype.auth = function (str) {
-  if (typeof str === 'string') {
-    this.config.api_key = typeof str === 'string' ? str : undefined;
-    this.headers({
-      'Authorization': str
-    });
-  }
-  return this;
-};
-
-request.prototype.headers = function (obj) {
-  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-    (0, _each2.default)(obj, function (value, key) {
-      this.config['headers'][key] = value;
-    }.bind(this));
-  }
-  return this;
-};
-
-request.prototype.timeout = function (num) {
-  this.config.timeout = typeof num === 'number' ? num : 300 * 1000;
-  return this;
-};
-
-request.prototype.send = function (obj) {
+_request.request.prototype.send = function (obj) {
   this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
   var httpHandler = httpHandlers[this.config['method']];
   var httpOptions = (0, _extend2.default)({}, this.config);
@@ -756,7 +786,7 @@ request.prototype.send = function (obj) {
   // for generic HTTP requests to known query resources
   if (typeof httpOptions.params.analysis_type === 'undefined') {
     if (httpOptions.url.indexOf('/queries/') > -1 && httpOptions.url.indexOf('/saved/') < 0) {
-      httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
+      httpOptions.params.analysis_type = (0, _request.getAnalysisType)(httpOptions.url);
     }
   }
 
@@ -782,13 +812,8 @@ request.prototype.send = function (obj) {
   });
 };
 
-function getAnalysisType(str) {
-  var split = str.split('/queries/');
-  return split[split.length - 1];
-}
-
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -981,7 +1006,7 @@ function getAnalysisType(str) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(3)))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -1037,7 +1062,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(8);
+__webpack_require__(9);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -1051,7 +1076,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {/* @preserve
@@ -4693,10 +4718,10 @@ module.exports = ret;
 
 },{"./es5":10}]},{},[3])(3)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(2), __webpack_require__(9).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(2), __webpack_require__(10).setImmediate))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -4865,7 +4890,7 @@ Emitter.prototype.hasListeners = function(event){
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = parseParams;
@@ -4887,17 +4912,17 @@ function parseParams(str){
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {(function(env){
   var previousKeen = env.Keen || undefined;
-  var each = __webpack_require__(0),
-      extend = __webpack_require__(1),
-      parseParams = __webpack_require__(12),
+  var each = __webpack_require__(1),
+      extend = __webpack_require__(0),
+      parseParams = __webpack_require__(13),
       serialize = __webpack_require__(5);
 
-  var Emitter = __webpack_require__(11);
+  var Emitter = __webpack_require__(12);
 
   function Client(props){
     if (this instanceof Client === false) {
@@ -5123,7 +5148,7 @@ function parseParams(str){
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5136,7 +5161,7 @@ exports.KeenAnalysis = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _keenCore = __webpack_require__(13);
+var _keenCore = __webpack_require__(14);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
@@ -5144,23 +5169,15 @@ var _promise = __webpack_require__(4);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _extend = __webpack_require__(1);
+var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _request = __webpack_require__(7);
-
-var request = _interopRequireWildcard(_request);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-(0, _extend2.default)(_keenCore2.default.prototype, request);
 
 _keenCore2.default.prototype.readKey = function (str) {
   if (!arguments.length) return this.config.readKey;
@@ -5297,7 +5314,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = _keenCore2.default;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5308,21 +5325,26 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Keen = undefined;
 
-var _index = __webpack_require__(14);
+var _index = __webpack_require__(15);
 
 var _index2 = _interopRequireDefault(_index);
 
+var _extend = __webpack_require__(0);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _requestBrowser = __webpack_require__(8);
+
+var request = _interopRequireWildcard(_requestBrowser);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+(0, _extend2.default)(_index2.default.prototype, request);
 
 var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 exports.default = Keen;
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(15);
-
 
 /***/ })
 /******/ ]);

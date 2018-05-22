@@ -1,17 +1,18 @@
 import helpers from '../helpers/client-config';
-import KeenClient from '../../../lib/index';
+import KeenClient from '../../../lib/browser';
 import XHRmock from 'xhr-mock';
 
-describe('Request methods', () => {
+describe('Browser Request methods', () => {
 
   let client;
+  let requestKey;
+
   const queryObject = {
     analysis_type: 'count',
     event_collection: 'pageview',
     timeframe: 'this_12_months'
   };
   const apiQueryUrl = new RegExp('queries/count');
-  let requestKey;
   const dummyResponse = { result: 123 };
   const dummyErrorResponse = { error: true };
 
