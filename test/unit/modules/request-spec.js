@@ -1,111 +1,121 @@
-var assert = require('proclaim');
-var helpers = require('../helpers/client-config');
+import helpers from '../helpers/client-config';
+import KeenClient from '../../../lib/index';
+import XHRmock from 'xhr-mock';
 
-var KeenClient = require('../../../lib/index');
+describe('Request methods', () => {
 
-describe('Request methods', function(){
+  let client;
+  const queryObject = {
+    analysis_type: 'count',
+    event_collection: 'pageview',
+    timeframe: 'this_12_months'
+  };
+  const apiQueryUrl = new RegExp('queries/count');
+  let requestKey;
+  const dummyResponse = { result: 123 };
+  const dummyErrorResponse = { error: true };
 
-  beforeEach(function(){
-    this.client = new KeenClient(helpers.client);
-
-    // PhantomJS SSL handshake issue
-    if (typeof window !== 'undefined' && window._phantom) {
-      this.client.config['protocol'] = 'http';
-    }
+  beforeEach(() => {
+    XHRmock.setup();
+    client = new KeenClient(helpers.client);
+    requestKey = client.readKey();
   });
 
-  afterEach(function(){
-    this.client = null;
+  afterEach(() => {
+    XHRmock.teardown();
   });
 
-  describe('.auth()', function(){
-    it('should set the given api_key value', function(){
-      var req = this.client.get('/test').auth('123');
-      assert.equal(req.config.api_key, '123');
+  describe('.auth()', () => {
+    it('should set the given api_key value', () => {
+      XHRmock.get(apiQueryUrl, {});
+      const req = client.get(apiQueryUrl).auth('123');
+      expect(req.config.api_key).toBe('123');
     });
   });
 
-  describe('.timeout()', function(){
-    it('should set the given timeout value', function(){
-      var req = this.client.get('/test').timeout(100);
-      assert.equal(req.config.timeout, 100);
+  describe('.timeout()', () => {
+    it('should set the given timeout value', () => {
+      XHRmock.get(apiQueryUrl, {});
+      const req = client.get(apiQueryUrl).timeout(100);
+      expect(req.config.timeout).toBe(100);
     });
   });
 
-  describe('.headers()', function(){
-    it('should set the given headers value', function(){
-      var req = this.client.get('./').headers({'x-custom-header':'123'});
-      assert.equal(req.config.headers['x-custom-header'], '123');
+  describe('.headers()', () => {
+    it('should set the given headers value', () => {
+      XHRmock.get(apiQueryUrl, {});
+      const req = client.get(apiQueryUrl).headers({'x-custom-header':'123'});
+      expect(req.config.headers['x-custom-header']).toBe('123');
     });
   });
 
-  describe('.query()', function(){
+  describe('.query()', () => {
 
-    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', function(done){
-      this.timeout(300 * 1000);
-      this.client
+    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
+      XHRmock.post(new RegExp('count'), (req, res) => {
+        return res.status(200).body(JSON.stringify(dummyResponse));
+      });
+      await client
         .query('count', {
           event_collection: 'pageview',
           timeframe: 'this_12_months'
         })
-        .then(function(res){
-          assert.equal(res.query.analysis_type, 'count');
-          assert.equal(res.query.event_collection, 'pageview');
-          assert.equal(res.query.timeframe, 'this_12_months');
-          assert.isNumber(res.result);
-          done();
+        .then(res => {
+          expect(res.query.analysis_type).toBe('count');
+          expect(res.query.event_collection).toBe('pageview');
+          expect(res.query.timeframe).toBe('this_12_months');
+          expect(res.result).toBe(dummyResponse.result);
         })
-        .catch(function(err){
-          done();
+        .catch(err => {
+          console.log(err);
         });
     });
 
-    it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', function(done){
-      this.timeout(300 * 1000);
-      this.client
+    it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', async () => {
+      XHRmock.post(new RegExp('count'), (req, res) => {
+        return res.status(400).body(JSON.stringify(dummyErrorResponse));
+      });
+      await client
         .query('count', {
           event_collection: false
         })
-        .then(done)
-        .catch(function(err){
-          done();
-        });
-    });
-
-    it('should make a GET request to a saved query endpoint, returning a response when successful', function(done){
-      this.timeout(300 * 1000);
-      this.client
-        .query('saved', 'clicks')
-        .then(function(res){
-          assert.isObject(res);
-          assert.isObject(res.query);
-          done();
+        .then(res => {
         })
-        .catch(function(err){
-          done();
+        .catch(err => {
+          expect(err).toEqual(dummyErrorResponse);
         });
     });
 
-    it('should make a GET request to a saved query endpoint, returning an error when unsuccessful', function(done){
-      this.timeout(300 * 1000);
-      this.client
+    it('should make a GET request to a saved query endpoint, returning a response when successful', async () => {
+      XHRmock.get(new RegExp('saved'), (req, res) => {
+        return res.status(200).body(JSON.stringify(dummyResponse));
+      });
+      await client
+        .query('saved', 'clicks')
+        .then(res => {
+          expect(res).toEqual(dummyResponse);
+        });
+    });
+
+    it('should make a GET request to a saved query endpoint, returning an error when unsuccessful', async () => {
+      XHRmock.get(new RegExp('saved'), (req, res) => {
+        return res.status(400).body(JSON.stringify(dummyErrorResponse));
+      });
+      await client
         .query('saved', 'does-not-exist')
-        .then(done)
-        .catch(function(err){
-          done();
+        .catch(err => {
+          expect(err).toEqual(dummyErrorResponse);
         });
     });
 
-    it('should return an error when incorrect arguments are provided', function(done){
-      this.timeout(300 * 1000);
-      this.client
-        .query('saved/clicks')
-        .then(done)
-        .catch(function(err){
-          done();
+    it('should return an error when incorrect arguments are provided', async () => {
+      await client
+        .query('saved/does-not-exist')
+        .catch(err => {
+          expect(err).toBeInstanceOf(Object);
+          expect(err.message).not.toBe(undefined);
         });
     });
-
 
   });
 
