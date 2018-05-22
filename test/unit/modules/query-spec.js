@@ -1,219 +1,201 @@
-var assert = require('proclaim');
+import helpers from '../helpers/client-config';
+import KeenClient from '../../../lib/index';
+import XHRmock from 'xhr-mock';
 
-var helpers = require('../helpers/client-config');
-var KeenClient = require('../../../lib/index');
+describe('Keen.Query', () => {
+  let client;
+  let query;
+  const queryObject = {
+    analysis_type: 'count',
+    event_collection: 'pageview',
+    timeframe: 'this_12_months'
+  };
+  const apiQueryUrl = new RegExp('queries/count');
+  let requestKey;
+  const dummyResponse = { result: 123 };
+  const dummyErrorResponse = { error: true };
 
-describe('Keen.Query', function(){
-
-  beforeEach(function(){
-    this.timeout(300 * 1000);
-    this.client = new KeenClient(helpers.client);
-
-    // PhantomJS SSL handshake issue
-    if (typeof window !== 'undefined' && window._phantom) {
-      this.client.config['protocol'] = 'http';
-    }
+  beforeEach(() => {
+    XHRmock.setup();
+    client = new KeenClient(helpers.client);
+    query = new KeenClient.Query(queryObject.analysis_type, {
+      event_collection: queryObject.event_collection,
+      timeframe: queryObject.timeframe
+    });
+    requestKey = client.readKey();
   });
 
-  afterEach(function(){
-    this.client = null;
+  afterEach(() => {
+    XHRmock.teardown();
+  });
+
+  beforeEach(() => {
+    query = new KeenClient.Query(queryObject.analysis_type, {
+      event_collection: queryObject.event_collection,
+      timeframe: queryObject.timeframe
+    });
+    requestKey = client.readKey();
   });
 
   describe('Constructor', function() {
 
-    it('should create a new Keen.Query instance', function(){
-      var q = new KeenClient.Query('count', {
+    it('should create a new Keen.Query instance', () => {
+      const q = new KeenClient.Query('count', {
         eventCollection: 'pageviews'
       });
-      assert.isInstanceOf(q, KeenClient.Query);
+      expect(q).toBeInstanceOf(KeenClient.Query);
     });
 
-    it('should have a correct analysis propery', function(){
-      var q = new KeenClient.Query('count');
-      assert.equal(q.analysis, 'count');
+    it('should have a correct analysis propery', () => {
+      const q = new KeenClient.Query('count');
+      expect(q.analysis).toBe('count');
     });
 
-    it('should have a params object', function(){
-      var q = new KeenClient.Query('count');
-      assert.isObject(q.params);
+    it('should have a params object', () => {
+      const q = new KeenClient.Query('count');
+      expect(q.params).toBeInstanceOf(Object);
     });
 
-    it('should have a params.event_collection property', function(){
-      var q = new KeenClient.Query('count', {
+    it('should have a params.event_collection property', () => {
+      const q = new KeenClient.Query('count', {
         eventCollection: 'pageviews'
       });
-      assert.equal(q.params.event_collection, 'pageviews');
+      expect(q.params.event_collection).toBe('pageviews');
     });
 
   });
 
-  describe('<Client.run> (Keen client instance)', function(){
+  describe('<Client.run> (Keen client instance)', () => {
 
-    beforeEach(function(){
-      this.timeout(300 * 1000);
-      this.query = new KeenClient.Query('count', {
-        eventCollection: 'pageview',
-        timeframe: 'this_12_months'
+    it('should return undefined when passed an invalid input', () => {
+      expect(client.run(null)).toBe(undefined);
+      expect(client.run(0)).toBe(undefined);
+      expect(client.run({})).toBe(undefined);
+      expect(client.run([])).toBe(undefined);
+    });
+
+    it('should return a response and query parameters when successful', async () => {
+      XHRmock.post(apiQueryUrl,
+        (req, res) => {
+          expect(req.header('Content-Type')).toEqual('application/json');
+          expect(req.header('Authorization')).toEqual(requestKey);
+          return res.status(200).body(JSON.stringify(dummyResponse));
+      });
+
+      await client.run(query).then(res => {
+        expect(res).toMatchObject(dummyResponse);
+        expect(res.query).toMatchObject(queryObject);
       });
     });
 
-    afterEach(function(){
-      this.query = void 0;
-    });
+    it('should add timezone to the query', async () => {
+      XHRmock.post(apiQueryUrl,
+        (req, res) => {
+          return res.status(200).body(JSON.stringify(dummyResponse));
+      });
 
-    it('should throw an error when passed an invalid object', function(){
-      var self = this;
-      assert.throws(function(){ self.run(null); });
-      assert.throws(function(){ self.run({}); });
-      assert.throws(function(){ self.run(0); });
-    });
-
-    it('should return a response and query parameters when successful', function(){
-      this.client.run(this.query, function(err, res){
-        assert.isNull(err);
-        assert.isObject(res);
-        assert.equal(res.query.analysis_type, 'count');
-        assert.equal(res.query.event_collection, 'pageview');
-        assert.equal(res.query.timeframe, 'this_12_months');
+      await client.run(query).then(res => {
+        expect(res.query.timezone).not.toBe(undefined);
       });
     });
 
-    it('should return an error when unsuccessful', function(){
-      var q = new KeenClient.Query('count');
-      this.client.run(q, function(err, res){
-        assert.isNotNull(err);
-        assert.isString(err.error_code);
-        assert.isNull(res);
+    it('should return an error when unsuccessful', async () => {
+      XHRmock.post(apiQueryUrl,
+        (req, res) => {
+          return res.status(404).body(JSON.stringify(dummyErrorResponse));
+      });
+
+      try {
+        const user = await client.run(query);
+      } catch (error) {
+        expect(error).toEqual(dummyErrorResponse);
+      }
+    });
+
+    it('should handle multiple query objects', async () => {
+      const count = jest.fn();
+      XHRmock.post(apiQueryUrl,
+        (req, res) => {
+          count();
+          return res.status(200).body(JSON.stringify(dummyResponse));
+      });
+      const queries = [query, query, query];
+      await client.run(queries).then(res => {
+        expect(count).toHaveBeenCalledTimes(queries.length);
+        expect(res).toBeInstanceOf(Array);
+        expect(res.length).toBe(queries.length);
+        expect(res[1].query).toMatchObject(queries[1].params);
       });
     });
-
-    it('should handle multiple query objects', function(){
-      this.client.run([this.query, this.query, this.query], function(err, res){
-        assert.isNull(err);
-        assert.isArray(res);
-        assert.lengthEquals(res, 3);
-      });
-    });
-
-    it('should return a promise', function(done){
-      this.timeout(300 * 1000);
-      this.client
-        .run([this.query, this.query, this.query])
-        .then(function(res){
-          assert.isArray(res);
-          done();
-        })
-        .catch(function(err){
-          console.log('ERROR!', err);
-          done();
-        });
-    });
-
   });
 
-  describe('.addFilter()', function(){
+  describe('.addFilter()', () => {
 
-    beforeEach(function(){
-      this.query = new KeenClient.Query('count', {
-        eventCollection: 'pageviews',
-        timeframe: 'this_7_days'
-      });
-    });
-
-    afterEach(function(){
-      this.query = void 0;
-    });
-
-    it('should add filters correctly', function(){
-      this.query.addFilter('property', 'eq', 'value');
-      assert.isArray(this.query.params.filters);
-      assert.deepEqual(this.query.params.filters[0], {
+    it('should add filters correctly', () => {
+      query.addFilter('property', 'eq', 'value');
+      expect(query.params.filters).toBeInstanceOf(Array);
+      expect(query.params.filters[0]).toEqual({
         operator: 'eq',
         property_name: 'property',
         property_value: 'value'
       });
     });
 
-    it('should allow filters with values that are null or false', function(){
-      this.query.addFilter('a', 'eq', null);
-      this.query.addFilter('b', 'eq', false);
-      assert.deepEqual(this.query.params.filters[0], {
+    it('should allow filters with values that are null or false', () => {
+      query.addFilter('a', 'eq', null);
+      query.addFilter('b', 'eq', false);
+      expect(query.params.filters[0]).toEqual({
         operator: 'eq',
         property_name: 'a',
         property_value: null
       });
-      assert.deepEqual(this.query.params.filters[1], {
+      expect(query.params.filters[1]).toEqual({
         operator: 'eq',
         property_name: 'b',
         property_value: false
       });
     });
 
-    it('should allow multiple filters on the same property name', function(){
-      this.query.addFilter('a', 'eq', 'b');
-      this.query.addFilter('a', 'eq', 'c');
-      assert.deepEqual(this.query.params.filters[0], {
+    it('should allow multiple filters on the same property name', () => {
+      query.addFilter('a', 'eq', 'b');
+      query.addFilter('a', 'eq', 'c');
+      expect(query.params.filters[0]).toEqual({
         operator: 'eq',
         property_name: 'a',
         property_value: 'b'
       });
-      assert.deepEqual(this.query.params.filters[1], {
+      expect(query.params.filters[1]).toEqual({
         operator: 'eq',
         property_name: 'a',
         property_value: 'c'
       });
     });
-
   });
 
-  describe('.get()', function(){
-
-    beforeEach(function(){
-      this.query = new KeenClient.Query('count', {
-        eventCollection: 'pageviews',
-        timeframe: 'this_7_days'
-      });
+  describe('.get()', () => {
+    it('should return values for camelCased attributes', () => {
+      expect(query.get('eventCollection')).toBe('pageview');
     });
 
-    afterEach(function(){
-      this.query = void 0;
+    it('should return values for underscored attributes', () => {
+      expect(query.get('event_collection')).toBe('pageview');
     });
-
-    it('should return values for camelCased attributes', function(){
-      assert.equal(this.query.get('eventCollection'), 'pageviews');
-    });
-
-    it('should return values for underscored attributes', function(){
-      assert.equal(this.query.get('event_collection'), 'pageviews');
-    });
-
   });
 
-  describe('.set()', function(){
+  describe('.set()', () => {
 
-    beforeEach(function(){
-      this.query = new KeenClient.Query('count', {
-        eventCollection: 'pageviews',
-        timeframe: 'this_7_days'
-      });
+    it('should set multiple specified attributes', () => {
+      query.set({ timeframe: 'this_7_days', interval: 'daily' });
+      expect(query.params.timeframe).toBe('this_7_days');
+      expect(query.params.interval).toBe('daily');
     });
 
-    afterEach(function(){
-      this.query = void 0;
-    });
-
-    it('should set multiple specified attributes', function(){
-      this.query.set({ timeframe: 'this_7_days', interval: 'daily' });
-      assert.equal(this.query.params.timeframe, 'this_7_days');
-      assert.equal(this.query.params.interval, 'daily');
-    });
-
-    it('should apply the latest attribute over previous values', function(){
-      this.query.set({ timeframe: 'this_7_days', interval: 'daily' });
-      this.query.set({ timeframe: 'this_21_days' });
-      this.query.set({ timeframe: 'this_14_days' });
-      assert.equal(this.query.params.timeframe, 'this_14_days');
-      assert.equal(this.query.params.interval, 'daily');
+    it('should apply the latest attribute over previous values', () => {
+      query.set({ timeframe: 'this_7_days', interval: 'daily' });
+      query.set({ timeframe: 'this_21_days' });
+      query.set({ timeframe: 'this_14_days' });
+      expect(query.params.timeframe).toBe('this_14_days');
+      expect(query.params.interval).toBe('daily');
     });
 
   });
