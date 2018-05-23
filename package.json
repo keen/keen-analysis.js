@@ -5,9 +5,9 @@
   "main": "dist/node/keen-analysis.js",
   "browser": "dist/keen-analysis.js",
   "scripts": {
-    "start": "webpack-dev-server",
-    "test": "NODE_ENV=test ENV=test jest",
-    "test:watch": "NODE_ENV=test ENV=test jest --watch",
+    "start": "ENV=development webpack-dev-server",
+    "test": "ENV=test jest && ENV=test TEST_ENV=node jest",
+    "test:watch": "ENV=test jest --watch",
     "build": "ENV=production webpack -p && ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node",
     "build:node": "TARGET=node ENV=production webpack -p",
     "profile": "webpack --profile --json > stats.json",

@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("url"), require("https"), require("keen-core"));
+		module.exports = factory(require("keen-core"));
 	else if(typeof define === 'function' && define.amd)
-		define(["url", "https", "keen-core"], factory);
+		define(["keen-core"], factory);
 	else {
-		var a = typeof exports === 'object' ? factory(require("url"), require("https"), require("keen-core")) : factory(root["url"], root["https"], root["keen-core"]);
+		var a = typeof exports === 'object' ? factory(require("keen-core")) : factory(root["keen-core"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(global, function(__WEBPACK_EXTERNAL_MODULE__5__, __WEBPACK_EXTERNAL_MODULE__6__, __WEBPACK_EXTERNAL_MODULE__10__) {
+})(global, function(__WEBPACK_EXTERNAL_MODULE__9__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -132,103 +132,6 @@ function each(o, cb, s){
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.BlueBird = undefined;
-
-var _bluebird = __webpack_require__(9);
-
-var _bluebird2 = _interopRequireDefault(_bluebird);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var BlueBird = exports.BlueBird = _bluebird2.default.config({
-  cancellation: true,
-  longStackTraces: false,
-  warnings: false
-});
-exports.default = BlueBird;
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.request = request;
-exports.getAnalysisType = getAnalysisType;
-
-var _each = __webpack_require__(1);
-
-var _each2 = _interopRequireDefault(_each);
-
-var _extend = __webpack_require__(0);
-
-var _extend2 = _interopRequireDefault(_extend);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function request(method) {
-  return function (str) {
-    this.config = {
-      'api_key': undefined,
-      'method': method,
-      'params': undefined,
-      'timeout': 300 * 1000,
-      'url': str,
-      'headers': {
-        'Authorization': '',
-        'Content-type': 'application/json'
-      }
-    };
-    return this;
-  }.bind(this);
-}
-
-request.prototype.auth = function (str) {
-  if (typeof str === 'string') {
-    this.config.api_key = typeof str === 'string' ? str : undefined;
-    this.headers({
-      'Authorization': str
-    });
-  }
-  return this;
-};
-
-request.prototype.headers = function (obj) {
-  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-    (0, _each2.default)(obj, function (value, key) {
-      this.config['headers'][key] = value;
-    }.bind(this));
-  }
-  return this;
-};
-
-request.prototype.timeout = function (num) {
-  this.config.timeout = typeof num === 'number' ? num : 300 * 1000;
-  return this;
-};
-
-function getAnalysisType(str) {
-  var split = str.split('/queries/');
-  return split[split.length - 1];
-}
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var each = __webpack_require__(1),
     extend = __webpack_require__(0);
 
@@ -247,19 +150,19 @@ function serialize(data){
 
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+module.exports = require("url");
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = require("https");
+
+/***/ }),
 /* 5 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__5__;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__6__;
-
-/***/ }),
-/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -270,11 +173,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
 
-var _https = __webpack_require__(6);
+var _https = __webpack_require__(4);
 
 var _https2 = _interopRequireDefault(_https);
 
-var _url = __webpack_require__(5);
+var _url = __webpack_require__(3);
 
 var _url2 = _interopRequireDefault(_url);
 
@@ -282,7 +185,7 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _serialize = __webpack_require__(4);
+var _serialize = __webpack_require__(2);
 
 var _serialize2 = _interopRequireDefault(_serialize);
 
@@ -332,7 +235,7 @@ function handleRequest(config, callback) {
         return callback(error, null);
       }
       if (parsedBody.error_code) {
-        error = new Error(parsedBody.message || 'Unknown error occurred');
+        var error = new Error(parsedBody.message || 'Unknown error occurred');
         error.code = parsedBody.error_code;
         callback(error, null);
       } else {
@@ -347,7 +250,7 @@ function handleRequest(config, callback) {
 }
 
 /***/ }),
-/* 8 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -356,13 +259,11 @@ function handleRequest(config, callback) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.del = exports.put = exports.post = exports.get = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _promise = __webpack_require__(2);
-
-var _promise2 = _interopRequireDefault(_promise);
+exports.default = request;
+exports.getAnalysisType = getAnalysisType;
 
 var _each = __webpack_require__(1);
 
@@ -372,35 +273,64 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _httpServer = __webpack_require__(7);
-
-var httpHandlers = _interopRequireWildcard(_httpServer);
-
-var _request = __webpack_require__(3);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var get = exports.get = new _request.request('GET');
-var post = exports.post = new _request.request('POST');
-var put = exports.put = new _request.request('PUT');
-var del = exports.del = new _request.request('DELETE');
+function request(method, httpHandlers) {
+  this.httpHandlers = httpHandlers;
+  return function (str) {
+    this.config = {
+      'api_key': undefined,
+      'method': method,
+      'params': undefined,
+      'timeout': 300 * 1000,
+      'url': str,
+      'headers': {
+        'Authorization': '',
+        'Content-type': 'application/json'
+      }
+    };
+    return this;
+  }.bind(this);
+}
 
-_request.request.prototype.send = function (obj) {
+request.prototype.auth = function (str) {
+  if (typeof str === 'string') {
+    this.config.api_key = typeof str === 'string' ? str : undefined;
+    this.headers({
+      'Authorization': str
+    });
+  }
+  return this;
+};
+
+request.prototype.headers = function (obj) {
+  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+    (0, _each2.default)(obj, function (value, key) {
+      this.config['headers'][key] = value;
+    }.bind(this));
+  }
+  return this;
+};
+
+request.prototype.timeout = function (num) {
+  this.config.timeout = typeof num === 'number' ? num : 300 * 1000;
+  return this;
+};
+
+request.prototype.send = function (obj) {
   this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
-  var httpHandler = httpHandlers[this.config['method']];
+  var httpHandler = this.httpHandlers[this.config['method']];
   var httpOptions = (0, _extend2.default)({}, this.config);
 
   // Temporary mod to append analysis_type to responses
   // for generic HTTP requests to known query resources
   if (typeof httpOptions.params.analysis_type === 'undefined') {
     if (httpOptions.url.indexOf('/queries/') > -1 && httpOptions.url.indexOf('/saved/') < 0) {
-      httpOptions.params.analysis_type = (0, _request.getAnalysisType)(httpOptions.url);
+      httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
     }
   }
 
-  return new _promise2.default(function (resolve, reject, onCancel) {
+  return new Promise(function (resolve, reject, onCancel) {
     var httpRequest = httpHandler(httpOptions, function (err, res) {
       var augmentedResponse = res;
       if (err) {
@@ -413,17 +343,24 @@ _request.request.prototype.send = function (obj) {
         resolve(augmentedResponse);
       }
     });
-    onCancel(function () {
-      if (httpRequest.abort) {
-        httpRequest.abort();
-      }
-    });
+    if (onCancel) {
+      onCancel(function () {
+        if (httpRequest.abort) {
+          httpRequest.abort();
+        }
+      });
+    }
     return httpRequest;
   });
 };
 
+function getAnalysisType(str) {
+  var split = str.split('/queries/');
+  return split[split.length - 1];
+}
+
 /***/ }),
-/* 9 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* @preserve
@@ -4067,13 +4004,38 @@ module.exports = ret;
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports) {
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__10__;
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BlueBird = undefined;
+
+var _bluebird = __webpack_require__(7);
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var BlueBird = exports.BlueBird = _bluebird2.default.config({
+  cancellation: true,
+  longStackTraces: false,
+  warnings: false
+});
+exports.default = BlueBird;
 
 /***/ }),
-/* 11 */
+/* 9 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__9__;
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4086,11 +4048,11 @@ exports.KeenAnalysis = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _keenCore = __webpack_require__(10);
+var _keenCore = __webpack_require__(9);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
-var _promise = __webpack_require__(2);
+var _promise = __webpack_require__(8);
 
 var _promise2 = _interopRequireDefault(_promise);
 
@@ -4236,10 +4198,10 @@ Query.prototype.addFilter = function (property, operator, value) {
 };
 
 var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
-exports.default = _keenCore2.default;
+exports.default = KeenAnalysis;
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4250,26 +4212,33 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Keen = undefined;
 
-var _index = __webpack_require__(11);
-
-var _index2 = _interopRequireDefault(_index);
-
 var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _requestServer = __webpack_require__(8);
+var _index = __webpack_require__(10);
 
-var request = _interopRequireWildcard(_requestServer);
+var _index2 = _interopRequireDefault(_index);
+
+var _request = __webpack_require__(6);
+
+var _request2 = _interopRequireDefault(_request);
+
+var _httpServer = __webpack_require__(5);
+
+var httpHandlers = _interopRequireWildcard(_httpServer);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-(0, _extend2.default)(_index2.default.prototype, request);
+_index2.default.prototype.get = new _request2.default('GET', httpHandlers);
+_index2.default.prototype.post = new _request2.default('POST', httpHandlers);
+_index2.default.prototype.put = new _request2.default('PUT', httpHandlers);
+_index2.default.prototype.del = new _request2.default('DELETE', httpHandlers);
 
 var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
-exports.default = Keen;
+module.exports = Keen;
 
 /***/ })
 /******/ ]);

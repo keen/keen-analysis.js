@@ -1,7 +1,7 @@
 const path = require('path');
+const webpack = require('webpack');
 
 const fileName = 'keen-analysis';
-
 const entry = ( process.env.TARGET !== 'node' ) ? './lib/browser.js' : './lib/server.js' ;
 
 module.exports = {
@@ -61,12 +61,14 @@ module.exports = {
 
   // stats: 'verbose',
 
-  plugins: [],
+  plugins: [
+    new webpack.EnvironmentPlugin(['ENV'])
+  ],
 
-  mode: !process.env.ENV ? 'development' : process.env.ENV,
+  mode: process.env.ENV,
 
   devServer: {
-    contentBase: path.join(__dirname, 'demo'),
+    contentBase: path.join(__dirname, 'test/demo'),
     open: true,
     inline: true,
     hot: false,

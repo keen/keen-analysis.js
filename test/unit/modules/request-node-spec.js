@@ -1,8 +1,10 @@
 import helpers from '../helpers/client-config';
-import KeenClient from '../../../lib/browser';
-import XHRmock from 'xhr-mock';
+import KeenClient from '../../../lib/server';
+import nock from 'nock';
 
-describe('Browser Request methods', () => {
+
+
+describe('Server Request methods', () => {
 
   let client;
   let requestKey;
@@ -35,45 +37,22 @@ describe('Browser Request methods', () => {
   };
 
   beforeEach(() => {
-    XHRmock.setup();
     client = new KeenClient(helpers.client);
     requestKey = client.readKey();
-  });
-
-  afterEach(() => {
-    XHRmock.teardown();
-  });
-
-  describe('.auth()', () => {
-    it('should set the given api_key value', () => {
-      XHRmock.get(apiQueryUrl, {});
-      const req = client.get(apiQueryUrl).auth('123');
-      expect(req.config.api_key).toBe('123');
-    });
-  });
-
-  describe('.timeout()', () => {
-    it('should set the given timeout value', () => {
-      XHRmock.get(apiQueryUrl, {});
-      const req = client.get(apiQueryUrl).timeout(100);
-      expect(req.config.timeout).toBe(100);
-    });
-  });
-
-  describe('.headers()', () => {
-    it('should set the given headers value', () => {
-      XHRmock.get(apiQueryUrl, {});
-      const req = client.get(apiQueryUrl).headers({'x-custom-header':'123'});
-      expect(req.config.headers['x-custom-header']).toBe('123');
-    });
   });
 
   describe('.query()', () => {
 
     it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
-      XHRmock.post(new RegExp('count'), (req, res) => {
-        return res.status(200).body(JSON.stringify(dummyResponse));
-      });
+      nock(/./, {
+        reqheaders: {
+          'authorization': requestKey,
+          'content-type': 'application/json'
+        }
+      })
+        .post(/./)
+        .reply(200, dummyResponse);
+
       await client
         .query('count', {
           event_collection: 'pageview',
@@ -88,24 +67,33 @@ describe('Browser Request methods', () => {
     });
 
     it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', async () => {
-      XHRmock.post(new RegExp('count'), (req, res) => {
-        return res.status(400).body(JSON.stringify(dummyErrorResponse));
-      });
+      nock(/./)
+        .post(/./)
+        .reply(404, {error_code: 404, message: 'Error'});
+
       await client
-        .query('count', {
-          event_collection: false
-        })
-        .then(res => {
-        })
-        .catch(err => {
-          expect(err).toEqual(dummyErrorResponse);
-        });
+          .query('count', {
+            event_collection: false
+          })
+          .then(res => {
+            expect(true).toBe(false);
+          })
+          .catch(err => {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.matcherResult).toBe(undefined); // error should be emitted not from Jest
+          });
     });
 
     it('should make a GET request to a saved query endpoint, returning a response when successful', async () => {
-      XHRmock.get(new RegExp('saved'), (req, res) => {
-        return res.status(200).body(JSON.stringify(dummyResponse));
-      });
+      nock(/./, {
+        reqheaders: {
+          'authorization': requestKey,
+          'content-type': 'application/json'
+        }
+      })
+        .get(/./)
+        .reply(200, dummyResponse);
+
       await client
         .query('saved', 'clicks')
         .then(res => {
@@ -113,27 +101,32 @@ describe('Browser Request methods', () => {
         });
     });
 
-    it('should throw error if response JSON is not valid', async () => {
-      XHRmock.put(new RegExp('saved'), (req, res) => {
-        return res.status(200).body("invalid text");
-      });
+    it('should make a GET request with data to a query endpoint, returning an error when unsuccessful', async () => {
+      nock(/./)
+        .get(/./)
+        .reply(404, {error_code: 404, message: 'Error'});
+
       await client
-        .put(client.url('queries', 'saved', 'some-saved-query1'))
-        .auth(client.masterKey())
-        .send(dummyQueryData)
-        .then(res => {
-          expect(true).toBe(false);
-        })
-        .catch(err => {
-          expect(err).not.toBe(null);
-          expect(err).toBeInstanceOf(Object);
-        });
+          .query('saved', 'does-not-exist')
+          .then(res => {
+            expect(true).toBe(false);
+          })
+          .catch(err => {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.matcherResult).toBe(undefined); // error should be emitted not from Jest
+          });
     });
 
     it('should make a PUT request to a saved query endpoint, returning a response when successful', async () => {
-      XHRmock.put(new RegExp('saved'), (req, res) => {
-        return res.status(200).body(JSON.stringify(dummyResponse));
-      });
+      nock(/./, {
+        reqheaders: {
+          'authorization': client.masterKey(),
+          'content-type': 'application/json'
+        }
+      })
+        .put(/./, JSON.stringify(dummyQueryData))
+        .reply(200, dummyResponse);
+
       await client
         .put(client.url('queries', 'saved', 'some-saved-query1'))
         .auth(client.masterKey())
@@ -144,26 +137,21 @@ describe('Browser Request methods', () => {
     });
 
     it('should make a DELETE request to a saved query endpoint, returning a response when successful', async () => {
-      XHRmock.delete(new RegExp('saved'), (req, res) => {
-        return res.status(200).body(JSON.stringify(dummyResponse));
-      });
+      nock(/./, {
+        reqheaders: {
+          'authorization': client.masterKey(),
+          'content-type': 'application/json'
+        }
+      })
+        .delete(/./)
+        .reply(200, dummyResponse);
+
       await client
         .del(client.url('queries', 'saved', 'new-saved-query'))
         .auth(client.masterKey())
         .send()
         .then(res => {
           expect(res).toEqual(dummyResponse);
-        });
-    });
-
-    it('should make a GET request to a saved query endpoint, returning an error when unsuccessful', async () => {
-      XHRmock.get(new RegExp('saved'), (req, res) => {
-        return res.status(400).body(JSON.stringify(dummyErrorResponse));
-      });
-      await client
-        .query('saved', 'does-not-exist')
-        .catch(err => {
-          expect(err).toEqual(dummyErrorResponse);
         });
     });
 
@@ -174,6 +162,22 @@ describe('Browser Request methods', () => {
           expect(err).toBeInstanceOf(Object);
           expect(err.message).not.toBe(undefined);
         });
+    });
+
+    it('should return an error when API response is not valid JSON', async () => {
+      nock(/./)
+        .get(/./)
+        .reply(200, "invalid text instead of json");
+
+      await client
+          .query('saved', 'abc')
+          .then(res => {
+            expect(true).toBe(false);
+          })
+          .catch(err => {
+            expect(/Unexpected token/.test(err.message)).toBe(true);
+            expect(err).toBeInstanceOf(Error);
+          });
     });
 
   });
