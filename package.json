@@ -8,6 +8,7 @@
     "start": "NODE_ENV=development webpack-dev-server",
     "test": "NODE_ENV=test jest && NODE_ENV=test TEST_ENV=node jest",
     "test:watch": "NODE_ENV=test jest --watch",
+    "test:node:watch": "NODE_ENV=test TEST_ENV=node jest --watch",
     "build": "NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node",
     "build:node": "TARGET=node NODE_ENV=production webpack -p",
     "profile": "webpack --profile --json > stats.json",

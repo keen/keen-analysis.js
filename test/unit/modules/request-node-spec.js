@@ -1,13 +1,12 @@
-import helpers from '../helpers/client-config';
-import KeenClient from '../../../lib/server';
 import nock from 'nock';
 
+import config from '../helpers/client-config';
+import KeenClient from '../../..';
 
-
-describe('Server Request methods', () => {
+describe('Node Request methods', () => {
 
   let client;
-  let requestKey;
+  const requestKey = config.client.readKey;
 
   const queryObject = {
     analysis_type: 'count',
@@ -36,23 +35,91 @@ describe('Server Request methods', () => {
     refresh_rate: 0
   };
 
-  beforeEach(() => {
-    client = new KeenClient(helpers.client);
-    requestKey = client.readKey();
-  });
+  beforeAll(() => {
+    nock(/./, {
+      reqheaders: {
+        'authorization': requestKey,
+        'content-type': 'application/json'
+      }
+      })
+      .persist()
+      .post(/./, JSON.stringify(queryObject))
+      .reply(200, dummyResponse);
 
-  describe('.query()', () => {
-
-    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
-      nock(/./, {
+    nock(/./, {
         reqheaders: {
           'authorization': requestKey,
           'content-type': 'application/json'
         }
       })
-        .post(/./)
-        .reply(200, dummyResponse);
+      .persist()
+      .post(/./, JSON.stringify({
+        analysis_type: queryObject.analysis_type,
+        event_collection: false
+      }))
+      .reply(500, {error_code: 500, message: 'Error'});
 
+    nock(/./, {
+      reqheaders: {
+        'authorization': requestKey,
+        'content-type': 'application/json'
+      }
+      })
+      .persist()
+      .get(/saved\/clicks/)
+      .reply(200, dummyResponse);
+
+    nock(/./, {
+      reqheaders: {
+        'authorization': requestKey,
+        'content-type': 'application/json'
+      }
+      })
+      .persist()
+      .get(/saved\/does\-not\-exist/)
+      .reply(500, {error_code: 500, message: 'Error'});
+
+    nock(/./, {
+        reqheaders: {
+          'authorization': config.client.masterKey,
+          'content-type': 'application/json'
+        }
+      })
+      .persist()
+      .put(/./, JSON.stringify(dummyQueryData))
+      .reply(200, dummyResponse);
+
+    nock(/./, {
+        reqheaders: {
+          'authorization': config.client.masterKey,
+          'content-type': 'application/json'
+        }
+      })
+      .persist()
+      .delete(/delete\-new\-saved\-query/)
+      .reply(200, dummyResponse);
+
+    nock(/./, {
+      reqheaders: {
+        'authorization': requestKey,
+        'content-type': 'application/json'
+      }
+      })
+      .persist()
+      .get(/saved\/invalid\-json/)
+      .reply(200, "invalid text instead of json");
+
+  });
+
+  beforeEach(() => {
+    client = new KeenClient(config.client);
+  });
+
+
+
+  describe('.query()', () => {
+
+    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
       await client
         .query('count', {
           event_collection: 'pageview',
@@ -67,33 +134,17 @@ describe('Server Request methods', () => {
     });
 
     it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', async () => {
-      nock(/./)
-        .post(/./)
-        .reply(404, {error_code: 404, message: 'Error'});
-
       await client
           .query('count', {
             event_collection: false
           })
-          .then(res => {
-            expect(true).toBe(false);
-          })
           .catch(err => {
             expect(err).toBeInstanceOf(Error);
-            expect(err.matcherResult).toBe(undefined); // error should be emitted not from Jest
+            expect(err.code).toBe(500);
           });
     });
 
     it('should make a GET request to a saved query endpoint, returning a response when successful', async () => {
-      nock(/./, {
-        reqheaders: {
-          'authorization': requestKey,
-          'content-type': 'application/json'
-        }
-      })
-        .get(/./)
-        .reply(200, dummyResponse);
-
       await client
         .query('saved', 'clicks')
         .then(res => {
@@ -102,31 +153,15 @@ describe('Server Request methods', () => {
     });
 
     it('should make a GET request with data to a query endpoint, returning an error when unsuccessful', async () => {
-      nock(/./)
-        .get(/./)
-        .reply(404, {error_code: 404, message: 'Error'});
-
       await client
           .query('saved', 'does-not-exist')
-          .then(res => {
-            expect(true).toBe(false);
-          })
           .catch(err => {
             expect(err).toBeInstanceOf(Error);
-            expect(err.matcherResult).toBe(undefined); // error should be emitted not from Jest
+            expect(err.code).toBe(500);
           });
     });
 
     it('should make a PUT request to a saved query endpoint, returning a response when successful', async () => {
-      nock(/./, {
-        reqheaders: {
-          'authorization': client.masterKey(),
-          'content-type': 'application/json'
-        }
-      })
-        .put(/./, JSON.stringify(dummyQueryData))
-        .reply(200, dummyResponse);
-
       await client
         .put(client.url('queries', 'saved', 'some-saved-query1'))
         .auth(client.masterKey())
@@ -137,17 +172,8 @@ describe('Server Request methods', () => {
     });
 
     it('should make a DELETE request to a saved query endpoint, returning a response when successful', async () => {
-      nock(/./, {
-        reqheaders: {
-          'authorization': client.masterKey(),
-          'content-type': 'application/json'
-        }
-      })
-        .delete(/./)
-        .reply(200, dummyResponse);
-
       await client
-        .del(client.url('queries', 'saved', 'new-saved-query'))
+        .del(client.url('queries', 'saved', 'delete-new-saved-query'))
         .auth(client.masterKey())
         .send()
         .then(res => {
@@ -165,15 +191,8 @@ describe('Server Request methods', () => {
     });
 
     it('should return an error when API response is not valid JSON', async () => {
-      nock(/./)
-        .get(/./)
-        .reply(200, "invalid text instead of json");
-
       await client
-          .query('saved', 'abc')
-          .then(res => {
-            expect(true).toBe(false);
-          })
+          .query('saved', 'invalid-json')
           .catch(err => {
             expect(/Unexpected token/.test(err.message)).toBe(true);
             expect(err).toBeInstanceOf(Error);
