@@ -2,13 +2,8 @@ var gulp = require('gulp'),
     pkg = require('./package.json');
 
 var aws = require('gulp-awspublish')
-    compress = require('gulp-yuicompressor'),
     rename = require('gulp-rename'),
-    replace = require('gulp-replace'),
-    squash = require('gulp-remove-empty-lines'),
-    strip = require('gulp-strip-comments'),
-    through2 = require('through2'),
-    util = require('gulp-util');
+    replace = require('gulp-replace');
 
 // ---------------------
 

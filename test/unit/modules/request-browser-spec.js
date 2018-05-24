@@ -1,5 +1,5 @@
 import helpers from '../helpers/client-config';
-import KeenClient from '../../../lib/browser';
+import KeenClient from '../../../dist/keen-analysis.min.js';
 import XHRmock from 'xhr-mock';
 
 describe('Browser Request methods', () => {
