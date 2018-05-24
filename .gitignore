@@ -5,3 +5,4 @@ test/unit/build/*
 .DS_Store
 
 demo.js
+demo-config.js

@@ -1,27 +1,22 @@
-var assert = require('proclaim');
-var helpers = require('../helpers/client-config');
+import helpers from '../helpers/client-config';
+import KeenClient from '../../../lib/browser';
 
-var KeenClient = require('../../../lib/index');
+describe('Client accessors', () => {
+  let client;
 
-describe('Client accessors', function(){
-
-  beforeEach(function(){
-    this.client = new KeenClient(helpers.client);
+  beforeEach(() => {
+    client = new KeenClient(helpers.client);
   });
 
-  afterEach(function(){
-    this.client = null;
-  });
-
-  describe('.readKey()', function(){
+  describe('.readKey()', () => {
 
     it('should get the correct readKey value', function(){
-      assert.equal(this.client.readKey(), helpers.client.readKey);
+      expect(client.readKey()).toBe(helpers.client.readKey);
     });
 
     it('should set a readKey value', function(){
-      this.client.readKey('123');
-      assert.equal(this.client.config.readKey, '123');
+      client.readKey('123');
+      expect(client.config.readKey).toBe('123');
     });
 
   });
