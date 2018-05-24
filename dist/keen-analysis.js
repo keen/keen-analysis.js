@@ -5273,7 +5273,7 @@ Query.prototype.addFilter = function (property, operator, value) {
 };
 
 var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
-exports.default = _keenCore2.default;
+exports.default = KeenAnalysis;
 
 /***/ }),
 /* 15 */

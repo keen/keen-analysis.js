@@ -32,6 +32,15 @@ const demoTests = (demoConfig, Keen) => {
   .catch(err => {
     console.log('err', err);
   });
+
+  client.run(qq1, (err, res) =>{
+    if (err) {
+      console.log('err', err);
+    }
+    else {
+      console.log(res);
+    }
+  });
 }
 
 if (typeof window !== 'undefined') {

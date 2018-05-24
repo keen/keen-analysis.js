@@ -61,11 +61,9 @@ module.exports = {
 
   // stats: 'verbose',
 
-  plugins: [
-    new webpack.EnvironmentPlugin(['ENV'])
-  ],
+  plugins: [],
 
-  mode: process.env.ENV,
+  mode: process.env.NODE_ENV,
 
   devServer: {
     contentBase: path.join(__dirname, 'test/demo'),
