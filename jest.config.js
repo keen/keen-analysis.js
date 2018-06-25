@@ -1,8 +1,12 @@
 const files = `<rootDir>/test/unit/modules/*${
-  process.env.TEST_ENV ? `-${process.env.TEST_ENV}-` : ``
+  process.env.TEST_ENV ? `-${process.env.TEST_ENV}-` : `-browser-`
 }*.js`;
 
 module.exports = {
+  automock: false,
+  setupFiles: [
+    "./test/setupJest.js"
+  ],
   verbose: true,
   bail: true,
   testMatch: [files],

@@ -2,6 +2,8 @@ import helpers from '../helpers/client-config';
 import KeenClient from '../../../lib/browser';
 import XHRmock from 'xhr-mock';
 
+jest.mock('promise-polyfill', () => {});
+
 describe('Keen.Query', () => {
   let client;
   let query;

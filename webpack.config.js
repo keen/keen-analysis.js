@@ -2,10 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 
 const fileName = 'keen-analysis';
-const entry = ( process.env.TARGET !== 'node' ) ? './lib/browser.js' : './lib/server.js' ;
+const entryFile = ( process.env.TARGET !== 'node' ) ? './lib/browser.js' : './lib/server.js' ;
 
 module.exports = {
-  entry,
+  entry: [entryFile],
 
   target: process.env.TARGET ? `${process.env.TARGET}` : 'web',
 
@@ -33,7 +33,7 @@ module.exports = {
         exclude: [
           path.resolve(__dirname, 'node_modules'),
         ],
-        loader: 'babel-loader',
+        loader: 'babel-loader'
       },
 
       {
@@ -74,8 +74,9 @@ module.exports = {
   },
 
   externals: process.env.TARGET === 'node' ? {
-    'bluebird' : 'bluebird',
-    'keen-core' : 'keen-core',
+    'whatwg-fetch' : true,
+    'promise-polyfill' : true,
+    'keen-core' : true,
   } : {
   },
 
