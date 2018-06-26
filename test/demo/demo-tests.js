@@ -2,7 +2,23 @@ const demoTests = (demoConfig, Keen) => {
   const client = new Keen(demoConfig);
 
   Keen.debug = true;
+  client.abort();
 
+  setTimeout(() => {
+    client
+      .query('count', {
+        event_collection: 'pageviews',
+        timeframe: 'this_144_days'
+      })
+      .then(res => {
+        console.log(res);
+          // Handle results
+      })
+      .catch(err => {
+        console.log('err', err);
+        // Handle errors
+      });
+  }, 2000);
   client
     .query('count', {
       event_collection: 'pageviews',
@@ -16,6 +32,8 @@ const demoTests = (demoConfig, Keen) => {
       console.log('err', err);
       // Handle errors
     });
+
+
 
   const qq1 = new Keen.Query('count', {
     event_collection: 'pageviews',
