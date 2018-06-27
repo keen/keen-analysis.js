@@ -1,8 +1,7 @@
 const demoTests = (demoConfig, Keen) => {
-  const client = new Keen(demoConfig);
+  const client = new Keen({ ...demoConfig, timeout: 100 });
 
   Keen.debug = true;
-  client.abort();
 
   setTimeout(() => {
     client
@@ -19,6 +18,19 @@ const demoTests = (demoConfig, Keen) => {
         // Handle errors
       });
   }, 2000);
+
+  const abortedQuery = client.query('count', {
+      event_collection: 'pageviews',
+      timeframe: 'this_144_days'
+    });
+  abortedQuery.abort();
+  abortedQuery.then(res => {
+    console.log('aborted', res);
+  })
+  .catch(err => {
+    console.log('aborted errx', err);
+  });
+
   client
     .query('count', {
       event_collection: 'pageviews',
@@ -33,8 +45,6 @@ const demoTests = (demoConfig, Keen) => {
       // Handle errors
     });
 
-
-
   const qq1 = new Keen.Query('count', {
     event_collection: 'pageviews',
     timeframe: 'this_1_days'
@@ -45,19 +55,20 @@ const demoTests = (demoConfig, Keen) => {
     timeframe: 'this_30_days'
   });
 
-  client.run([qq1, qq2]).then(res => {
-    console.log(res);
+  const runs = client.run([qq1, qq2]);
+  runs.then(res => {
+    console.log('runs', res);
   })
   .catch(err => {
     console.log('err', err);
   });
 
-  client.run(qq1, (err, res) =>{
+  const singleRun = client.run(qq1, (err, res) =>{
     if (err) {
       console.log('err', err);
     }
     else {
-      console.log(res);
+      console.log('single run', res);
     }
   });
 }

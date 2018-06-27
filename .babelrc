@@ -3,13 +3,13 @@
     ["env", {
       "production": {
         "targets": {
-          "chrome" : 1
+          "browsers": ["last 5 versions", "safari >= 7"]
         },
         "modules": false,
       },
       "development": {
         "targets": {
-          "chrome" : 1
+          "browsers": ["last 5 versions", "safari >= 7"]
         },
         "modules": false,
       },

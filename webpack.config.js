@@ -77,6 +77,7 @@ module.exports = {
     'whatwg-fetch' : true,
     'promise-polyfill' : true,
     'keen-core' : true,
+    'abortcontroller-polyfill/dist/polyfill-patch-fetch': true
   } : {
   },
 

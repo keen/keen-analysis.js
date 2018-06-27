@@ -1,8 +1,5 @@
 import helpers from '../helpers/client-config';
 import KeenClient from '../../../lib/browser';
-import XHRmock from 'xhr-mock';
-
-jest.mock('promise-polyfill', () => {});
 
 describe('Keen.Query', () => {
   let client;
@@ -18,7 +15,7 @@ describe('Keen.Query', () => {
   const dummyErrorResponse = { error: true };
 
   beforeEach(() => {
-    XHRmock.setup();
+    fetch.resetMocks();
     client = new KeenClient(helpers.client);
     query = new KeenClient.Query(queryObject.analysis_type, {
       event_collection: queryObject.event_collection,
@@ -28,7 +25,6 @@ describe('Keen.Query', () => {
   });
 
   afterEach(() => {
-    XHRmock.teardown();
   });
 
   beforeEach(() => {
@@ -77,12 +73,7 @@ describe('Keen.Query', () => {
     });
 
     it('should return a response and query parameters when successful', async () => {
-      XHRmock.post(apiQueryUrl,
-        (req, res) => {
-          expect(req.header('Content-Type')).toEqual('application/json');
-          expect(req.header('Authorization')).toEqual(requestKey);
-          return res.status(200).body(JSON.stringify(dummyResponse));
-      });
+      fetch.mockResponseOnce(JSON.stringify(dummyResponse));
 
       await client.run(query).then(res => {
         expect(res).toMatchObject(dummyResponse);
@@ -91,10 +82,7 @@ describe('Keen.Query', () => {
     });
 
     it('should add timezone to the query', async () => {
-      XHRmock.post(apiQueryUrl,
-        (req, res) => {
-          return res.status(200).body(JSON.stringify(dummyResponse));
-      });
+      fetch.mockResponseOnce(JSON.stringify(dummyResponse));
 
       await client.run(query).then(res => {
         expect(res.query.timezone).not.toBe(undefined);
@@ -102,10 +90,7 @@ describe('Keen.Query', () => {
     });
 
     it('should return an error when unsuccessful', async () => {
-      XHRmock.post(apiQueryUrl,
-        (req, res) => {
-          return res.status(404).body(JSON.stringify(dummyErrorResponse));
-      });
+      fetch.mockResponseOnce(JSON.stringify(dummyResponse));
 
       try {
         const user = await client.run(query);
@@ -115,15 +100,10 @@ describe('Keen.Query', () => {
     });
 
     it('should handle multiple query objects', async () => {
-      const count = jest.fn();
-      XHRmock.post(apiQueryUrl,
-        (req, res) => {
-          count();
-          return res.status(200).body(JSON.stringify(dummyResponse));
-      });
+      fetch.mockResponse(JSON.stringify(dummyResponse));
       const queries = [query, query, query];
       await client.run(queries).then(res => {
-        expect(count).toHaveBeenCalledTimes(queries.length);
+        expect(fetch.mock.calls.length).toBe(queries.length);
         expect(res).toBeInstanceOf(Array);
         expect(res.length).toBe(queries.length);
         expect(res[1].query).toMatchObject(queries[1].params);
