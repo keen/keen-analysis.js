@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("keen-core"));
+		module.exports = factory(require("keen-core"), require("promise-polyfill"));
 	else if(typeof define === 'function' && define.amd)
-		define(["keen-core"], factory);
+		define(["keen-core", "promise-polyfill"], factory);
 	else {
-		var a = typeof exports === 'object' ? factory(require("keen-core")) : factory(root["keen-core"]);
+		var a = typeof exports === 'object' ? factory(require("keen-core"), require("promise-polyfill")) : factory(root["keen-core"], root["promise-polyfill"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(global, function(__WEBPACK_EXTERNAL_MODULE__7__) {
+})(global, function(__WEBPACK_EXTERNAL_MODULE__7__, __WEBPACK_EXTERNAL_MODULE__8__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -369,6 +369,12 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__7__;
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__8__;
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -379,10 +385,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.KeenAnalysis = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // import Promise from 'promise-polyfill';
-
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 //"browsers": ["last 2 versions", "safari >= 7"]
 
+
+var _promisePolyfill = __webpack_require__(8);
+
+var _promisePolyfill2 = _interopRequireDefault(_promisePolyfill);
 
 var _keenCore = __webpack_require__(7);
 
@@ -417,7 +426,7 @@ _keenCore2.default.prototype.query = function (a, b) {
     var q = (0, _extend2.default)({ analysis_type: a }, b);
     return this.post(this.url('queries', a)).auth(this.readKey()).send(q);
   } else if (a && !b) {
-    return Promise.reject({
+    return _promisePolyfill2.default.reject({
       error_code: 'SDKError',
       message: ".query() called with incorrect arguments"
     });
@@ -446,7 +455,7 @@ _keenCore2.default.prototype.run = function (q, callback) {
   });
 
   if (promises.length > 1) {
-    output = Promise.all(promises);
+    output = _promisePolyfill2.default.all(promises);
   } else {
     // Only return single
     output = promises[0];
@@ -533,7 +542,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = KeenAnalysis;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -548,7 +557,7 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _index = __webpack_require__(8);
+var _index = __webpack_require__(9);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -573,10 +582,10 @@ var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 module.exports = Keen;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(9);
+module.exports = __webpack_require__(10);
 
 
 /***/ })
