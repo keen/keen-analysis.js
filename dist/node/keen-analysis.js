@@ -7,7 +7,7 @@
 		var a = typeof exports === 'object' ? factory(require("keen-core")) : factory(root["keen-core"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(global, function(__WEBPACK_EXTERNAL_MODULE__8__) {
+})(global, function(__WEBPACK_EXTERNAL_MODULE__9__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -529,18 +529,25 @@ function handleRequest(config) {
   });
 
   req.on('error', callback);
+  req.on('abort', function () {
+    return req.abort();
+  });
   req.write(data);
   req.end();
-
-  args.request.abort = function () {
-    return req.abort();
-  };
 
   return req;
 }
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// ignore polyfills for env Node or Browser
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -562,6 +569,8 @@ var _each2 = _interopRequireDefault(_each);
 var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
+
+__webpack_require__(7);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -621,8 +630,17 @@ request.prototype.send = function (obj) {
     }
   }
 
-  return new Promise(function (resolve, reject) {
+  var fetchAbortController = void 0;
+  if (typeof AbortController !== 'undefined') {
+    fetchAbortController = new AbortController();
+  }
+
+  var httpHandlerResponse = void 0;
+  var requestPromise = new Promise(function (resolve, reject) {
     var options = {};
+    if (fetchAbortController) {
+      options.signal = fetchAbortController.signal;
+    }
     options.callback = function (err, res) {
       var augmentedResponse = res;
       if (err) {
@@ -635,12 +653,23 @@ request.prototype.send = function (obj) {
         resolve(augmentedResponse);
       }
     };
-
-    options.request = self;
-    var httpRequest = httpHandler(httpOptions, options);
-    return httpRequest;
+    httpHandlerResponse = httpHandler(httpOptions, options);
+    return httpHandlerResponse;
   });
+
+  requestPromise.abort = function () {
+    if (fetchAbortController) {
+      // browser
+      return fetchAbortController.abort();
+    }
+
+    //node
+    httpHandlerResponse.emit('abort');
+  };
+  return requestPromise;
 };
+
+function abortExecutor() {}
 
 function getAnalysisType(str) {
   var split = str.split('/queries/');
@@ -648,13 +677,13 @@ function getAnalysisType(str) {
 }
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__8__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__9__;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -669,7 +698,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 __webpack_require__(2);
 
-var _keenCore = __webpack_require__(8);
+var _keenCore = __webpack_require__(9);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
@@ -691,16 +720,6 @@ _keenCore2.default.prototype.readKey = function (str) {
 
 _keenCore2.default.prototype.query = function (a, b) {
   var requestQuery = {};
-  Promise.prototype.abort = function () {
-    if (requestQuery.abortController) {
-      // browser
-      requestQuery.abortController.abort();
-    }
-    if (requestQuery.abort) {
-      // node
-      requestQuery.abort();
-    }
-  };
   if (a && b && typeof b === 'string') {
     if (b.indexOf('/result') < 0) {
       b += '/result';
@@ -835,7 +854,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = KeenAnalysis;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -850,11 +869,11 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _index = __webpack_require__(9);
+var _index = __webpack_require__(10);
 
 var _index2 = _interopRequireDefault(_index);
 
-var _request = __webpack_require__(7);
+var _request = __webpack_require__(8);
 
 var _request2 = _interopRequireDefault(_request);
 
@@ -875,10 +894,10 @@ var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 module.exports = Keen;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(10);
+module.exports = __webpack_require__(11);
 
 
 /***/ })

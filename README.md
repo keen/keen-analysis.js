@@ -2,7 +2,7 @@
 
 ### Installation
 
-Install this package from npm:
+Install this package from NPM *Recommended*
 
 ```ssh
 $ npm install keen-analysis --save
@@ -121,8 +121,8 @@ These HTTP methods take a URL (string) as a single argument and return an intern
 
 * `.auth(string)`: sets the API_KEY as an Authorization header
 * `.headers(object)`: sets headers to apply to the request
-* `.timeout(number)`: sets a timeout value (default is 300 seconds)
 * `.send()`: handles an optional object of parameters, executes the request and returns a promise
+* `.abort()`: cancels already running request
 
 The following example demonstrates the full HTTP request that is executed when `client.query()` is called (detailed above):
 
@@ -158,7 +158,6 @@ import Keen from 'keen-analysis';
 
 const client = new Keen({
   projectId: 'YOUR_PROJECT_ID',
-  readKey: 'YOUR_READ_KEY',
   masterKey: 'YOUR_MASTER_KEY'
 });
 
@@ -173,6 +172,34 @@ client
   .catch(err => {
     // Handle errors
   });
+```
+
+#### Example Canceling Queries
+
+```javascript
+import Keen from 'keen-analysis';
+
+const client = new Keen({
+  projectId: 'YOUR_PROJECT_ID',
+  readKey: 'YOUR_READ_KEY'
+});
+
+const query = client
+  .get(client.url('queries', 'saved'))
+  .auth(client.masterKey())
+  .send();
+
+// cancel
+query.abort();
+
+/*
+query.then(res => {
+  console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+*/
 ```
 
 #### Example POST Request
@@ -273,7 +300,7 @@ const client = new Keen({
   readKey: 'YOUR_READ_KEY'
 });
 
-var query = new Keen.Query('count', {
+const query = new Keen.Query('count', {
   event_collection: 'pageviews',
   timeframe: 'this_14_days'
 });
@@ -313,7 +340,7 @@ There are several breaking changes from earlier versions of [keen-js](https://gi
 This method now references an internal collection of resource paths, and constructs URLs using client configuration properties like `host` and `projectId`:
 
 ```javascript
-var url = client.url('projectId');
+const url = client.url('projectId');
 // Renders {protocol}://{host}/3.0/projects/{projectId}
 // Returns https://api.keen.io/3.0/projects/PROJECT_ID
 ```
@@ -330,14 +357,14 @@ Default resources:
 Non-matching strings will be appended to the `base` resource, like so:
 
 ```javascript
-var url = client.url('/3.0/projects');
+const url = client.url('/3.0/projects');
 // Returns https://api.keen.io/3.0/projects
 ```
 
 You can also pass in an object to append a serialized query string to the result, like so:
 
 ```javascript
-var url = client.url('events', { api_key: 'YOUR_API_KEY' });
+const url = client.url('events', { api_key: 'YOUR_API_KEY' });
 // Returns https://api.keen.io/3.0/projects/PROJECT_ID/events?api_key=YOUR_API_KEY
 ```
 

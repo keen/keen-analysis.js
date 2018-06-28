@@ -1,7 +1,21 @@
 const demoTests = (demoConfig, Keen) => {
-  const client = new Keen({ ...demoConfig, timeout: 100 });
+  const client = new Keen(demoConfig);
 
   Keen.debug = true;
+
+  const query = client
+    .get(client.url('queries', 'saved'))
+    .auth(client.masterKey())
+    .send();
+
+  // cancel ?
+  // query.abort();
+
+  query.then((res) => {
+    console.log('saved queries', res);
+  }).catch((err) => {
+    console.error(err);
+  })
 
   setTimeout(() => {
     client
@@ -17,18 +31,18 @@ const demoTests = (demoConfig, Keen) => {
         console.log('err', err);
         // Handle errors
       });
-  }, 2000);
+  }, 1000);
 
   const abortedQuery = client.query('count', {
       event_collection: 'pageviews',
-      timeframe: 'this_144_days'
+      timeframe: 'this_100_days'
     });
   abortedQuery.abort();
   abortedQuery.then(res => {
-    console.log('aborted', res);
+    console.log('you shouldnt see this - aborted', res);
   })
   .catch(err => {
-    console.log('aborted errx', err);
+    console.log('you shouldnt see this - aborted err', err);
   });
 
   client

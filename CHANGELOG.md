@@ -6,6 +6,12 @@
 **BREAKING:**
 **CHANGE:**
 -->
+<a name="2.0.1"></a>
+
+**FIXED:**
+* Keen-Analysis.js is now a valid ES5 module (UMD)
+* Root.location.protocol bug is now fixed (ios/android emulators) (#22)
+
 <a name="2.0.0"></a>
 
 **FIXED:**
