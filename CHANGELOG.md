@@ -6,11 +6,13 @@
 **BREAKING:**
 **CHANGE:**
 -->
-<a name="2.0.1"></a>
+<a name="2.1.0"></a>
+# Fetch API
 
-**FIXED:**
-* Keen-Analysis.js is now a valid ES5 module (UMD)
-* Root.location.protocol bug is now fixed (ios/android emulators) (#22)
+**NEW:**
+* Fetch API is now the default method of making requests.
+* Lighter Promise polyfill instead of Bluebird.
+* Ability to `.abort()` queries
 
 <a name="2.0.0"></a>
 

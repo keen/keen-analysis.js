@@ -33,12 +33,12 @@
   },
   "homepage": "https://github.com/keen/keen-analysis.js#readme",
   "dependencies": {
-    "abortcontroller-polyfill": "^1.1.9",
     "keen-core": "^0.2.0",
     "promise-polyfill": "^8.0.0",
     "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
+    "abortcontroller-polyfill": "^1.1.9",
     "babel-loader": "^7.1.4",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
