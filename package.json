@@ -14,9 +14,10 @@
     "profile": "webpack --profile --json > stats.json",
     "analyze": "webpack-bundle-analyzer stats.json /dist",
     "preversion": "npm run build && npm run test",
-    "version": "git add .",
+    "version": "npm run update_docs && git add .",
     "postversion": "git push && git push --tags",
-    "demo": "node ./test/demo/index.node.js"
+    "demo": "node ./test/demo/index.node.js",
+    "update_docs": "node ./node_modules/replace-in-file/bin/cli.js --configFile=replace-config.js"
   },
   "repository": {
     "type": "git",
@@ -63,6 +64,7 @@
     "jest-fetch-mock": "^1.6.5",
     "nock": "^9.2.6",
     "regenerator-runtime": "^0.11.1",
+    "replace-in-file": "^3.4.0",
     "requirejs": "^2.1.22",
     "through2": "^2.0.0",
     "webpack": "^4.5.0",
