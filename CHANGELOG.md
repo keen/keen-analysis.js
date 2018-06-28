@@ -6,6 +6,14 @@
 **BREAKING:**
 **CHANGE:**
 -->
+<a name="2.1.0"></a>
+# Fetch API
+
+**NEW:**
+* Fetch API is now the default method of making requests.
+* Lighter Promise polyfill instead of Bluebird.
+* Ability to `.abort()` queries
+
 <a name="2.0.0"></a>
 
 **FIXED:**
