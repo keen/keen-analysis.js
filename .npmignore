@@ -5,11 +5,15 @@
 *.md
 .awspublish-keen-js
 
+bower.json
 gulpfile.js
-config-karma.js
-config-sauce.js
-
+.babelrc
 test
+.travis.yml
+jest.config.js
+replace-config.js
+webpack.config.js
+.eslintrc
 
 CHANGELOG.md
 bower.json

@@ -3,6 +3,48 @@ const demoTests = (demoConfig, Keen) => {
 
   Keen.debug = true;
 
+  const query = client
+    .get(client.url('queries', 'saved'))
+    .auth(client.masterKey())
+    .send();
+
+  // cancel ?
+  // query.abort();
+
+  query.then((res) => {
+    console.log('saved queries', res);
+  }).catch((err) => {
+    console.error(err);
+  })
+
+  setTimeout(() => {
+    client
+      .query('count', {
+        event_collection: 'pageviews',
+        timeframe: 'this_144_days'
+      })
+      .then(res => {
+        console.log(res);
+          // Handle results
+      })
+      .catch(err => {
+        console.log('err', err);
+        // Handle errors
+      });
+  }, 1000);
+
+  const abortedQuery = client.query('count', {
+      event_collection: 'pageviews',
+      timeframe: 'this_100_days'
+    });
+  abortedQuery.abort();
+  abortedQuery.then(res => {
+    console.log('you shouldnt see this - aborted', res);
+  })
+  .catch(err => {
+    console.log('you shouldnt see this - aborted err', err);
+  });
+
   client
     .query('count', {
       event_collection: 'pageviews',
@@ -27,19 +69,20 @@ const demoTests = (demoConfig, Keen) => {
     timeframe: 'this_30_days'
   });
 
-  client.run([qq1, qq2]).then(res => {
-    console.log(res);
+  const runs = client.run([qq1, qq2]);
+  runs.then(res => {
+    console.log('runs', res);
   })
   .catch(err => {
     console.log('err', err);
   });
 
-  client.run(qq1, (err, res) =>{
+  const singleRun = client.run(qq1, (err, res) =>{
     if (err) {
       console.log('err', err);
     }
     else {
-      console.log(res);
+      console.log('single run', res);
     }
   });
 }

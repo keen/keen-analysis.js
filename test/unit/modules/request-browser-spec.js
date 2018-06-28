@@ -35,14 +35,12 @@ describe('Browser Request methods', () => {
   };
 
   beforeEach(() => {
-    // XHRmock.setup();
     fetch.resetMocks();
     client = new KeenClient(helpers.client);
     requestKey = client.readKey();
   });
 
   afterEach(() => {
-    // XHRmock.teardown();
   });
 
   describe('.auth()', () => {

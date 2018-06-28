@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("keen-core"), require("promise-polyfill"));
+		module.exports = factory(require("keen-core"));
 	else if(typeof define === 'function' && define.amd)
-		define(["keen-core", "promise-polyfill"], factory);
+		define(["keen-core"], factory);
 	else {
-		var a = typeof exports === 'object' ? factory(require("keen-core"), require("promise-polyfill")) : factory(root["keen-core"], root["promise-polyfill"]);
+		var a = typeof exports === 'object' ? factory(require("keen-core")) : factory(root["keen-core"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(global, function(__WEBPACK_EXTERNAL_MODULE__7__, __WEBPACK_EXTERNAL_MODULE__8__) {
+})(global, function(__WEBPACK_EXTERNAL_MODULE__9__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -130,6 +130,287 @@ function each(o, cb, s){
 
 /***/ }),
 /* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+// CONCATENATED MODULE: ./node_modules/promise-polyfill/src/finally.js
+/* harmony default export */ var src_finally = (function(callback) {
+  var constructor = this.constructor;
+  return this.then(
+    function(value) {
+      return constructor.resolve(callback()).then(function() {
+        return value;
+      });
+    },
+    function(reason) {
+      return constructor.resolve(callback()).then(function() {
+        return constructor.reject(reason);
+      });
+    }
+  );
+});
+
+// CONCATENATED MODULE: ./node_modules/promise-polyfill/src/index.js
+
+
+// Store setTimeout reference so promise-polyfill will be unaffected by
+// other code modifying setTimeout (like sinon.useFakeTimers())
+var setTimeoutFunc = setTimeout;
+
+function noop() {}
+
+// Polyfill for Function.prototype.bind
+function bind(fn, thisArg) {
+  return function() {
+    fn.apply(thisArg, arguments);
+  };
+}
+
+function Promise(fn) {
+  if (!(this instanceof Promise))
+    throw new TypeError('Promises must be constructed via new');
+  if (typeof fn !== 'function') throw new TypeError('not a function');
+  this._state = 0;
+  this._handled = false;
+  this._value = undefined;
+  this._deferreds = [];
+
+  doResolve(fn, this);
+}
+
+function handle(self, deferred) {
+  while (self._state === 3) {
+    self = self._value;
+  }
+  if (self._state === 0) {
+    self._deferreds.push(deferred);
+    return;
+  }
+  self._handled = true;
+  Promise._immediateFn(function() {
+    var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+    if (cb === null) {
+      (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+      return;
+    }
+    var ret;
+    try {
+      ret = cb(self._value);
+    } catch (e) {
+      reject(deferred.promise, e);
+      return;
+    }
+    resolve(deferred.promise, ret);
+  });
+}
+
+function resolve(self, newValue) {
+  try {
+    // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+    if (newValue === self)
+      throw new TypeError('A promise cannot be resolved with itself.');
+    if (
+      newValue &&
+      (typeof newValue === 'object' || typeof newValue === 'function')
+    ) {
+      var then = newValue.then;
+      if (newValue instanceof Promise) {
+        self._state = 3;
+        self._value = newValue;
+        finale(self);
+        return;
+      } else if (typeof then === 'function') {
+        doResolve(bind(then, newValue), self);
+        return;
+      }
+    }
+    self._state = 1;
+    self._value = newValue;
+    finale(self);
+  } catch (e) {
+    reject(self, e);
+  }
+}
+
+function reject(self, newValue) {
+  self._state = 2;
+  self._value = newValue;
+  finale(self);
+}
+
+function finale(self) {
+  if (self._state === 2 && self._deferreds.length === 0) {
+    Promise._immediateFn(function() {
+      if (!self._handled) {
+        Promise._unhandledRejectionFn(self._value);
+      }
+    });
+  }
+
+  for (var i = 0, len = self._deferreds.length; i < len; i++) {
+    handle(self, self._deferreds[i]);
+  }
+  self._deferreds = null;
+}
+
+function Handler(onFulfilled, onRejected, promise) {
+  this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+  this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+  this.promise = promise;
+}
+
+/**
+ * Take a potentially misbehaving resolver function and make sure
+ * onFulfilled and onRejected are only called once.
+ *
+ * Makes no guarantees about asynchrony.
+ */
+function doResolve(fn, self) {
+  var done = false;
+  try {
+    fn(
+      function(value) {
+        if (done) return;
+        done = true;
+        resolve(self, value);
+      },
+      function(reason) {
+        if (done) return;
+        done = true;
+        reject(self, reason);
+      }
+    );
+  } catch (ex) {
+    if (done) return;
+    done = true;
+    reject(self, ex);
+  }
+}
+
+Promise.prototype['catch'] = function(onRejected) {
+  return this.then(null, onRejected);
+};
+
+Promise.prototype.then = function(onFulfilled, onRejected) {
+  var prom = new this.constructor(noop);
+
+  handle(this, new Handler(onFulfilled, onRejected, prom));
+  return prom;
+};
+
+Promise.prototype['finally'] = src_finally;
+
+Promise.all = function(arr) {
+  return new Promise(function(resolve, reject) {
+    if (!arr || typeof arr.length === 'undefined')
+      throw new TypeError('Promise.all accepts an array');
+    var args = Array.prototype.slice.call(arr);
+    if (args.length === 0) return resolve([]);
+    var remaining = args.length;
+
+    function res(i, val) {
+      try {
+        if (val && (typeof val === 'object' || typeof val === 'function')) {
+          var then = val.then;
+          if (typeof then === 'function') {
+            then.call(
+              val,
+              function(val) {
+                res(i, val);
+              },
+              reject
+            );
+            return;
+          }
+        }
+        args[i] = val;
+        if (--remaining === 0) {
+          resolve(args);
+        }
+      } catch (ex) {
+        reject(ex);
+      }
+    }
+
+    for (var i = 0; i < args.length; i++) {
+      res(i, args[i]);
+    }
+  });
+};
+
+Promise.resolve = function(value) {
+  if (value && typeof value === 'object' && value.constructor === Promise) {
+    return value;
+  }
+
+  return new Promise(function(resolve) {
+    resolve(value);
+  });
+};
+
+Promise.reject = function(value) {
+  return new Promise(function(resolve, reject) {
+    reject(value);
+  });
+};
+
+Promise.race = function(values) {
+  return new Promise(function(resolve, reject) {
+    for (var i = 0, len = values.length; i < len; i++) {
+      values[i].then(resolve, reject);
+    }
+  });
+};
+
+// Use polyfill for setImmediate for performance gains
+Promise._immediateFn =
+  (typeof setImmediate === 'function' &&
+    function(fn) {
+      setImmediate(fn);
+    }) ||
+  function(fn) {
+    setTimeoutFunc(fn, 0);
+  };
+
+Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+  if (typeof console !== 'undefined' && console) {
+    console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+  }
+};
+
+/* harmony default export */ var src = (Promise);
+
+// CONCATENATED MODULE: ./node_modules/promise-polyfill/src/polyfill.js
+
+
+
+var globalNS = (function() {
+  // the only reliable means to get the global object is
+  // `Function('return this')()`
+  // However, this causes CSP violations in Chrome apps.
+  if (typeof self !== 'undefined') {
+    return self;
+  }
+  if (typeof window !== 'undefined') {
+    return window;
+  }
+  if (typeof global !== 'undefined') {
+    return global;
+  }
+  throw new Error('unable to locate global object');
+})();
+
+if (!globalNS.Promise) {
+  globalNS.Promise = src;
+} else if (!globalNS.Promise.prototype['finally']) {
+  globalNS.Promise.prototype['finally'] = src_finally;
+}
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var each = __webpack_require__(1),
@@ -150,19 +431,19 @@ function serialize(data){
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = require("url");
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 module.exports = require("https");
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -173,11 +454,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
 
-var _https = __webpack_require__(4);
+var _https = __webpack_require__(5);
 
 var _https2 = _interopRequireDefault(_https);
 
-var _url = __webpack_require__(3);
+var _url = __webpack_require__(4);
 
 var _url2 = _interopRequireDefault(_url);
 
@@ -185,7 +466,7 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _serialize = __webpack_require__(2);
+var _serialize = __webpack_require__(3);
 
 var _serialize2 = _interopRequireDefault(_serialize);
 
@@ -196,7 +477,10 @@ var POST = exports.POST = handleRequest;
 var PUT = exports.PUT = handleRequest;
 var DELETE = exports.DELETE = handleRequest;
 
-function handleRequest(config, callback) {
+function handleRequest(config) {
+  var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var callback = args.callback;
   var parsedUrl = _url2.default.parse(config.url);
 
   var options = {
@@ -245,12 +529,25 @@ function handleRequest(config, callback) {
   });
 
   req.on('error', callback);
+  req.on('abort', function () {
+    return req.abort();
+  });
   req.write(data);
   req.end();
+
+  return req;
 }
 
 /***/ }),
-/* 6 */
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// ignore polyfills for env Node or Browser
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -272,6 +569,8 @@ var _each2 = _interopRequireDefault(_each);
 var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
+
+__webpack_require__(7);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -321,6 +620,7 @@ request.prototype.send = function (obj) {
   this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
   var httpHandler = this.httpHandlers[this.config['method']];
   var httpOptions = (0, _extend2.default)({}, this.config);
+  var self = this;
 
   // Temporary mod to append analysis_type to responses
   // for generic HTTP requests to known query resources
@@ -330,8 +630,18 @@ request.prototype.send = function (obj) {
     }
   }
 
-  return new Promise(function (resolve, reject, onCancel) {
-    var httpRequest = httpHandler(httpOptions, function (err, res) {
+  var fetchAbortController = void 0;
+  if (typeof AbortController !== 'undefined') {
+    fetchAbortController = new AbortController();
+  }
+
+  var httpHandlerResponse = void 0;
+  var requestPromise = new Promise(function (resolve, reject) {
+    var options = {};
+    if (fetchAbortController) {
+      options.signal = fetchAbortController.signal;
+    }
+    options.callback = function (err, res) {
       var augmentedResponse = res;
       if (err) {
         reject(err);
@@ -342,19 +652,24 @@ request.prototype.send = function (obj) {
         }
         resolve(augmentedResponse);
       }
-    });
-    console.log(onCancel);
-    if (onCancel) {
-      console.log('ooo');
-      onCancel(function () {
-        if (httpRequest.abort) {
-          httpRequest.abort();
-        }
-      });
-    }
-    return httpRequest;
+    };
+    httpHandlerResponse = httpHandler(httpOptions, options);
+    return httpHandlerResponse;
   });
+
+  requestPromise.abort = function () {
+    if (fetchAbortController) {
+      // browser
+      return fetchAbortController.abort();
+    }
+
+    //node
+    httpHandlerResponse.emit('abort');
+  };
+  return requestPromise;
 };
+
+function abortExecutor() {}
 
 function getAnalysisType(str) {
   var split = str.split('/queries/');
@@ -362,19 +677,13 @@ function getAnalysisType(str) {
 }
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__7__;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__8__;
-
-/***/ }),
 /* 9 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__9__;
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -386,14 +695,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.KeenAnalysis = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-//"browsers": ["last 2 versions", "safari >= 7"]
 
+__webpack_require__(2);
 
-var _promisePolyfill = __webpack_require__(8);
-
-var _promisePolyfill2 = _interopRequireDefault(_promisePolyfill);
-
-var _keenCore = __webpack_require__(7);
+var _keenCore = __webpack_require__(9);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
@@ -414,19 +719,23 @@ _keenCore2.default.prototype.readKey = function (str) {
 };
 
 _keenCore2.default.prototype.query = function (a, b) {
+  var requestQuery = {};
   if (a && b && typeof b === 'string') {
     if (b.indexOf('/result') < 0) {
       b += '/result';
     }
-    return this.get(this.url('queries', a, b)).auth(this.readKey()).send();
+    requestQuery = this.get(this.url('queries', a, b)).auth(this.readKey());
+    return requestQuery.send();
   } else if (a === 'dataset' && (typeof b === 'undefined' ? 'undefined' : _typeof(b)) === 'object') {
-    return this.get(this.url('datasets', b.name, 'results')).auth(this.readKey()).send(b);
+    requestQuery = this.get(this.url('datasets', b.name, 'results')).auth(this.readKey());
+    return requestQuery.send(b);
   } else if (a && b && (typeof b === 'undefined' ? 'undefined' : _typeof(b)) === 'object') {
     // Include analysis_type for downstream use
     var q = (0, _extend2.default)({ analysis_type: a }, b);
-    return this.post(this.url('queries', a)).auth(this.readKey()).send(q);
+    requestQuery = this.post(this.url('queries', a)).auth(this.readKey());
+    return requestQuery.send(q);
   } else if (a && !b) {
-    return _promisePolyfill2.default.reject({
+    return Promise.reject({
       error_code: 'SDKError',
       message: ".query() called with incorrect arguments"
     });
@@ -446,16 +755,19 @@ _keenCore2.default.prototype.run = function (q, callback) {
   var promises = [];
 
   (0, _each2.default)(queries, function (query, i) {
+    var queryPromise = void 0;
     if (typeof query === 'string') {
-      promises.push(self.query('saved', query + '/result'));
+      queryPromise = self.query('saved', query + '/result');
     } else if (query instanceof _keenCore2.default.Query) {
       // Include analysis_type for downstream use
-      promises.push(self.query(query.analysis, (0, _extend2.default)({ analysis_type: query.analysis }, query.params)));
+      queryPromise = self.query(query.analysis, (0, _extend2.default)({ analysis_type: query.analysis }, query.params));
     }
+    // query.abort = queryPromise.abort;
+    promises.push(queryPromise);
   });
 
   if (promises.length > 1) {
-    output = _promisePolyfill2.default.all(promises);
+    output = Promise.all(promises);
   } else {
     // Only return single
     output = promises[0];
@@ -542,7 +854,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = KeenAnalysis;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -557,15 +869,15 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _index = __webpack_require__(9);
+var _index = __webpack_require__(10);
 
 var _index2 = _interopRequireDefault(_index);
 
-var _request = __webpack_require__(6);
+var _request = __webpack_require__(8);
 
 var _request2 = _interopRequireDefault(_request);
 
-var _httpServer = __webpack_require__(5);
+var _httpServer = __webpack_require__(6);
 
 var httpHandlers = _interopRequireWildcard(_httpServer);
 
@@ -582,10 +894,10 @@ var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 module.exports = Keen;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(10);
+module.exports = __webpack_require__(11);
 
 
 /***/ })

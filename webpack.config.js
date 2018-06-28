@@ -3,6 +3,10 @@ const webpack = require('webpack');
 
 const fileName = 'keen-analysis';
 const entryFile = ( process.env.TARGET !== 'node' ) ? './lib/browser.js' : './lib/server.js' ;
+const resolveAlias = {};
+if (process.env.TARGET === 'node'){
+  resolveAlias['abortcontroller-polyfill/dist/polyfill-patch-fetch'] = path.resolve(__dirname, 'lib/blank.js');
+}
 
 module.exports = {
   entry: [entryFile],
@@ -49,6 +53,7 @@ module.exports = {
       'node_modules',
     ],
     extensions: ['.js', '.json', '.jsx', '.css', '.scss'],
+    alias: resolveAlias
   },
 
   optimization: {
@@ -76,7 +81,7 @@ module.exports = {
   externals: process.env.TARGET === 'node' ? {
     'whatwg-fetch' : true,
     'promise-polyfill' : true,
-    'keen-core' : true,
+    'keen-core' : true
   } : {
   },
 

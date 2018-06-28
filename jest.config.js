@@ -1,5 +1,5 @@
 const files = `<rootDir>/test/unit/modules/*${
-  process.env.TEST_ENV ? `-${process.env.TEST_ENV}-` : `-browser-`
+  process.env.TEST_ENV ? `-${process.env.TEST_ENV}-` : ``
 }*.js`;
 
 module.exports = {
