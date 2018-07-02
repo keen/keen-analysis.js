@@ -8,10 +8,10 @@ Install this package from NPM *Recommended*
 $ npm install keen-analysis --save
 ```
 
-Or load it from our CDN:
+Or load it from public CDN:
 
 ```html
-<script src="https://d26b395fwzu5fz.cloudfront.net/keen-analysis-2.1.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/keen-analysis@2"></script>
 ```
 
 ### Project ID & API Keys
