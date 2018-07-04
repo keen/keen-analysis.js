@@ -1025,8 +1025,12 @@ function sendFetch(method, config) {
   var headers = {};
   var url = config.url;
 
-  if (method == 'GET') {
-    url += '?';
+  if (method === 'GET' || method === 'DELETE') {
+    if (url.indexOf('?') === -1) {
+      url += '?';
+    } else {
+      url += '&';
+    }
     if (config.api_key) {
       url += 'api_key=' + config.api_key + '&';
     }
@@ -1048,6 +1052,9 @@ function sendFetch(method, config) {
     headers: headers,
     signal: options.signal
   }).then(function (response) {
+    if (response.ok && method === 'DELETE') {
+      return {};
+    }
     if (response.ok) {
       return response.json();
     }
