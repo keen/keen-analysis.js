@@ -9,15 +9,13 @@ Run the following commands to install and build this project:
 $ git clone https://github.com/keen/keen-analysis.js.git && cd keen-analysis.js
 
 # Install project dependencies
-$ npm install
+npm install
 
-# Build project with gulp
-# npm install -g gulp
-$ gulp
+# start dev server
+npm start
 
-# Build and run tests
-$ gulp
-$ open http://localhost:9001
+# build
+npm run build
 ```
 
 ## Submitting a Pull Request
