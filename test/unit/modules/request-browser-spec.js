@@ -130,13 +130,13 @@ describe('Browser Request methods', () => {
     });
 
     it('should make a DELETE request to a saved query endpoint, returning a response when successful', async () => {
-      fetch.mockResponseOnce(JSON.stringify(dummyResponse));
+      fetch.mockResponseOnce(JSON.stringify({}));
       await client
         .del(client.url('queries', 'saved', 'new-saved-query'))
         .auth(client.masterKey())
         .send()
         .then(res => {
-          expect(res).toEqual(dummyResponse);
+          expect(res).toEqual({});
         });
     });
 

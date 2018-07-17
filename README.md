@@ -12,6 +12,29 @@ Or load it from public CDN:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/keen-analysis@2"></script>
+<script>
+  !function(name,path,ctx){
+    let latest,prev=name!=="Keen"&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName("head")[0],s=document.createElement("script"),w=window,loaded;s.onload=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
+  }('KeenAnalysis', 'https://cdn.jsdelivr.net/npm/keen-analysis@2', this);
+
+  KeenAnalysis.ready(function(){
+    const client = new KeenAnalysis({
+      projectId: 'YOUR_PROJECT_ID',
+      readKey: 'YOUR_READ_KEY'
+    });
+    client
+      .query('count', {
+        event_collection: 'pageviews',
+        timeframe: 'this_114_days'
+      })
+      .then(res => {
+        // Handle results
+      })
+      .catch(err => {
+        // Handle errors
+      });
+  });
+</script>
 ```
 
 ### Project ID & API Keys
@@ -36,12 +59,12 @@ Create a new `client` instance with your Project ID and Read Key, and use the `.
 
 ```javascript
 // browser/front-end
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-// for Node.js/back-end
-// const Keen = require('keen-analysis');
+// for Node.js / back-end
+// const KeenAnalysis = require('keen-analysis');
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   readKey: 'YOUR_READ_KEY'
 });
@@ -65,9 +88,9 @@ client
 ### Saved and Cached Queries
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   readKey: 'YOUR_READ_KEY'
 });
@@ -87,9 +110,9 @@ client
 Note the special param `name` to specify the name of the cached dataset that you have already created.
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   readKey: 'YOUR_READ_KEY'
 });
@@ -127,9 +150,9 @@ These HTTP methods take a URL (string) as a single argument and return an intern
 The following example demonstrates the full HTTP request that is executed when `client.query()` is called (detailed above):
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   readKey: 'YOUR_READ_KEY'
 });
@@ -154,9 +177,9 @@ As an added convenience, API URLs can be generated using the `client.url()`.
 #### Example GET request
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   masterKey: 'YOUR_MASTER_KEY'
 });
@@ -177,9 +200,9 @@ client
 #### Example Canceling Queries
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   readKey: 'YOUR_READ_KEY'
 });
@@ -205,9 +228,9 @@ query.then(res => {
 #### Example POST Request
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   readKey: 'YOUR_READ_KEY'
 });
@@ -234,9 +257,9 @@ client
 #### Example PUT Request
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   masterKey: 'YOUR_MASTER_KEY'
 });
@@ -268,9 +291,9 @@ client
 #### Example DELETE Request
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   masterKey: 'YOUR_MASTER_KEY'
 });
@@ -293,14 +316,14 @@ client
 The `Keen.Query` object and `client.run()` method introduced in [keen-js](https://github.com/keen/keen-js) are still supported. However, `client.run()` now also returns a promise, as an alternate interface to the node-style callback.
 
 ```javascript
-import Keen from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
 
-const client = new Keen({
+const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   readKey: 'YOUR_READ_KEY'
 });
 
-const query = new Keen.Query('count', {
+const query = new KeenAnalysis.Query('count', {
   event_collection: 'pageviews',
   timeframe: 'this_14_days'
 });

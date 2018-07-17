@@ -492,9 +492,14 @@ function handleRequest(config) {
 
   var data = '';
 
-  if (config['method'] === 'GET') {
+  if (config['method'] === 'GET' || config['method'] === 'DELETE') {
     data = '';
-    options.path += '?api_key=' + config.api_key;
+    if (options.path.indexOf('?') === -1) {
+      options.path += '?';
+    } else {
+      options.path += '&';
+    }
+    options.path += 'api_key=' + config.api_key;
     if (config.params) {
       options.path += '&' + (0, _serialize2.default)(config.params);
     }
@@ -668,8 +673,6 @@ request.prototype.send = function (obj) {
   };
   return requestPromise;
 };
-
-function abortExecutor() {}
 
 function getAnalysisType(str) {
   var split = str.split('/queries/');
