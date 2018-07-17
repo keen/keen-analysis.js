@@ -11,32 +11,25 @@ npm install keen-analysis --save
 Or load it from public CDN:
 
 ```html
+<script src="https://cdn.jsdelivr.net/npm/keen-analysis@2"></script>
 <script>
-  !function(name,path,ctx){
-    let latest,prev=name!=="Keen"&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName("head")[0],s=document.createElement("script"),w=window,loaded;s.onload=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
-  }('KeenAnalysis', 'https://cdn.jsdelivr.net/npm/keen-analysis@2', this);
-
-  KeenAnalysis.ready(function(){
-
-    // create a client instance
-    const client = new KeenAnalysis({
-      projectId: 'YOUR_PROJECT_ID',
-      readKey: 'YOUR_READ_KEY'
-    });
-
-    // execute some query
-    client
-      .query('count', {
-        event_collection: 'pageviews',
-        timeframe: 'this_114_days'
-      })
-      .then(res => {
-        // Handle results
-      })
-      .catch(err => {
-        // Handle errors
-      });
+  const client = new Keen({
+    projectId: 'YOUR_PROJECT_ID',
+    readKey: 'YOUR_READ_KEY'
   });
+
+  // execute some query
+  client
+    .query('count', {
+      event_collection: 'pageviews',
+      timeframe: 'this_114_days'
+    })
+    .then(res => {
+      // Handle results
+    })
+    .catch(err => {
+      // Handle errors
+    });
 </script>
 ```
 
