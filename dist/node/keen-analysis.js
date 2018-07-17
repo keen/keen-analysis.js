@@ -674,8 +674,6 @@ request.prototype.send = function (obj) {
   return requestPromise;
 };
 
-function abortExecutor() {}
-
 function getAnalysisType(str) {
   var split = str.split('/queries/');
   return split[split.length - 1];
