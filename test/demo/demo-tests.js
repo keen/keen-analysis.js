@@ -3,8 +3,23 @@ const demoTests = (demoConfig, Keen) => {
 
   Keen.debug = true;
 
+  client
+    .query('count', {
+      event_collection: 'pageviews',
+      timeframe: 'this_144_days'
+    }, {cache: { maxAge: 5000 }})
+    .then(res => {
+      console.log(res);
+        // Handle results
+    })
+    .catch(err => {
+      console.log('err', err);
+      // Handle errors
+    });
+    return;
+
   const query = client
-    .get(client.url('queries', 'saved'))
+    .get(client.url('queries', 'saved'), { cache: { maxAge: 10000 } })
     .auth(client.masterKey())
     .send();
 

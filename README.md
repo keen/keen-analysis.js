@@ -11,7 +11,7 @@ npm install keen-analysis --save
 Or load it from public CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/keen-analysis@2"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@2"></script>
 <script>
   const client = new Keen({
     projectId: 'YOUR_PROJECT_ID',
