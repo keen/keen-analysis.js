@@ -20,9 +20,10 @@ Or load it from public CDN:
 
   // execute some query
   client
-    .query('count', {
+    .query({
+      analysis_type: 'count',
       event_collection: 'pageviews',
-      timeframe: 'this_114_days'
+      timeframe: 'this_31_days'
     })
     .then(res => {
       // Handle results
@@ -66,9 +67,10 @@ const client = new KeenAnalysis({
 });
 
 client
-  .query('count', {
+  .query({
+    analysis_type: 'count',
     event_collection: 'pageviews',
-    timeframe: 'this_14_days'
+    timeframe: 'this_31_days'
   })
   .then(res => {
     // Handle results
@@ -81,7 +83,7 @@ client
 **Important:** the `res` response object returned in the example above will also include a `query` object containing the `analysis_type` and query parameters shaping the request. This query information is artificially appended to the response by this SDK, as this information is currently only provided by the API for saved queries. **Why?** Query parameters are extremely useful for intelligent response handling downstream, particularly by our own automagical visualization capabilities in [keen-dataviz.js](https://github.com/keen/keen-dataviz.js).
 
 
-### Saved and Cached Queries
+### Reading Saved and Cached Queries
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -91,8 +93,11 @@ const client = new KeenAnalysis({
   readKey: 'YOUR_READ_KEY'
 });
 
+// run already saved query
 client
-  .query('saved', 'pageviews-this-14-days')
+  .query({
+    saved_query_name: 'pageviews-this-14-days'
+  })
   .then(res => {
     // Handle results
   })
@@ -101,7 +106,7 @@ client
   });
 ```
 
-### Cached Datasets
+### Reading Cached Datasets
 
 Note the special param `name` to specify the name of the cached dataset that you have already created.
 
@@ -114,8 +119,8 @@ const client = new KeenAnalysis({
 });
 
 client
-  .query('dataset', {
-    name: 'my-cached-dataset',
+  .query({
+    dataset_name: 'my-cached-dataset',
     index_by: 'customer.id',
     timeframe: 'this_7_days'
   })
