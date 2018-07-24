@@ -73,7 +73,7 @@ Browser-side caching is based on  [IndexedDB](https://developer.mozilla.org/en-U
 ```javascript
 import KeenAnalysis from 'keen-analysis';
 
-// set global caching of all queries
+// set global caching of all queries *Optional*
 const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
   masterKey: 'YOUR_MASTER_KEY',
@@ -82,7 +82,7 @@ const client = new KeenAnalysis({
   }
 });
 
-// or set custom caching for a specific query
+// or set custom caching for a specific query *Optional*
 client
   .query({
     analysis_type: 'count',
@@ -117,7 +117,7 @@ client
 
 #### Create Saved Query
 
-[Read more about Saved Queries](https://keen.io/docs/api/?javascript#creating-a-saved-query)
+API reference: [Saved Query](https://keen.io/docs/api/?javascript#creating-a-saved-query)
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -133,7 +133,7 @@ client
     url: client.url('queries', 'saved', 'daily-pageviews-this-14-days'),
     api_key: client.config.masterKey,
     params: {
-      refresh_rate: 60 * 60 * 4, // recalculate query every 4 hours
+      refresh_rate: 60 * 60 * 4, // API will refresh result of this query every 4 hours
       query: {
         analysis_type: 'count',
         event_collection: 'pageviews',
@@ -159,7 +159,7 @@ client
   });
 ```
 
-### Read Saved/Cached Query
+#### Read Saved/Cached Query
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -206,7 +206,7 @@ client
   });
 ```
 
-### Create Cached Datasets
+#### Create Cached Datasets
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -250,7 +250,7 @@ client
   });
 ```
 
-### Read Cached Datasets
+#### Read Cached Datasets
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';

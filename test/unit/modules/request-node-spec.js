@@ -11,9 +11,9 @@ describe('Node Request methods', () => {
   const queryObject = {
     analysis_type: 'count',
     event_collection: 'pageview',
-    timeframe: 'this_12_months'
+    timeframe: 'this_12_months',
+    timezone: 7200
   };
-  const apiQueryUrl = new RegExp('queries/count');
   const dummyResponse = { result: 123 };
   const dummyErrorResponse = { error: true };
   const dummyQueryData = {
@@ -55,7 +55,8 @@ describe('Node Request methods', () => {
       .persist()
       .post(/./, JSON.stringify({
         analysis_type: queryObject.analysis_type,
-        event_collection: false
+        event_collection: false,
+        timezone: 7200
       }))
       .reply(500, {error_code: 500, message: 'Error'});
 
@@ -118,6 +119,20 @@ describe('Node Request methods', () => {
 
 
   describe('.query()', () => {
+    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
+      await client
+        .query({
+          analysis_type: 'count',
+          event_collection: 'pageview',
+          timeframe: 'this_12_months'
+        })
+        .then(res => {
+          expect(res.query.analysis_type).toBe('count');
+          expect(res.query.event_collection).toBe('pageview');
+          expect(res.query.timeframe).toBe('this_12_months');
+          expect(res.result).toBe(dummyResponse.result);
+        });
+    });
 
     it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
       await client

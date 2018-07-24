@@ -3,20 +3,7 @@ const demoTests = (demoConfig, Keen) => {
 
   Keen.debug = true;
 
-  client
-    .get({
-      url: client.url('queries', 'saved'),
-      api_key: client.config.masterKey
-    })
-    .then(res => {
-      // Handle results
-      console.log(res);
-    })
-    .catch(err => {
-      // Handle errors
-    });
-
-    return;
+  return;
 
   const newDatasetName = 'my-first-dataset2';
 
@@ -79,21 +66,6 @@ return;
     });
   return;
 
-/*  */
-  client
-    .del({
-      url: client.url('queries', 'saved', 'daily-pageviews-this-15-days'),
-      api_key: client.config.masterKey
-    })    .then(res => {
-          console.log('res', res);
-          // Handle results
-        })
-        .catch(err => {
-          console.error(err);
-          // Handle errors
-        });
-
-        return;
 
   client
     .put({
@@ -152,67 +124,8 @@ return;
     });
 
     return;
-/*
-  clientx
-    .put(client.url('datasets', newDatasetName))
-    .auth(client.masterKey())
-    .send({
-      display_name: 'Count Daily Product Purchases',
-      query: {
-        analysis_type: 'count',
-        event_collection: 'pageviews',
-        filters: [
-        ],
-        interval: 'daily',
-        timeframe: 'this_100_days'
-      },
-      index_by: 'tech.os.major'
-    })
-    .then(res => {
-      // Handle response
-    })
-    .catch(err => {
-      // Handle error
-    });
-    */
 
-    client
-    //  .query('saved', 'axa')
-    /*   */
-      .query({
-        dataset_name: newDatasetName,
-        timeframe: 'this_7_days',
-        index_by: 'keen.id',
-        cache: false
-      })
 
-      .then(res => {
-        // Handle results
-        console.log(res);
-      })
-      .catch(err => {
-        // Handle errors
-      });
-
-    return;
-
-  client
-  //  .query('saved', 'axa')
-  /*   */
-    .query({
-      saved_query_name: 'axa',
-      cache: {
-        maxAge: 1000
-      }
-    })
-
-    .then(res => {
-      // Handle results
-      console.log(res);
-    })
-    .catch(err => {
-      // Handle errors
-    });
 
 return;
   client
