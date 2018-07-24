@@ -2961,7 +2961,8 @@ function Query(analysisType) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   this.analysis = analysisType;
-  this.set(params);
+  this.params = {};
+  -this.set(params);
   this.options = _extends({}, options);
 }
 
