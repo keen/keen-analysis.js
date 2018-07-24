@@ -66,9 +66,9 @@ client
 
 ---
 
-#### Cache Query Client-Side
+#### Cache queries in the client
 
-Browser-side caching is based on  [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
+Client-side (browser) caching is based on [IndexedDB API](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -115,7 +115,7 @@ client
   });
 ```
 
-#### Create Saved Query
+#### Create a Saved Query
 
 API reference: [Saved Query](https://keen.io/docs/api/?javascript#creating-a-saved-query)
 
@@ -159,7 +159,7 @@ client
   });
 ```
 
-#### Read Saved/Cached Query
+#### Read Saved/Cached Queries
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -274,7 +274,7 @@ client
   });
 ```
 
-#### Cancel query
+#### Cancel a query
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';

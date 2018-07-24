@@ -65,10 +65,13 @@ describe('Keen.Query', () => {
 
   describe('<Client.run> (Keen client instance)', () => {
 
-    it('should return undefined when passed an invalid input', () => {
-      expect(client.run(null)).toBe(undefined);
-      expect(client.run(0)).toBe(undefined);
-      expect(client.run({})).toBe(undefined);
+    it('should return input value if it is not valid', () => {
+      expect(client.run(null)).toBe(null);
+      expect(client.run(0)).toBe(0);
+      expect(client.run({})).toEqual({});
+    });
+
+    it('should return undefined for empty array input', () => {
       expect(client.run([])).toBe(undefined);
     });
 
