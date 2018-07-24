@@ -564,6 +564,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 exports.default = request;
 exports.getAnalysisType = getAnalysisType;
 
@@ -581,19 +583,34 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function request(method, httpHandlers) {
   this.httpHandlers = httpHandlers;
-  return function (str) {
-    this.config = {
-      'api_key': undefined,
-      'method': method,
-      'params': undefined,
-      'timeout': 300 * 1000,
-      'url': str,
-      'headers': {
-        'Authorization': '',
+  return function (requestUrlAndOptions) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (typeof requestUrlAndOptions === 'string') {
+      // backward compatibility
+      this.config = _extends({
+        api_key: undefined,
+        method: method,
+        params: {},
+        url: requestUrlAndOptions,
+        headers: {
+          'Authorization': '',
+          'Content-type': 'application/json'
+        }
+      }, options);
+      return this;
+    }
+
+    this.config = _extends({
+      api_key: undefined,
+      params: {},
+      method: method,
+      headers: {
+        'Authorization': requestUrlAndOptions.api_key,
         'Content-type': 'application/json'
       }
-    };
-    return this;
+    }, requestUrlAndOptions, options);
+    return this.send();
   }.bind(this);
 }
 
@@ -622,14 +639,16 @@ request.prototype.timeout = function (num) {
 };
 
 request.prototype.send = function (obj) {
-  this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
+  if (obj) {
+    this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
+  }
   var httpHandler = this.httpHandlers[this.config['method']];
   var httpOptions = (0, _extend2.default)({}, this.config);
   var self = this;
 
   // Temporary mod to append analysis_type to responses
   // for generic HTTP requests to known query resources
-  if (typeof httpOptions.params.analysis_type === 'undefined') {
+  if (this.config['method'] !== 'DELETE' && typeof httpOptions.params.analysis_type === 'undefined') {
     if (httpOptions.url.indexOf('/queries/') > -1 && httpOptions.url.indexOf('/saved/') < 0) {
       httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
     }
@@ -652,7 +671,7 @@ request.prototype.send = function (obj) {
         reject(err);
       } else {
         // Append query object to ad-hoc query results
-        if (typeof httpOptions.params.event_collection !== 'undefined' && typeof res.query === 'undefined') {
+        if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof res.query === 'undefined') {
           augmentedResponse = (0, _extend2.default)({ query: httpOptions.params }, res);
         }
         resolve(augmentedResponse);
@@ -697,6 +716,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.KeenAnalysis = undefined;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 __webpack_require__(2);
@@ -715,34 +736,81 @@ var _extend2 = _interopRequireDefault(_extend);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 _keenCore2.default.prototype.readKey = function (str) {
   if (!arguments.length) return this.config.readKey;
   this.config.readKey = str ? String(str) : null;
   return this;
 };
 
-_keenCore2.default.prototype.query = function (a, b) {
-  var requestQuery = {};
-  if (a && b && typeof b === 'string') {
-    if (b.indexOf('/result') < 0) {
-      b += '/result';
+_keenCore2.default.prototype.query = function (a) {
+  var b = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  // a - analysis type or config object
+  // b - params
+  var analysisType = a;
+  var queryParams = b;
+
+  // all this for backward compatibility, remove in next major version
+  if ((typeof a === 'undefined' ? 'undefined' : _typeof(a)) === 'object' && !b) {
+    // initialized with signle argument - config object
+    var analysisTypeExtracted = a.analysis_type,
+        cacheOptionsExtracted = a.cache,
+        queryParamsExtracted = _objectWithoutProperties(a, ['analysis_type', 'cache']);
+
+    analysisType = analysisTypeExtracted;
+    queryParams = queryParamsExtracted;
+    options.cache = _extends({}, this.config.cache || {}, cacheOptionsExtracted || {});
+    if (cacheOptionsExtracted === false) {
+      options.cache = false;
     }
-    requestQuery = this.get(this.url('queries', a, b)).auth(this.readKey());
-    return requestQuery.send();
-  } else if (a === 'dataset' && (typeof b === 'undefined' ? 'undefined' : _typeof(b)) === 'object') {
-    requestQuery = this.get(this.url('datasets', b.name, 'results')).auth(this.readKey());
-    return requestQuery.send(b);
-  } else if (a && b && (typeof b === 'undefined' ? 'undefined' : _typeof(b)) === 'object') {
-    // Include analysis_type for downstream use
-    var q = (0, _extend2.default)({ analysis_type: a }, b);
-    requestQuery = this.post(this.url('queries', a)).auth(this.readKey());
-    return requestQuery.send(q);
-  } else if (a && !b) {
-    return Promise.reject({
-      error_code: 'SDKError',
-      message: ".query() called with incorrect arguments"
-    });
   }
+
+  // for deprecated queries
+  if (options.cache === undefined && this.config.cache) {
+    options.cache = _extends({}, this.config.cache);
+  }
+
+  // read saved queries - DEPRECATED - to remove
+  if (analysisType && queryParams && typeof queryParams === 'string') {
+    if (queryParams.indexOf('/result') < 0) {
+      queryParams += '/result';
+    }
+    return this.get(this.url('queries', analysisType, queryParams), options).auth(this.config.readKey).send();
+  }
+
+  // read saved queries
+  else if (queryParams && queryParams.saved_query_name) {
+      var savedQueryResultsUrl = queryParams.saved_query_name.indexOf('/result') > -1 ? queryParams.saved_query_name : queryParams.saved_query_name + '/result';
+      return this.get(this.url('queries', 'saved', savedQueryResultsUrl), options).auth(this.config.readKey).send();
+    }
+
+    // cached datasets - DEPRECATED
+    else if (analysisType === 'dataset' && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
+        return this.get(this.url('datasets', queryParams.name, 'results'), options).auth(this.config.readKey).send(queryParams);
+      } else if (queryParams && queryParams.dataset_name) {
+        return this.get(this.url('datasets', queryParams.dataset_name, 'results'), options).auth(this.config.readKey).send(queryParams);
+      }
+
+      // standard queries
+      else if (analysisType && queryParams && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
+          // Include analysis_type for downstream use
+          var queryBodyParams = (0, _extend2.default)({ analysis_type: analysisType }, queryParams);
+
+          // Localize timezone if none is set
+          if (!queryBodyParams.timezone) {
+            queryBodyParams.timezone = new Date().getTimezoneOffset() * -60;
+          }
+
+          return this.post(this.url('queries', analysisType), options).auth(this.config.readKey).send(queryBodyParams);
+        } else if (analysisType && !queryParams) {
+          return Promise.reject({
+            error_code: 'SDKError',
+            message: ".query() called with incorrect arguments"
+          });
+        }
 };
 
 // Keen.Query handler
@@ -763,7 +831,9 @@ _keenCore2.default.prototype.run = function (q, callback) {
       queryPromise = self.query('saved', query + '/result');
     } else if (query instanceof _keenCore2.default.Query) {
       // Include analysis_type for downstream use
-      queryPromise = self.query(query.analysis, (0, _extend2.default)({ analysis_type: query.analysis }, query.params));
+      queryPromise = self.query(query.analysis, (0, _extend2.default)({ analysis_type: query.analysis }, query.params), query.options);
+    } else {
+      queryPromise = query;
     }
     // query.abort = queryPromise.abort;
     promises.push(queryPromise);
@@ -790,18 +860,18 @@ _keenCore2.default.prototype.run = function (q, callback) {
   return output;
 };
 
-function Query(analysisType, params) {
-  this.analysis = analysisType;
-  this.params = {};
-  this.set(params);
+// DEPRECATED
+function Query(analysisType) {
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  // Localize timezone if none is set
-  if (this.params.timezone === void 0) {
-    this.params.timezone = new Date().getTimezoneOffset() * -60;
-  }
+  this.analysis = analysisType;
+  this.set(params);
+  this.options = _extends({}, options);
 }
 
 Query.prototype.set = function (attributes) {
+  // DEPRECATED
   var self = this;
   (0, _each2.default)(attributes, function (v, k) {
     var key = k;
@@ -832,6 +902,7 @@ Query.prototype.set = function (attributes) {
 };
 
 Query.prototype.get = function (attribute) {
+  // DEPRECATED
   var key = attribute;
   if (key.match(new RegExp('[A-Z]'))) {
     key = key.replace(/([A-Z])/g, function ($1) {
@@ -844,6 +915,7 @@ Query.prototype.get = function (attribute) {
 };
 
 Query.prototype.addFilter = function (property, operator, value) {
+  // DEPRECATED
   this.params.filters = this.params.filters || [];
   this.params.filters.push({
     'property_name': property,

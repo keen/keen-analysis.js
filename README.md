@@ -1,5 +1,7 @@
 # keen-analysis.js
 
+JavaScript Client for [Keen](https://keen.io/).
+
 ### Installation
 
 Install this package from NPM *Recommended*
@@ -8,29 +10,10 @@ Install this package from NPM *Recommended*
 npm install keen-analysis --save
 ```
 
-Or load it from public CDN:
+Or load it from a public CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/keen-analysis@2"></script>
-<script>
-  const client = new Keen({
-    projectId: 'YOUR_PROJECT_ID',
-    readKey: 'YOUR_READ_KEY'
-  });
-
-  // execute some query
-  client
-    .query('count', {
-      event_collection: 'pageviews',
-      timeframe: 'this_114_days'
-    })
-    .then(res => {
-      // Handle results
-    })
-    .catch(err => {
-      // Handle errors
-    });
-</script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@3"></script>
 ```
 
 ### Project ID & API Keys
@@ -38,11 +21,11 @@ Or load it from public CDN:
 [Login to Keen IO to create a project](https://keen.io/login?s=gh_js) and grab the **Project ID** and **Read Key** from your project's **Access** page.
 
 
-## Getting started
+### Getting started
 
-The following examples demonstrate how to get up and running quickly with our Compute API. This SDK can also contains basic [HTTP wrappers](#api-resources) that can be used to interact with every part of our platform.
+The following examples demonstrate how to get up and running quickly with our API. This SDK can also contains basic [HTTP wrappers](#api-resources) that can be used to interact with every part of our platform.
 
-If any of this is confusing, that's our fault and we would love to help. Join our  [Slack community](https://slack.keen.io) or send us a [message](https://keen.io/support/).
+If any of this is confusing, join our [Slack community](https://slack.keen.io) or send us a [message](https://keen.io/support/).
 
 **Looking for tracking capabilities?** Check out [keen-tracking.js](https://github.com/keen/keen-tracking.js).
 
@@ -54,10 +37,10 @@ If any of this is confusing, that's our fault and we would love to help. Join ou
 Create a new `client` instance with your Project ID and Read Key, and use the `.query()` method to execute an ad-hoc query. This client instance is the core of the library and will be required for all API-related functionality.
 
 ```javascript
-// browser/front-end
+// Browsers
 import KeenAnalysis from 'keen-analysis';
 
-// for Node.js / back-end
+// Node.js
 // const KeenAnalysis = require('keen-analysis');
 
 const client = new KeenAnalysis({
@@ -66,12 +49,13 @@ const client = new KeenAnalysis({
 });
 
 client
-  .query('count', {
+  .query({
+    analysis_type: 'count',
     event_collection: 'pageviews',
-    timeframe: 'this_14_days'
+    timeframe: 'this_31_days'
   })
   .then(res => {
-    // Handle results
+    // Handle results, e.g. visualise them with https://github.com/keen/keen-dataviz.js
   })
   .catch(err => {
     // Handle errors
@@ -80,85 +64,48 @@ client
 
 **Important:** the `res` response object returned in the example above will also include a `query` object containing the `analysis_type` and query parameters shaping the request. This query information is artificially appended to the response by this SDK, as this information is currently only provided by the API for saved queries. **Why?** Query parameters are extremely useful for intelligent response handling downstream, particularly by our own automagical visualization capabilities in [keen-dataviz.js](https://github.com/keen/keen-dataviz.js).
 
+---
 
-### Saved and Cached Queries
+#### Cache Query Client-Side
 
-```javascript
-import KeenAnalysis from 'keen-analysis';
-
-const client = new KeenAnalysis({
-  projectId: 'YOUR_PROJECT_ID',
-  readKey: 'YOUR_READ_KEY'
-});
-
-client
-  .query('saved', 'pageviews-this-14-days')
-  .then(res => {
-    // Handle results
-  })
-  .catch(err => {
-    // Handle errors
-  });
-```
-
-### Cached Datasets
-
-Note the special param `name` to specify the name of the cached dataset that you have already created.
+Browser-side caching is based on  [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
 
+// set global caching of all queries *Optional*
 const client = new KeenAnalysis({
   projectId: 'YOUR_PROJECT_ID',
-  readKey: 'YOUR_READ_KEY'
+  masterKey: 'YOUR_MASTER_KEY',
+  cache: {
+    maxAge: 60 * 1000 // cache for 1 minute
+  }
 });
 
+// or set custom caching for a specific query *Optional*
 client
-  .query('dataset', {
-    name: 'my-cached-dataset',
-    index_by: 'customer.id',
-    timeframe: 'this_7_days'
-  })
-  .then(res => {
-    // Handle results
-  })
-  .catch(err => {
-    // Handle errors
-  });
-```
-
-### API Resources
-
-The following HTTP methods are exposed on the client instance:
-
-* `.get(string)`
-* `.post(string)`
-* `.put(string)`
-* `.del(string)`
-
-These HTTP methods take a URL (string) as a single argument and return an internal request object with several methods that configure and execute the request, finally returning a promise for the asynchronous response. These methods include:
-
-* `.auth(string)`: sets the API_KEY as an Authorization header
-* `.headers(object)`: sets headers to apply to the request
-* `.send()`: handles an optional object of parameters, executes the request and returns a promise
-* `.abort()`: cancels already running request
-
-The following example demonstrates the full HTTP request that is executed when `client.query()` is called (detailed above):
-
-```javascript
-import KeenAnalysis from 'keen-analysis';
-
-const client = new KeenAnalysis({
-  projectId: 'YOUR_PROJECT_ID',
-  readKey: 'YOUR_READ_KEY'
-});
-
-client
-  .post(`https://api.keen.io/3.0/projects/${client.projectId()}/queries/count`)
-  .auth(client.readKey())
-  .send({
+  .query({
+    analysis_type: 'count',
     event_collection: 'pageviews',
-    timeframe: 'this_14_days'
+    timeframe: 'this_31_days',
+    cache: {
+      maxAge: 10 * 1000 // [ms]
+    }
+  })
+  .then(res => {
+    // Handle results
+  })
+  .catch(err => {
+    // Handle errors
+  });
+
+// don't cache a specific query, even if the global caching is on
+client
+  .query({
+    analysis_type: 'count',
+    event_collection: 'pageviews',
+    timeframe: 'this_14_days',
+    cache: false
   })
   .then(res => {
     // Handle results
@@ -168,9 +115,74 @@ client
   });
 ```
 
-As an added convenience, API URLs can be generated using the `client.url()`.
+#### Create Saved Query
 
-#### Example GET request
+API reference: [Saved Query](https://keen.io/docs/api/?javascript#creating-a-saved-query)
+
+```javascript
+import KeenAnalysis from 'keen-analysis';
+
+const client = new KeenAnalysis({
+  projectId: 'YOUR_PROJECT_ID',
+  masterKey: 'YOUR_MASTER_KEY'
+});
+
+// Create or Update a saved query
+client
+  .put({
+    url: client.url('queries', 'saved', 'daily-pageviews-this-14-days'),
+    api_key: client.config.masterKey,
+    params: {
+      refresh_rate: 60 * 60 * 4, // API will refresh result of this query every 4 hours
+      query: {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        timeframe: 'this_14_days'
+      },
+      metadata: {
+        display_name: 'Daily pageviews (this 14 days)',
+        /*
+          If you plan to use this saved query inside Explorer set the default visualization.
+          We suggest using "metric" for a single value, "area" for intervals
+        */
+        visualization: {
+          chart_type: "metric"
+        }
+      }
+    }
+  })
+  .then(res => {
+    // Handle results
+  })
+  .catch(err => {
+    // Handle errors
+  });
+```
+
+#### Read Saved/Cached Query
+
+```javascript
+import KeenAnalysis from 'keen-analysis';
+
+const client = new KeenAnalysis({
+  projectId: 'YOUR_PROJECT_ID',
+  readKey: 'YOUR_READ_KEY'
+});
+
+// read already saved query
+client
+  .query({
+    saved_query_name: 'pageviews-this-14-days'
+  })
+  .then(res => {
+    // Handle results
+  })
+  .catch(err => {
+    // Handle errors
+  });
+```
+
+#### List Saved Queries
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -182,9 +194,10 @@ const client = new KeenAnalysis({
 
 // Retrieve all saved queries
 client
-  .get(client.url('queries', 'saved'))
-  .auth(client.masterKey())
-  .send()
+  .get({
+    url: client.url('queries', 'saved'),
+    api_key: client.config.masterKey
+  })
   .then(res => {
     // Handle results
   })
@@ -193,7 +206,51 @@ client
   });
 ```
 
-#### Example Canceling Queries
+#### Create Cached Datasets
+
+```javascript
+import KeenAnalysis from 'keen-analysis';
+
+const client = new KeenAnalysis({
+  projectId: 'PROJECT_ID',
+  masterKey: 'MASTER_KEY'
+});
+
+const newDatasetName = 'my-first-dataset';
+
+client
+  .put({
+    url: client.url('datasets', newDatasetName),
+    api_key: client.config.masterKey,
+    params: {
+      display_name: 'Count Daily Product Purchases Over $100 by Country',
+      query: {
+        analysis_type: 'count',
+        event_collection: 'purchases',
+        filters: [
+          {
+            property_name: 'price',
+            operator: 'gte',
+            property_value: 100
+          }
+        ],
+        group_by: 'ip_geo_info.country',
+        interval: 'daily',
+        timeframe: 'this_500_days'
+      },
+      index_by: 'product.id'
+    }
+  })
+  .then(res => {
+    console.log('res', res);
+    // Handle response
+  })
+  .catch(err => {
+    // Handle error
+  });
+```
+
+#### Read Cached Datasets
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -203,13 +260,38 @@ const client = new KeenAnalysis({
   readKey: 'YOUR_READ_KEY'
 });
 
-const query = client
-  .get(client.url('queries', 'saved'))
-  .auth(client.masterKey())
-  .send();
+client
+  .query({
+    dataset_name: 'my-cached-dataset',
+    index_by: 'customer.id',
+    timeframe: 'this_7_days'
+  })
+  .then(res => {
+    // Handle results
+  })
+  .catch(err => {
+    // Handle errors
+  });
+```
+
+#### Cancel query
+
+```javascript
+import KeenAnalysis from 'keen-analysis';
+
+const client = new KeenAnalysis({
+  projectId: 'YOUR_PROJECT_ID',
+  readKey: 'YOUR_READ_KEY'
+});
+
+const queryPageviews = client.query({
+  analysis_type: 'count',
+  event_collection: 'pageviews',
+  timeframe: 'this_31_days'
+});
 
 // cancel
-query.abort();
+queryPageviews.abort();
 
 /*
 query.then(res => {
@@ -221,7 +303,9 @@ query.then(res => {
 */
 ```
 
-#### Example POST Request
+#### Timeout of the queries
+
+Fetch API doesn't support timeout, but we can fix that
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -231,85 +315,32 @@ const client = new KeenAnalysis({
   readKey: 'YOUR_READ_KEY'
 });
 
-// Get average
-client
-  .post(client.url('queries', 'average'))
-  .auth(client.readKey())
-  .send({
-    event_collection: 'purchases',
-   target_property: 'price',
-   timeframe: 'this_27_days'
-  })
-  .then(res => {
-    console.log(res);
-    // Handle results
-  })
-  .catch(err => {
-    console.log(err);
-    // Handle errors
-  });
-```
-
-#### Example PUT Request
-
-```javascript
-import KeenAnalysis from 'keen-analysis';
-
-const client = new KeenAnalysis({
-  projectId: 'YOUR_PROJECT_ID',
-  masterKey: 'YOUR_MASTER_KEY'
+const queryPageviews = client.query({
+  analysis_type: 'count',
+  event_collection: 'pageviews',
+  timeframe: 'this_31_days'
 });
 
-// Update a saved query
-client
-  .put(client.url('queries', 'saved', 'daily-pageviews-this-14-days'))
-  .auth(client.masterKey())
-  .send({
-    refresh_rate: 60 * 60 * 4,
-    query: {
-      analysis_type: 'count',
-      event_collection: 'pageviews',
-      timeframe: 'this_14_days'
-    },
-    metadata: {
-      display_name: 'Daily pageviews (this 14 days)'
-    }
-    // ...
-  })
+// cancel after 10 seconds
+setTimeout(() => {
+  queryPageviews.abort();
+}, 1000 * 10);
+
+queryPageviews
   .then(res => {
-    // Handle results
+    console.log('response', res);
   })
   .catch(err => {
-    // Handle errors
+    console.log('error', err);
   });
+
 ```
 
-#### Example DELETE Request
+### Running multiple queries at once
 
-```javascript
-import KeenAnalysis from 'keen-analysis';
-
-const client = new KeenAnalysis({
-  projectId: 'YOUR_PROJECT_ID',
-  masterKey: 'YOUR_MASTER_KEY'
-});
-
-// Delete a saved query
-client
-  .del(client.url('queries', 'saved', 'new-saved-query'))
-  .auth(client.masterKey())
-  .send()
-  .then(res => {
-    // Handle results
-  })
-  .catch(err => {
-    // Handle errors
-  });
-```
-
-### Keen.Query
-
-The `Keen.Query` object and `client.run()` method introduced in [keen-js](https://github.com/keen/keen-js) are still supported. However, `client.run()` now also returns a promise, as an alternate interface to the node-style callback.
+`client.run()` will `Promise.all` array of queries.
+Please note, that in general, we recommend running queries independently of each other.
+This example is useful if you are rendering many results on one Keen-dataviz.js chart object.
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -319,24 +350,21 @@ const client = new KeenAnalysis({
   readKey: 'YOUR_READ_KEY'
 });
 
-const query = new KeenAnalysis.Query('count', {
+const queryPageviews = client.query({
+  analysis_type: 'count',
   event_collection: 'pageviews',
   timeframe: 'this_14_days'
 });
 
-// Node-style callback
-client.run(query, (err, res) =>{
-  if (err) {
-    // Handle errors
-  }
-  else {
-    // Handle results
-  }
+const queryFormSubmissions = client.query({
+  analysis_type: 'count',
+  event_collection: 'form_submissions',
+  timeframe: 'this_14_days'
 });
 
-// promise
+// promise all
 client
-  .run(query)
+  .run([queryPageviews, queryFormSubmissions])
   .then(res => {
     // Handle results
   })
@@ -344,6 +372,19 @@ client
     // Handle errors
   });
 ```
+
+---
+
+### Client instance methods
+
+The following HTTP methods are exposed on the client instance:
+
+* `.get(object)`
+* `.post(object)`
+* `.put(object)`
+* `.del(object)`
+
+These HTTP methods take a single argument and return a promise for the asynchronous response.
 
 ---
 
@@ -419,3 +460,26 @@ Need a hand with something? Shoot us an email at [team@keen.io](mailto:team@keen
 * [How-to guides](https://keen.io/guides)
 * [Data modeling guide](https://keen.io/guides/data-modeling-guide/)
 * [Slack (public)](http://slack.keen.io/)
+
+---
+
+## Custom builds
+
+Run the following commands to install and build this project:
+
+```ssh
+# Clone the repo
+$ git clone https://github.com/keen/keen-analysis.js.git && cd keen-analysis.js
+
+# Install project dependencies
+$ npm install
+
+# Build project with Webpack
+$ npm run build
+
+# Build and launch to view demo page
+$ npm run start
+
+# Run Jest tests
+$ npm run test
+```

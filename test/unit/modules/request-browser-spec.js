@@ -12,7 +12,7 @@ describe('Browser Request methods', () => {
     event_collection: 'pageview',
     timeframe: 'this_12_months'
   };
-  const apiQueryUrl = new RegExp('queries/count');
+  const apiQueryUrl = 'queries/count';
   const dummyResponse = { result: 123 };
   const dummyErrorResponse = { error: true };
   const dummyQueryData = {
@@ -43,6 +43,7 @@ describe('Browser Request methods', () => {
   afterEach(() => {
   });
 
+  /* DEPRECATED but still supported */
   describe('.auth()', () => {
     it('should set the given api_key value', () => {
       const req = client.get(apiQueryUrl).auth('123');
@@ -50,13 +51,7 @@ describe('Browser Request methods', () => {
     });
   });
 
-  describe('.timeout()', () => {
-    it('should set the given timeout value', () => {
-      const req = client.get(apiQueryUrl).timeout(100);
-      expect(req.config.timeout).toBe(100);
-    });
-  });
-
+  /* DEPRECATED but still supported */
   describe('.headers()', () => {
     it('should set the given headers value', () => {
       const req = client.get(apiQueryUrl).headers({'x-custom-header':'123'});
@@ -65,6 +60,60 @@ describe('Browser Request methods', () => {
   });
 
   describe('.query()', () => {
+
+    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
+      fetch.mockResponseOnce(JSON.stringify(dummyResponse));
+      const queryParams = {
+        analysis_type: 'count',
+        event_collection: 'pageview',
+        timeframe: 'this_12_months'
+      };
+      await client
+        .query(queryParams)
+        .then(res => {
+          expect(fetch.mock.calls.length).toEqual(1);
+          expect(fetch.mock.calls[0][0]).toContain('api.keen.io');
+          const fetchOptions = fetch.mock.calls[0][1];
+          expect(JSON.parse(fetchOptions.body)).toMatchObject(queryParams);
+          expect(fetchOptions.method).toBe('POST');
+          expect(fetchOptions.mode).toBe('cors');
+          expect(fetchOptions.headers.Authorization).toBe(client.config.readKey);
+          expect(fetchOptions.signal).not.toBe(undefined);
+          expect(res.query.analysis_type).toBe('count');
+          expect(res.query.event_collection).toBe('pageview');
+          expect(res.query.timeframe).toBe('this_12_months');
+          expect(res.result).toBe(dummyResponse.result);
+        });
+    });
+
+    describe('cache', () => {
+      it('should cache the query if cache param is present', async () => {
+        fetch.mockResponseOnce(JSON.stringify(dummyResponse));
+        const queryParams = {
+          analysis_type: 'count',
+          event_collection: 'pageview',
+          timeframe: 'this_14_months',
+          cache: {
+            maxAge: 10000
+          }
+        };
+        await client
+          .query(queryParams)
+          .then(res => {
+            expect(fetch.mock.calls.length).toEqual(1);
+          });
+        fetch.mockResponseOnce(JSON.stringify({}));
+        await client
+          .query(queryParams)
+          .then(res => {
+            expect(res).toMatchObject(dummyResponse);
+            expect(fetch.mock.calls.length).toEqual(1);
+          });
+      });
+    });
+
+    /* DEPRECATED but still supported */
+    describe('deprecated implementation', () => {
     it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful', async () => {
       fetch.mockResponseOnce(JSON.stringify(dummyResponse));
 
@@ -156,6 +205,8 @@ describe('Browser Request methods', () => {
           expect(err).toBeInstanceOf(Object);
           expect(err.message).not.toBe(undefined);
         });
+    });
+
     });
 
   });

@@ -6,7 +6,8 @@
   "browser": "dist/keen-analysis.js",
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server",
-    "test": "NODE_ENV=test jest && NODE_ENV=test TEST_ENV=node jest",
+    "test": "NODE_ENV=test jest && npm run test:node",
+    "test:node": "NODE_ENV=test TEST_ENV=node jest",
     "test:watch": "NODE_ENV=test jest --watch",
     "test:node:watch": "NODE_ENV=test TEST_ENV=node jest --watch",
     "build": "NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node",
@@ -49,6 +50,7 @@
     "eslint-loader": "^2.0.0",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
+    "fake-indexeddb": "^2.0.4",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^22.4.3",

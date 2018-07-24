@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -178,32 +178,11 @@ function extend(target){
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var each = __webpack_require__(0),
-    extend = __webpack_require__(2);
-
-module.exports = serialize;
-
-function serialize(data){
-  var query = [];
-  each(data, function(value, key){
-    if ('string' !== typeof value) {
-      value = JSON.stringify(value);
-    }
-    query.push(key + '=' + encodeURIComponent(value));
-  });
-  return query.join('&');
-}
-
-
-/***/ }),
-/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 /* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 
 
@@ -233,244 +212,7 @@ if (!globalNS.Promise) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(setImmediate) {/* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
-
-
-// Store setTimeout reference so promise-polyfill will be unaffected by
-// other code modifying setTimeout (like sinon.useFakeTimers())
-var setTimeoutFunc = setTimeout;
-
-function noop() {}
-
-// Polyfill for Function.prototype.bind
-function bind(fn, thisArg) {
-  return function() {
-    fn.apply(thisArg, arguments);
-  };
-}
-
-function Promise(fn) {
-  if (!(this instanceof Promise))
-    throw new TypeError('Promises must be constructed via new');
-  if (typeof fn !== 'function') throw new TypeError('not a function');
-  this._state = 0;
-  this._handled = false;
-  this._value = undefined;
-  this._deferreds = [];
-
-  doResolve(fn, this);
-}
-
-function handle(self, deferred) {
-  while (self._state === 3) {
-    self = self._value;
-  }
-  if (self._state === 0) {
-    self._deferreds.push(deferred);
-    return;
-  }
-  self._handled = true;
-  Promise._immediateFn(function() {
-    var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
-    if (cb === null) {
-      (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
-      return;
-    }
-    var ret;
-    try {
-      ret = cb(self._value);
-    } catch (e) {
-      reject(deferred.promise, e);
-      return;
-    }
-    resolve(deferred.promise, ret);
-  });
-}
-
-function resolve(self, newValue) {
-  try {
-    // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-    if (newValue === self)
-      throw new TypeError('A promise cannot be resolved with itself.');
-    if (
-      newValue &&
-      (typeof newValue === 'object' || typeof newValue === 'function')
-    ) {
-      var then = newValue.then;
-      if (newValue instanceof Promise) {
-        self._state = 3;
-        self._value = newValue;
-        finale(self);
-        return;
-      } else if (typeof then === 'function') {
-        doResolve(bind(then, newValue), self);
-        return;
-      }
-    }
-    self._state = 1;
-    self._value = newValue;
-    finale(self);
-  } catch (e) {
-    reject(self, e);
-  }
-}
-
-function reject(self, newValue) {
-  self._state = 2;
-  self._value = newValue;
-  finale(self);
-}
-
-function finale(self) {
-  if (self._state === 2 && self._deferreds.length === 0) {
-    Promise._immediateFn(function() {
-      if (!self._handled) {
-        Promise._unhandledRejectionFn(self._value);
-      }
-    });
-  }
-
-  for (var i = 0, len = self._deferreds.length; i < len; i++) {
-    handle(self, self._deferreds[i]);
-  }
-  self._deferreds = null;
-}
-
-function Handler(onFulfilled, onRejected, promise) {
-  this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
-  this.onRejected = typeof onRejected === 'function' ? onRejected : null;
-  this.promise = promise;
-}
-
-/**
- * Take a potentially misbehaving resolver function and make sure
- * onFulfilled and onRejected are only called once.
- *
- * Makes no guarantees about asynchrony.
- */
-function doResolve(fn, self) {
-  var done = false;
-  try {
-    fn(
-      function(value) {
-        if (done) return;
-        done = true;
-        resolve(self, value);
-      },
-      function(reason) {
-        if (done) return;
-        done = true;
-        reject(self, reason);
-      }
-    );
-  } catch (ex) {
-    if (done) return;
-    done = true;
-    reject(self, ex);
-  }
-}
-
-Promise.prototype['catch'] = function(onRejected) {
-  return this.then(null, onRejected);
-};
-
-Promise.prototype.then = function(onFulfilled, onRejected) {
-  var prom = new this.constructor(noop);
-
-  handle(this, new Handler(onFulfilled, onRejected, prom));
-  return prom;
-};
-
-Promise.prototype['finally'] = _finally__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"];
-
-Promise.all = function(arr) {
-  return new Promise(function(resolve, reject) {
-    if (!arr || typeof arr.length === 'undefined')
-      throw new TypeError('Promise.all accepts an array');
-    var args = Array.prototype.slice.call(arr);
-    if (args.length === 0) return resolve([]);
-    var remaining = args.length;
-
-    function res(i, val) {
-      try {
-        if (val && (typeof val === 'object' || typeof val === 'function')) {
-          var then = val.then;
-          if (typeof then === 'function') {
-            then.call(
-              val,
-              function(val) {
-                res(i, val);
-              },
-              reject
-            );
-            return;
-          }
-        }
-        args[i] = val;
-        if (--remaining === 0) {
-          resolve(args);
-        }
-      } catch (ex) {
-        reject(ex);
-      }
-    }
-
-    for (var i = 0; i < args.length; i++) {
-      res(i, args[i]);
-    }
-  });
-};
-
-Promise.resolve = function(value) {
-  if (value && typeof value === 'object' && value.constructor === Promise) {
-    return value;
-  }
-
-  return new Promise(function(resolve) {
-    resolve(value);
-  });
-};
-
-Promise.reject = function(value) {
-  return new Promise(function(resolve, reject) {
-    reject(value);
-  });
-};
-
-Promise.race = function(values) {
-  return new Promise(function(resolve, reject) {
-    for (var i = 0, len = values.length; i < len; i++) {
-      values[i].then(resolve, reject);
-    }
-  });
-};
-
-// Use polyfill for setImmediate for performance gains
-Promise._immediateFn =
-  (typeof setImmediate === 'function' &&
-    function(fn) {
-      setImmediate(fn);
-    }) ||
-  function(fn) {
-    setTimeoutFunc(fn, 0);
-  };
-
-Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
-  if (typeof console !== 'undefined' && console) {
-    console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
-  }
-};
-
-/* harmony default export */ __webpack_exports__["a"] = (Promise);
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(16).setImmediate))
-
-/***/ }),
-/* 7 */
+/* 5 */
 /***/ (function(module, exports) {
 
 (function(self) {
@@ -942,7 +684,458 @@ Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var each = __webpack_require__(0),
+    extend = __webpack_require__(2);
+
+module.exports = serialize;
+
+function serialize(data){
+  var query = [];
+  each(data, function(value, key){
+    if ('string' !== typeof value) {
+      value = JSON.stringify(value);
+    }
+    query.push(key + '=' + encodeURIComponent(value));
+  });
+  return query.join('&');
+}
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(setImmediate) {/* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+
+
+// Store setTimeout reference so promise-polyfill will be unaffected by
+// other code modifying setTimeout (like sinon.useFakeTimers())
+var setTimeoutFunc = setTimeout;
+
+function noop() {}
+
+// Polyfill for Function.prototype.bind
+function bind(fn, thisArg) {
+  return function() {
+    fn.apply(thisArg, arguments);
+  };
+}
+
+function Promise(fn) {
+  if (!(this instanceof Promise))
+    throw new TypeError('Promises must be constructed via new');
+  if (typeof fn !== 'function') throw new TypeError('not a function');
+  this._state = 0;
+  this._handled = false;
+  this._value = undefined;
+  this._deferreds = [];
+
+  doResolve(fn, this);
+}
+
+function handle(self, deferred) {
+  while (self._state === 3) {
+    self = self._value;
+  }
+  if (self._state === 0) {
+    self._deferreds.push(deferred);
+    return;
+  }
+  self._handled = true;
+  Promise._immediateFn(function() {
+    var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+    if (cb === null) {
+      (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+      return;
+    }
+    var ret;
+    try {
+      ret = cb(self._value);
+    } catch (e) {
+      reject(deferred.promise, e);
+      return;
+    }
+    resolve(deferred.promise, ret);
+  });
+}
+
+function resolve(self, newValue) {
+  try {
+    // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+    if (newValue === self)
+      throw new TypeError('A promise cannot be resolved with itself.');
+    if (
+      newValue &&
+      (typeof newValue === 'object' || typeof newValue === 'function')
+    ) {
+      var then = newValue.then;
+      if (newValue instanceof Promise) {
+        self._state = 3;
+        self._value = newValue;
+        finale(self);
+        return;
+      } else if (typeof then === 'function') {
+        doResolve(bind(then, newValue), self);
+        return;
+      }
+    }
+    self._state = 1;
+    self._value = newValue;
+    finale(self);
+  } catch (e) {
+    reject(self, e);
+  }
+}
+
+function reject(self, newValue) {
+  self._state = 2;
+  self._value = newValue;
+  finale(self);
+}
+
+function finale(self) {
+  if (self._state === 2 && self._deferreds.length === 0) {
+    Promise._immediateFn(function() {
+      if (!self._handled) {
+        Promise._unhandledRejectionFn(self._value);
+      }
+    });
+  }
+
+  for (var i = 0, len = self._deferreds.length; i < len; i++) {
+    handle(self, self._deferreds[i]);
+  }
+  self._deferreds = null;
+}
+
+function Handler(onFulfilled, onRejected, promise) {
+  this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+  this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+  this.promise = promise;
+}
+
+/**
+ * Take a potentially misbehaving resolver function and make sure
+ * onFulfilled and onRejected are only called once.
+ *
+ * Makes no guarantees about asynchrony.
+ */
+function doResolve(fn, self) {
+  var done = false;
+  try {
+    fn(
+      function(value) {
+        if (done) return;
+        done = true;
+        resolve(self, value);
+      },
+      function(reason) {
+        if (done) return;
+        done = true;
+        reject(self, reason);
+      }
+    );
+  } catch (ex) {
+    if (done) return;
+    done = true;
+    reject(self, ex);
+  }
+}
+
+Promise.prototype['catch'] = function(onRejected) {
+  return this.then(null, onRejected);
+};
+
+Promise.prototype.then = function(onFulfilled, onRejected) {
+  var prom = new this.constructor(noop);
+
+  handle(this, new Handler(onFulfilled, onRejected, prom));
+  return prom;
+};
+
+Promise.prototype['finally'] = _finally__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"];
+
+Promise.all = function(arr) {
+  return new Promise(function(resolve, reject) {
+    if (!arr || typeof arr.length === 'undefined')
+      throw new TypeError('Promise.all accepts an array');
+    var args = Array.prototype.slice.call(arr);
+    if (args.length === 0) return resolve([]);
+    var remaining = args.length;
+
+    function res(i, val) {
+      try {
+        if (val && (typeof val === 'object' || typeof val === 'function')) {
+          var then = val.then;
+          if (typeof then === 'function') {
+            then.call(
+              val,
+              function(val) {
+                res(i, val);
+              },
+              reject
+            );
+            return;
+          }
+        }
+        args[i] = val;
+        if (--remaining === 0) {
+          resolve(args);
+        }
+      } catch (ex) {
+        reject(ex);
+      }
+    }
+
+    for (var i = 0; i < args.length; i++) {
+      res(i, args[i]);
+    }
+  });
+};
+
+Promise.resolve = function(value) {
+  if (value && typeof value === 'object' && value.constructor === Promise) {
+    return value;
+  }
+
+  return new Promise(function(resolve) {
+    resolve(value);
+  });
+};
+
+Promise.reject = function(value) {
+  return new Promise(function(resolve, reject) {
+    reject(value);
+  });
+};
+
+Promise.race = function(values) {
+  return new Promise(function(resolve, reject) {
+    for (var i = 0, len = values.length; i < len; i++) {
+      values[i].then(resolve, reject);
+    }
+  });
+};
+
+// Use polyfill for setImmediate for performance gains
+Promise._immediateFn =
+  (typeof setImmediate === 'function' &&
+    function(fn) {
+      setImmediate(fn);
+    }) ||
+  function(fn) {
+    setTimeoutFunc(fn, 0);
+  };
+
+Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+  if (typeof console !== 'undefined' && console) {
+    console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+  }
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (Promise);
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(18).setImmediate))
+
+/***/ }),
 /* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var MD5 = exports.MD5 = function MD5(d) {
+  var result = M(V(Y(X(d), 8 * d.length)));return result.toLowerCase();
+};function M(d) {
+  for (var _, m = "0123456789ABCDEF", f = "", r = 0; r < d.length; r++) {
+    _ = d.charCodeAt(r), f += m.charAt(_ >>> 4 & 15) + m.charAt(15 & _);
+  }return f;
+}function X(d) {
+  for (var _ = Array(d.length >> 2), m = 0; m < _.length; m++) {
+    _[m] = 0;
+  }for (m = 0; m < 8 * d.length; m += 8) {
+    _[m >> 5] |= (255 & d.charCodeAt(m / 8)) << m % 32;
+  }return _;
+}function V(d) {
+  for (var _ = "", m = 0; m < 32 * d.length; m += 8) {
+    _ += String.fromCharCode(d[m >> 5] >>> m % 32 & 255);
+  }return _;
+}function Y(d, _) {
+  d[_ >> 5] |= 128 << _ % 32, d[14 + (_ + 64 >>> 9 << 4)] = _;for (var m = 1732584193, f = -271733879, r = -1732584194, i = 271733878, n = 0; n < d.length; n += 16) {
+    var h = m,
+        t = f,
+        g = r,
+        e = i;f = md5_ii(f = md5_ii(f = md5_ii(f = md5_ii(f = md5_hh(f = md5_hh(f = md5_hh(f = md5_hh(f = md5_gg(f = md5_gg(f = md5_gg(f = md5_gg(f = md5_ff(f = md5_ff(f = md5_ff(f = md5_ff(f, r = md5_ff(r, i = md5_ff(i, m = md5_ff(m, f, r, i, d[n + 0], 7, -680876936), f, r, d[n + 1], 12, -389564586), m, f, d[n + 2], 17, 606105819), i, m, d[n + 3], 22, -1044525330), r = md5_ff(r, i = md5_ff(i, m = md5_ff(m, f, r, i, d[n + 4], 7, -176418897), f, r, d[n + 5], 12, 1200080426), m, f, d[n + 6], 17, -1473231341), i, m, d[n + 7], 22, -45705983), r = md5_ff(r, i = md5_ff(i, m = md5_ff(m, f, r, i, d[n + 8], 7, 1770035416), f, r, d[n + 9], 12, -1958414417), m, f, d[n + 10], 17, -42063), i, m, d[n + 11], 22, -1990404162), r = md5_ff(r, i = md5_ff(i, m = md5_ff(m, f, r, i, d[n + 12], 7, 1804603682), f, r, d[n + 13], 12, -40341101), m, f, d[n + 14], 17, -1502002290), i, m, d[n + 15], 22, 1236535329), r = md5_gg(r, i = md5_gg(i, m = md5_gg(m, f, r, i, d[n + 1], 5, -165796510), f, r, d[n + 6], 9, -1069501632), m, f, d[n + 11], 14, 643717713), i, m, d[n + 0], 20, -373897302), r = md5_gg(r, i = md5_gg(i, m = md5_gg(m, f, r, i, d[n + 5], 5, -701558691), f, r, d[n + 10], 9, 38016083), m, f, d[n + 15], 14, -660478335), i, m, d[n + 4], 20, -405537848), r = md5_gg(r, i = md5_gg(i, m = md5_gg(m, f, r, i, d[n + 9], 5, 568446438), f, r, d[n + 14], 9, -1019803690), m, f, d[n + 3], 14, -187363961), i, m, d[n + 8], 20, 1163531501), r = md5_gg(r, i = md5_gg(i, m = md5_gg(m, f, r, i, d[n + 13], 5, -1444681467), f, r, d[n + 2], 9, -51403784), m, f, d[n + 7], 14, 1735328473), i, m, d[n + 12], 20, -1926607734), r = md5_hh(r, i = md5_hh(i, m = md5_hh(m, f, r, i, d[n + 5], 4, -378558), f, r, d[n + 8], 11, -2022574463), m, f, d[n + 11], 16, 1839030562), i, m, d[n + 14], 23, -35309556), r = md5_hh(r, i = md5_hh(i, m = md5_hh(m, f, r, i, d[n + 1], 4, -1530992060), f, r, d[n + 4], 11, 1272893353), m, f, d[n + 7], 16, -155497632), i, m, d[n + 10], 23, -1094730640), r = md5_hh(r, i = md5_hh(i, m = md5_hh(m, f, r, i, d[n + 13], 4, 681279174), f, r, d[n + 0], 11, -358537222), m, f, d[n + 3], 16, -722521979), i, m, d[n + 6], 23, 76029189), r = md5_hh(r, i = md5_hh(i, m = md5_hh(m, f, r, i, d[n + 9], 4, -640364487), f, r, d[n + 12], 11, -421815835), m, f, d[n + 15], 16, 530742520), i, m, d[n + 2], 23, -995338651), r = md5_ii(r, i = md5_ii(i, m = md5_ii(m, f, r, i, d[n + 0], 6, -198630844), f, r, d[n + 7], 10, 1126891415), m, f, d[n + 14], 15, -1416354905), i, m, d[n + 5], 21, -57434055), r = md5_ii(r, i = md5_ii(i, m = md5_ii(m, f, r, i, d[n + 12], 6, 1700485571), f, r, d[n + 3], 10, -1894986606), m, f, d[n + 10], 15, -1051523), i, m, d[n + 1], 21, -2054922799), r = md5_ii(r, i = md5_ii(i, m = md5_ii(m, f, r, i, d[n + 8], 6, 1873313359), f, r, d[n + 15], 10, -30611744), m, f, d[n + 6], 15, -1560198380), i, m, d[n + 13], 21, 1309151649), r = md5_ii(r, i = md5_ii(i, m = md5_ii(m, f, r, i, d[n + 4], 6, -145523070), f, r, d[n + 11], 10, -1120210379), m, f, d[n + 2], 15, 718787259), i, m, d[n + 9], 21, -343485551), m = safe_add(m, h), f = safe_add(f, t), r = safe_add(r, g), i = safe_add(i, e);
+  }return Array(m, f, r, i);
+}function md5_cmn(d, _, m, f, r, i) {
+  return safe_add(bit_rol(safe_add(safe_add(_, d), safe_add(f, i)), r), m);
+}function md5_ff(d, _, m, f, r, i, n) {
+  return md5_cmn(_ & m | ~_ & f, d, _, r, i, n);
+}function md5_gg(d, _, m, f, r, i, n) {
+  return md5_cmn(_ & f | m & ~f, d, _, r, i, n);
+}function md5_hh(d, _, m, f, r, i, n) {
+  return md5_cmn(_ ^ m ^ f, d, _, r, i, n);
+}function md5_ii(d, _, m, f, r, i, n) {
+  return md5_cmn(m ^ (_ | ~f), d, _, r, i, n);
+}function safe_add(d, _) {
+  var m = (65535 & d) + (65535 & _);return (d >> 16) + (_ >> 16) + (m >> 16) << 16 | 65535 & m;
+}function bit_rol(d, _) {
+  return d << _ | d >>> 32 - _;
+}
+
+exports.default = MD5;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getFromCache = exports.saveToCache = undefined;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+__webpack_require__(4);
+
+__webpack_require__(5);
+
+var _md = __webpack_require__(8);
+
+var _md2 = _interopRequireDefault(_md);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var indexedDBAvailable = 'indexedDB' in self;
+var cachingEnabled = true;
+
+if (!indexedDBAvailable) {
+  // console.log("Your browser doesn't support a stable version of IndexedDB.");
+  cachingEnabled = false; // graceful degradation
+}
+
+var db = void 0;
+var cacheConfig = {
+  dbName: 'keenAnalysisIndexedDB',
+  dbCollectionName: 'requests',
+  dbCollectionKey: 'url',
+  maxAge: 60000
+};
+
+function initializeIndexedDb() {
+  var requestCacheConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  if (db) {
+    return Promise.resolve();
+  }
+  if (!cachingEnabled) {
+    return Promise.resolve();
+  }
+  cacheConfig = _extends({}, cacheConfig, requestCacheConfig);
+  return new Promise(function (resolve, reject) {
+    var dbConnectionRequest = self.indexedDB.open(cacheConfig.dbName);
+    dbConnectionRequest.onerror = function (event) {
+      cachingEnabled = false;
+      resolve();
+    };
+
+    dbConnectionRequest.onupgradeneeded = function (event) {
+      var db = event.target.result;
+      var objectStore = db.createObjectStore(cacheConfig.dbCollectionName, { keyPath: cacheConfig.dbCollectionKey });
+      objectStore.createIndex(cacheConfig.dbCollectionKey, cacheConfig.dbCollectionKey, { unique: true });
+      objectStore.createIndex('expiryTime', 'expiryTime', { unique: false });
+    };
+
+    dbConnectionRequest.onsuccess = function (event) {
+      db = event.target.result;
+      db.onerror = function (event) {
+        cachingEnabled = false; // graceful degradation
+      };
+      resolve(db);
+    };
+  });
+}
+
+var urlWithBodyHash = function urlWithBodyHash(url, fetchOptions) {
+  return (0, _md2.default)(url + '&body=' + JSON.stringify(fetchOptions.body));
+};
+
+var saveToCache = exports.saveToCache = function saveToCache(url, fetchOptions, responseJson) {
+  return initializeIndexedDb().then(function () {
+    var transactionSave = db.transaction(cacheConfig.dbCollectionName, "readwrite").objectStore(cacheConfig.dbCollectionName);
+    var requestSave = transactionSave.add({
+      url: urlWithBodyHash(url, fetchOptions),
+      expiryTime: Date.now() + cacheConfig.maxAge,
+      responseJson: responseJson
+    });
+    requestSave.onsuccess = function (event) {};
+    requestSave.onerror = function (event) {
+      cachingEnabled = false;
+    };
+  });
+};
+
+var getFromCache = exports.getFromCache = function getFromCache(url, fetchOptions) {
+  var configOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  return initializeIndexedDb(configOptions.cache).then(function () {
+    return new Promise(function (resolve, reject) {
+      if (!cachingEnabled) {
+        return resolve(null);
+      }
+
+      var transactionCleanUp = db.transaction(cacheConfig.dbCollectionName, "readwrite").objectStore(cacheConfig.dbCollectionName);
+      var indexCleanUp = transactionCleanUp.index('expiryTime');
+      var upperBoundOpenKeyRange = IDBKeyRange.upperBound(Date.now(), true);
+      indexCleanUp.openCursor(upperBoundOpenKeyRange).onsuccess = function (event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          var transactionDelete = db.transaction(cacheConfig.dbCollectionName, "readwrite").objectStore(cacheConfig.dbCollectionName).delete(event.target.result.value[cacheConfig.dbCollectionKey]);
+          cursor.continue();
+        }
+      };
+
+      var transactionIndex = db.transaction(cacheConfig.dbCollectionName, "readwrite").objectStore(cacheConfig.dbCollectionName);
+      var index = transactionIndex.index(cacheConfig.dbCollectionKey);
+      var responseFromCache = index.get(urlWithBodyHash(url, fetchOptions));
+      responseFromCache.onsuccess = function (event) {
+        if (!event.target.result || event.target.result.expiryTime < Date.now()) {
+          if (event.target.result && event.target.result.expiryTime < Date.now()) {
+            var transactionDelete = db.transaction(cacheConfig.dbCollectionName, "readwrite").objectStore(cacheConfig.dbCollectionName).delete(event.target.result[cacheConfig.dbCollectionKey]);
+            transactionDelete.onsuccess = function (event) {
+              resolve(getFromCache(url, fetchOptions, configOptions));
+            };
+            transactionDelete.onerror = function (event) {
+              cachingEnabled = false;
+              resolve(getFromCache(url, fetchOptions, configOptions));
+            };
+            return resolve(null);
+          }
+          return resolve(null);
+        } else {
+          return resolve(event.target.result.responseJson);
+        }
+      };
+      responseFromCache.onerror = function (event) {
+        cachingEnabled = false;
+        resolve(getFromCache(url, fetchOptions, configOptions));
+      };
+    });
+  });
+};
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -953,17 +1146,21 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
 
-__webpack_require__(5);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-__webpack_require__(7);
+__webpack_require__(4);
+
+__webpack_require__(5);
 
 var _each = __webpack_require__(0);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _serialize = __webpack_require__(4);
+var _serialize = __webpack_require__(6);
 
 var _serialize2 = _interopRequireDefault(_serialize);
+
+var _cacheBrowser = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -980,8 +1177,6 @@ function get(config, options) {
     return sendFetch('GET', config, options);
   } else if (xhrObject()) {
     return sendXhr('GET', config, options);
-  } else if (xdrObject()) {
-    return sendXdr('GET', config, options);
   } else {
     return sendJsonp(config, options);
   }
@@ -992,8 +1187,6 @@ function post(config, options) {
     return sendFetch('POST', config, options);
   } else if (xhrObject()) {
     return sendXhr('POST', config, options);
-  } else if (xdrObject()) {
-    return sendXdr('POST', config, options);
   } else {
     options.callback('XHR POST not supported', null);
   }
@@ -1045,13 +1238,28 @@ function sendFetch(method, config) {
     }
   });
 
-  return fetch(url, {
+  var fetchOptions = {
     method: method,
     body: method !== 'GET' && config.params ? JSON.stringify(config.params) : undefined,
     mode: 'cors',
-    headers: headers,
-    signal: options.signal
-  }).then(function (response) {
+    headers: headers
+  };
+
+  if (config.cache && method !== 'DELETE' && method !== 'PUT' && !options.notFoundInCache) {
+    return (0, _cacheBrowser.getFromCache)(url, fetchOptions, config).then(function (responseJSONFromCache) {
+      if (responseJSONFromCache) {
+        if (typeof options.callback !== 'undefined') {
+          options.callback.call(self, null, responseJSONFromCache);
+        }
+        return Promise.resolve(responseJSONFromCache);
+      }
+      sendFetch(method, config, _extends({}, options, { notFoundInCache: true }));
+    });
+  }
+
+  return fetch(url, _extends({}, fetchOptions, {
+    signal: options.signal // abort signal
+  })).then(function (response) {
     if (response.ok && method === 'DELETE') {
       return {};
     }
@@ -1069,6 +1277,9 @@ function sendFetch(method, config) {
       });
     });
   }).then(function (responseJSON) {
+    if (config.cache && method !== 'DELETE') {
+      (0, _cacheBrowser.saveToCache)(url, fetchOptions, responseJSON);
+    }
     if (typeof options.callback !== 'undefined') {
       options.callback.call(self, null, responseJSON);
     }
@@ -1078,7 +1289,7 @@ function sendFetch(method, config) {
 
 // XMLHttpRequest Support
 // ------------------------------
-
+// DEPRECATED - WILL BE REMOVED
 function xhrObject() {
   var root = 'undefined' == typeof window ? this : window;
   if (root.XMLHttpRequest && (!root.ActiveXObject || root.location && root.location.protocol && 'file:' !== root.location.protocol)) {
@@ -1174,63 +1385,8 @@ function sendXhr(method, config) {
   return xhr;
 }
 
-// XDomainRequest Support
-// ------------------------------
-
-function xdrObject() {
-  var root = 'undefined' == typeof window ? this : window;
-  if (root.XDomainRequest) {
-    return new root.XDomainRequest();
-  }
-  return false;
-}
-
-function sendXdr(method, config) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-  var xdr = xdrObject();
-  var cb = options.callback;
-
-  if (xdr) {
-    xdr.timeout = config.timeout || 300 * 1000;
-
-    xdr.ontimeout = function () {
-      handleResponse(xdr, null);
-    };
-
-    xdr.onerror = function () {
-      handleResponse(xdr, null);
-    };
-
-    xdr.onload = function () {
-      var response = JSON.parse(xdr.responseText);
-      handleResponse(null, response);
-    };
-
-    xdr.open(method.toLowerCase(), config.url);
-
-    setTimeout(function () {
-      if (config['params']) {
-        xdr.send((0, _serialize2.default)(config['params']));
-      } else {
-        xdr.send();
-      }
-    }, 0);
-  }
-
-  function handleResponse(a, b) {
-    if (cb && typeof cb === 'function') {
-      cb(a, b);
-      cb = void 0;
-    }
-  }
-
-  return xdr;
-}
-
 // JSON-P Support
-// ------------------------------
-
+// DEPRECATED - WILL BE REMOVED
 function sendJsonp(config) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -1291,7 +1447,7 @@ function sendJsonp(config) {
 }
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {(function (global, factory) {
@@ -1617,7 +1773,7 @@ function abortableFetchDecorator(patchTargets) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1628,6 +1784,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = request;
 exports.getAnalysisType = getAnalysisType;
@@ -1640,25 +1798,41 @@ var _extend = __webpack_require__(2);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-__webpack_require__(9);
+__webpack_require__(11);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function request(method, httpHandlers) {
   this.httpHandlers = httpHandlers;
-  return function (str) {
-    this.config = {
-      'api_key': undefined,
-      'method': method,
-      'params': undefined,
-      'timeout': 300 * 1000,
-      'url': str,
-      'headers': {
-        'Authorization': '',
+  return function (requestUrlAndOptions) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (typeof requestUrlAndOptions === 'string') {
+      // backward compatibility
+      this.config = _extends({
+        api_key: undefined,
+        method: method,
+        params: {},
+        timeout: 300 * 1000, // fetch api doesn't support timeouts
+        url: requestUrlAndOptions,
+        headers: {
+          'Authorization': '',
+          'Content-type': 'application/json'
+        }
+      }, options);
+      return this;
+    }
+
+    this.config = _extends({
+      api_key: undefined,
+      params: {},
+      method: method,
+      headers: {
+        'Authorization': requestUrlAndOptions.api_key,
         'Content-type': 'application/json'
       }
-    };
-    return this;
+    }, requestUrlAndOptions, options);
+    return this.send();
   }.bind(this);
 }
 
@@ -1687,14 +1861,16 @@ request.prototype.timeout = function (num) {
 };
 
 request.prototype.send = function (obj) {
-  this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
+  if (obj) {
+    this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
+  }
   var httpHandler = this.httpHandlers[this.config['method']];
   var httpOptions = (0, _extend2.default)({}, this.config);
   var self = this;
 
   // Temporary mod to append analysis_type to responses
   // for generic HTTP requests to known query resources
-  if (typeof httpOptions.params.analysis_type === 'undefined') {
+  if (this.config['method'] !== 'DELETE' && typeof httpOptions.params.analysis_type === 'undefined') {
     if (httpOptions.url.indexOf('/queries/') > -1 && httpOptions.url.indexOf('/saved/') < 0) {
       httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
     }
@@ -1717,7 +1893,7 @@ request.prototype.send = function (obj) {
         reject(err);
       } else {
         // Append query object to ad-hoc query results
-        if (typeof httpOptions.params.event_collection !== 'undefined' && typeof res.query === 'undefined') {
+        if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof res.query === 'undefined') {
           augmentedResponse = (0, _extend2.default)({ query: httpOptions.params }, res);
         }
         resolve(augmentedResponse);
@@ -1745,7 +1921,7 @@ function getAnalysisType(str) {
 }
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1914,7 +2090,7 @@ Emitter.prototype.hasListeners = function(event){
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = parseParams;
@@ -1936,17 +2112,17 @@ function parseParams(str){
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {(function(env){
   var previousKeen = env.Keen || undefined;
   var each = __webpack_require__(0),
       extend = __webpack_require__(2),
-      parseParams = __webpack_require__(12),
-      serialize = __webpack_require__(4);
+      parseParams = __webpack_require__(14),
+      serialize = __webpack_require__(6);
 
-  var Emitter = __webpack_require__(11);
+  var Emitter = __webpack_require__(13);
 
   function Client(props){
     if (this instanceof Client === false) {
@@ -2172,7 +2348,7 @@ function parseParams(str){
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2362,7 +2538,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -2552,10 +2728,10 @@ process.umask = function() { return 0; };
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1), __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1), __webpack_require__(16)))
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -2611,7 +2787,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(15);
+__webpack_require__(17);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -2625,7 +2801,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2636,11 +2812,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.KeenAnalysis = undefined;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-__webpack_require__(5);
+__webpack_require__(4);
 
-var _keenCore = __webpack_require__(13);
+var _keenCore = __webpack_require__(15);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
@@ -2654,34 +2832,81 @@ var _extend2 = _interopRequireDefault(_extend);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 _keenCore2.default.prototype.readKey = function (str) {
   if (!arguments.length) return this.config.readKey;
   this.config.readKey = str ? String(str) : null;
   return this;
 };
 
-_keenCore2.default.prototype.query = function (a, b) {
-  var requestQuery = {};
-  if (a && b && typeof b === 'string') {
-    if (b.indexOf('/result') < 0) {
-      b += '/result';
+_keenCore2.default.prototype.query = function (a) {
+  var b = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  // a - analysis type or config object
+  // b - params
+  var analysisType = a;
+  var queryParams = b;
+
+  // all this for backward compatibility, remove in next major version
+  if ((typeof a === 'undefined' ? 'undefined' : _typeof(a)) === 'object' && !b) {
+    // initialized with signle argument - config object
+    var analysisTypeExtracted = a.analysis_type,
+        cacheOptionsExtracted = a.cache,
+        queryParamsExtracted = _objectWithoutProperties(a, ['analysis_type', 'cache']);
+
+    analysisType = analysisTypeExtracted;
+    queryParams = queryParamsExtracted;
+    options.cache = _extends({}, this.config.cache || {}, cacheOptionsExtracted || {});
+    if (cacheOptionsExtracted === false) {
+      options.cache = false;
     }
-    requestQuery = this.get(this.url('queries', a, b)).auth(this.readKey());
-    return requestQuery.send();
-  } else if (a === 'dataset' && (typeof b === 'undefined' ? 'undefined' : _typeof(b)) === 'object') {
-    requestQuery = this.get(this.url('datasets', b.name, 'results')).auth(this.readKey());
-    return requestQuery.send(b);
-  } else if (a && b && (typeof b === 'undefined' ? 'undefined' : _typeof(b)) === 'object') {
-    // Include analysis_type for downstream use
-    var q = (0, _extend2.default)({ analysis_type: a }, b);
-    requestQuery = this.post(this.url('queries', a)).auth(this.readKey());
-    return requestQuery.send(q);
-  } else if (a && !b) {
-    return Promise.reject({
-      error_code: 'SDKError',
-      message: ".query() called with incorrect arguments"
-    });
   }
+
+  // for deprecated queries
+  if (options.cache === undefined && this.config.cache) {
+    options.cache = _extends({}, this.config.cache);
+  }
+
+  // read saved queries - DEPRECATED - to remove
+  if (analysisType && queryParams && typeof queryParams === 'string') {
+    if (queryParams.indexOf('/result') < 0) {
+      queryParams += '/result';
+    }
+    return this.get(this.url('queries', analysisType, queryParams), options).auth(this.config.readKey).send();
+  }
+
+  // read saved queries
+  else if (queryParams && queryParams.saved_query_name) {
+      var savedQueryResultsUrl = queryParams.saved_query_name.indexOf('/result') > -1 ? queryParams.saved_query_name : queryParams.saved_query_name + '/result';
+      return this.get(this.url('queries', 'saved', savedQueryResultsUrl), options).auth(this.config.readKey).send();
+    }
+
+    // cached datasets - DEPRECATED
+    else if (analysisType === 'dataset' && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
+        return this.get(this.url('datasets', queryParams.name, 'results'), options).auth(this.config.readKey).send(queryParams);
+      } else if (queryParams && queryParams.dataset_name) {
+        return this.get(this.url('datasets', queryParams.dataset_name, 'results'), options).auth(this.config.readKey).send(queryParams);
+      }
+
+      // standard queries
+      else if (analysisType && queryParams && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
+          // Include analysis_type for downstream use
+          var queryBodyParams = (0, _extend2.default)({ analysis_type: analysisType }, queryParams);
+
+          // Localize timezone if none is set
+          if (!queryBodyParams.timezone) {
+            queryBodyParams.timezone = new Date().getTimezoneOffset() * -60;
+          }
+
+          return this.post(this.url('queries', analysisType), options).auth(this.config.readKey).send(queryBodyParams);
+        } else if (analysisType && !queryParams) {
+          return Promise.reject({
+            error_code: 'SDKError',
+            message: ".query() called with incorrect arguments"
+          });
+        }
 };
 
 // Keen.Query handler
@@ -2702,7 +2927,9 @@ _keenCore2.default.prototype.run = function (q, callback) {
       queryPromise = self.query('saved', query + '/result');
     } else if (query instanceof _keenCore2.default.Query) {
       // Include analysis_type for downstream use
-      queryPromise = self.query(query.analysis, (0, _extend2.default)({ analysis_type: query.analysis }, query.params));
+      queryPromise = self.query(query.analysis, (0, _extend2.default)({ analysis_type: query.analysis }, query.params), query.options);
+    } else {
+      queryPromise = query;
     }
     // query.abort = queryPromise.abort;
     promises.push(queryPromise);
@@ -2729,18 +2956,18 @@ _keenCore2.default.prototype.run = function (q, callback) {
   return output;
 };
 
-function Query(analysisType, params) {
-  this.analysis = analysisType;
-  this.params = {};
-  this.set(params);
+// DEPRECATED
+function Query(analysisType) {
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  // Localize timezone if none is set
-  if (this.params.timezone === void 0) {
-    this.params.timezone = new Date().getTimezoneOffset() * -60;
-  }
+  this.analysis = analysisType;
+  this.set(params);
+  this.options = _extends({}, options);
 }
 
 Query.prototype.set = function (attributes) {
+  // DEPRECATED
   var self = this;
   (0, _each2.default)(attributes, function (v, k) {
     var key = k;
@@ -2771,6 +2998,7 @@ Query.prototype.set = function (attributes) {
 };
 
 Query.prototype.get = function (attribute) {
+  // DEPRECATED
   var key = attribute;
   if (key.match(new RegExp('[A-Z]'))) {
     key = key.replace(/([A-Z])/g, function ($1) {
@@ -2783,6 +3011,7 @@ Query.prototype.get = function (attribute) {
 };
 
 Query.prototype.addFilter = function (property, operator, value) {
+  // DEPRECATED
   this.params.filters = this.params.filters || [];
   this.params.filters.push({
     'property_name': property,
@@ -2796,7 +3025,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = KeenAnalysis;
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2805,21 +3034,21 @@ exports.default = KeenAnalysis;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Keen = undefined;
+exports.KeenAnalysis = exports.Keen = undefined;
 
 var _extend = __webpack_require__(2);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _index = __webpack_require__(17);
+var _index = __webpack_require__(19);
 
 var _index2 = _interopRequireDefault(_index);
 
-var _request = __webpack_require__(10);
+var _request = __webpack_require__(12);
 
 var _request2 = _interopRequireDefault(_request);
 
-var _httpBrowser = __webpack_require__(8);
+var _httpBrowser = __webpack_require__(10);
 
 var httpHandlers = _interopRequireWildcard(_httpBrowser);
 
@@ -2833,13 +3062,14 @@ _index2.default.prototype.put = new _request2.default('PUT', httpHandlers);
 _index2.default.prototype.del = new _request2.default('DELETE', httpHandlers);
 
 var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
+var KeenAnalysis = exports.KeenAnalysis = Keen; // backward compatibility - CDN
 exports.default = Keen;
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(18);
+module.exports = __webpack_require__(20);
 
 
 /***/ })
