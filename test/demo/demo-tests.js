@@ -2,8 +2,156 @@ const demoTests = (demoConfig, Keen) => {
   const client = new Keen(demoConfig);
 
   Keen.debug = true;
-  const newDatasetName = 'my-first-dataset';
 
+  client
+    .get({
+      url: client.url('queries', 'saved'),
+      api_key: client.config.masterKey
+    })
+    .then(res => {
+      // Handle results
+      console.log(res);
+    })
+    .catch(err => {
+      // Handle errors
+    });
+
+    return;
+
+  const newDatasetName = 'my-first-dataset2';
+
+  client
+    .query({
+      dataset_name: newDatasetName,
+      index_by: 'customer.id',
+      timeframe: 'this_7_days'
+    })
+    .then(res => {
+      console.log(res);
+      // Handle results
+    })
+    .catch(err => {
+      // Handle errors
+    });
+return;
+
+  client
+    .put({
+      url: client.url('datasets', newDatasetName),
+      api_key: client.config.masterKey,
+      params: {
+        display_name: 'Count Daily Product Purchases Over $100 by Country',
+        query: {
+          analysis_type: 'count',
+          event_collection: 'purchases',
+          filters: [
+            {
+              property_name: 'price',
+              operator: 'gte',
+              property_value: 100
+            }
+          ],
+          group_by: 'ip_geo_info.country',
+          interval: 'daily',
+          timeframe: 'this_500_days'
+        },
+        index_by: 'product.id'
+      }
+    })
+    .then(res => {
+      console.log('res', res);
+      // Handle response
+    })
+    .catch(err => {
+      // Handle error
+    });
+return;
+
+  client
+    .query({
+      saved_query_name: 'daily-pageviews-this-15-days'
+    })
+    .then(res => {
+      // Handle results
+    })
+    .catch(err => {
+      // Handle errors
+    });
+  return;
+
+/*  */
+  client
+    .del({
+      url: client.url('queries', 'saved', 'daily-pageviews-this-15-days'),
+      api_key: client.config.masterKey
+    })    .then(res => {
+          console.log('res', res);
+          // Handle results
+        })
+        .catch(err => {
+          console.error(err);
+          // Handle errors
+        });
+
+        return;
+
+  client
+    .put({
+      url: client.url('queries', 'saved', 'daily-pageviews-this-15-days'),
+      api_key: client.config.masterKey,
+      params: {
+        refresh_rate: 60 * 60 * 4, // API will recalculate it every 4 hours [secs]
+        query: {
+          analysis_type: 'count',
+          event_collection: 'pageviews',
+          timeframe: 'this_16_days'
+        },
+        metadata: {
+          display_name: 'Daily pageviews (this 14 days)',
+          visualization: {
+            chart_type: "metric"
+          }
+        }
+      }
+    })
+    // .auth(client.config.readKey)
+    // .send()
+    .then(res => {
+      console.log('res', res);
+      // Handle results
+    })
+    .catch(err => {
+      console.error(err);
+      // Handle errors
+    });
+
+    return;
+  client
+    .put(client.url('queries', 'saved', 'daily-pageviews-this-14-days'))
+    .auth(client.config.readKey)
+    .send({
+      refresh_rate: 60 * 60 * 4, // API will recalculate it every 4 hours [secs]
+      query: {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        timeframe: 'this_15_days'
+      },
+      metadata: {
+        display_name: 'Daily pageviews (this 14 days)',
+        visualization: {
+          chart_type: "metric"
+        }
+      }
+      // ...
+    })
+    .then(res => {
+      // Handle results
+    })
+    .catch(err => {
+      // Handle errors
+    });
+
+    return;
 /*
   clientx
     .put(client.url('datasets', newDatasetName))
