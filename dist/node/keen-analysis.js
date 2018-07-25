@@ -452,7 +452,7 @@ module.exports = require("https");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
+exports.DEL = exports.PUT = exports.POST = exports.GET = undefined;
 
 var _https = __webpack_require__(5);
 
@@ -472,15 +472,9 @@ var _serialize2 = _interopRequireDefault(_serialize);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var GET = exports.GET = handleRequest;
-var POST = exports.POST = handleRequest;
-var PUT = exports.PUT = handleRequest;
-var DELETE = exports.DELETE = handleRequest;
-
-function handleRequest(config) {
+var handleRequest = function handleRequest(config) {
   var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var callback = args.callback;
   var parsedUrl = _url2.default.parse(config.url);
 
   var options = {
@@ -510,7 +504,7 @@ function handleRequest(config) {
 
   var req = _https2.default.request(options, function (res) {
     if (options.method === 'DELETE' && res.statusCode === 204) {
-      return callback(null, {});
+      return args.resolve({});
     }
     var body = '';
     res.on('data', function (d) {
@@ -521,19 +515,18 @@ function handleRequest(config) {
       try {
         parsedBody = JSON.parse(body);
       } catch (error) {
-        return callback(error, null);
+        return args.reject(error);
       }
       if (parsedBody.error_code) {
         var error = new Error(parsedBody.message || 'Unknown error occurred');
         error.code = parsedBody.error_code;
-        callback(error, null);
-      } else {
-        callback(null, parsedBody);
+        return args.reject(error);
       }
+      args.resolve(parsedBody);
     });
   });
 
-  req.on('error', callback);
+  req.on('error', args.reject);
   req.on('abort', function () {
     return req.abort();
   });
@@ -541,7 +534,12 @@ function handleRequest(config) {
   req.end();
 
   return req;
-}
+};
+
+var GET = exports.GET = handleRequest;
+var POST = exports.POST = handleRequest;
+var PUT = exports.PUT = handleRequest;
+var DEL = exports.DEL = handleRequest;
 
 /***/ }),
 /* 7 */
@@ -567,7 +565,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = request;
-exports.getAnalysisType = getAnalysisType;
 
 var _each = __webpack_require__(1);
 
@@ -578,6 +575,8 @@ var _extend = __webpack_require__(0);
 var _extend2 = _interopRequireDefault(_extend);
 
 __webpack_require__(7);
+
+__webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -642,7 +641,12 @@ request.prototype.send = function (obj) {
   if (obj) {
     this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
   }
-  var httpHandler = this.httpHandlers[this.config['method']];
+  var httpRequestType = this.config['method'];
+  if (httpRequestType === 'DELETE') {
+    // delete is a reserved word in JS, so to avoid bugs
+    httpRequestType = 'DEL';
+  }
+  var httpHandler = this.httpHandlers[httpRequestType];
   var httpOptions = (0, _extend2.default)({}, this.config);
   var self = this;
 
@@ -650,7 +654,7 @@ request.prototype.send = function (obj) {
   // for generic HTTP requests to known query resources
   if (this.config['method'] !== 'DELETE' && typeof httpOptions.params.analysis_type === 'undefined') {
     if (httpOptions.url.indexOf('/queries/') > -1 && httpOptions.url.indexOf('/saved/') < 0) {
-      httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
+      httpOptions.params.analysis_type = httpOptions.url.split('/queries/').pop();
     }
   }
 
@@ -665,20 +669,15 @@ request.prototype.send = function (obj) {
     if (fetchAbortController) {
       options.signal = fetchAbortController.signal;
     }
-    options.callback = function (err, res) {
-      var augmentedResponse = res;
-      if (err) {
-        reject(err);
-      } else {
-        // Append query object to ad-hoc query results
-        if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof res.query === 'undefined') {
-          augmentedResponse = (0, _extend2.default)({ query: httpOptions.params }, res);
-        }
-        resolve(augmentedResponse);
-      }
-    };
+    options.resolve = resolve;
+    options.reject = reject;
     httpHandlerResponse = httpHandler(httpOptions, options);
     return httpHandlerResponse;
+  }).then(function (response) {
+    if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof response.query === 'undefined') {
+      return (0, _extend2.default)({ query: httpOptions.params }, response);
+    }
+    return response;
   });
 
   requestPromise.abort = function () {
@@ -690,13 +689,9 @@ request.prototype.send = function (obj) {
     //node
     httpHandlerResponse.emit('abort');
   };
+
   return requestPromise;
 };
-
-function getAnalysisType(str) {
-  var split = str.split('/queries/');
-  return split[split.length - 1];
-}
 
 /***/ }),
 /* 9 */
@@ -778,20 +773,34 @@ _keenCore2.default.prototype.query = function (a) {
     if (queryParams.indexOf('/result') < 0) {
       queryParams += '/result';
     }
-    return this.get(this.url('queries', analysisType, queryParams), options).auth(this.config.readKey).send();
+    return this.get({
+      url: this.url('queries', analysisType, queryParams),
+      api_key: this.config.readKey
+    }, options);
   }
 
   // read saved queries
   else if (queryParams && queryParams.saved_query_name) {
       var savedQueryResultsUrl = queryParams.saved_query_name.indexOf('/result') > -1 ? queryParams.saved_query_name : queryParams.saved_query_name + '/result';
-      return this.get(this.url('queries', 'saved', savedQueryResultsUrl), options).auth(this.config.readKey).send();
+      return this.get({
+        url: this.url('queries', 'saved', savedQueryResultsUrl),
+        api_key: this.config.readKey
+      }, options);
     }
 
     // cached datasets - DEPRECATED
     else if (analysisType === 'dataset' && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
-        return this.get(this.url('datasets', queryParams.name, 'results'), options).auth(this.config.readKey).send(queryParams);
+        return this.get({
+          url: this.url('datasets', queryParams.name, 'results'),
+          api_key: this.config.readKey,
+          params: queryParams
+        }, options);
       } else if (queryParams && queryParams.dataset_name) {
-        return this.get(this.url('datasets', queryParams.dataset_name, 'results'), options).auth(this.config.readKey).send(queryParams);
+        return this.get({
+          url: this.url('datasets', queryParams.dataset_name, 'results'),
+          api_key: this.config.readKey,
+          params: queryParams
+        }, options);
       }
 
       // standard queries
@@ -804,8 +813,12 @@ _keenCore2.default.prototype.query = function (a) {
             queryBodyParams.timezone = new Date().getTimezoneOffset() * -60;
           }
 
-          return this.post(this.url('queries', analysisType), options).auth(this.config.readKey).send(queryBodyParams);
-        } else if (analysisType && !queryParams) {
+          return this.post({
+            url: this.url('queries', analysisType),
+            api_key: this.config.readKey,
+            params: queryBodyParams
+          }, options);
+        } else if (analysisType && typeof analysisType === 'string' && !queryParams) {
           return Promise.reject({
             error_code: 'SDKError',
             message: ".query() called with incorrect arguments"

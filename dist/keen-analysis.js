@@ -159,31 +159,9 @@ function extend(target){
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony default export */ __webpack_exports__["a"] = (function(callback) {
-  var constructor = this.constructor;
-  return this.then(
-    function(value) {
-      return constructor.resolve(callback()).then(function() {
-        return value;
-      });
-    },
-    function(reason) {
-      return constructor.resolve(callback()).then(function() {
-        return constructor.reject(reason);
-      });
-    }
-  );
-});
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
-/* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 
 
 
@@ -210,6 +188,28 @@ if (!globalNS.Promise) {
 }
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = (function(callback) {
+  var constructor = this.constructor;
+  return this.then(
+    function(value) {
+      return constructor.resolve(callback()).then(function() {
+        return value;
+      });
+    },
+    function(reason) {
+      return constructor.resolve(callback()).then(function() {
+        return constructor.reject(reason);
+      });
+    }
+  );
+});
+
 
 /***/ }),
 /* 5 */
@@ -709,7 +709,7 @@ function serialize(data){
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(setImmediate) {/* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* WEBPACK VAR INJECTION */(function(setImmediate) {/* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 
 
 // Store setTimeout reference so promise-polyfill will be unaffected by
@@ -1006,7 +1006,7 @@ exports.getFromCache = exports.saveToCache = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-__webpack_require__(4);
+__webpack_require__(3);
 
 __webpack_require__(5);
 
@@ -1144,11 +1144,11 @@ var getFromCache = exports.getFromCache = function getFromCache(url, fetchOption
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DELETE = exports.PUT = exports.POST = exports.GET = undefined;
+exports.DEL = exports.PUT = exports.POST = exports.GET = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-__webpack_require__(4);
+__webpack_require__(3);
 
 __webpack_require__(5);
 
@@ -1164,15 +1164,10 @@ var _cacheBrowser = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var GET = exports.GET = get;
-var POST = exports.POST = post;
-var PUT = exports.PUT = put;
-var DELETE = exports.DELETE = del;
-
 // HTTP Handlers
 // ------------------------------
 
-function get(config, options) {
+var GET = exports.GET = function GET(config, options) {
   if (typeof fetch !== 'undefined') {
     return sendFetch('GET', config, options);
   } else if (xhrObject()) {
@@ -1180,39 +1175,39 @@ function get(config, options) {
   } else {
     return sendJsonp(config, options);
   }
-}
+};
 
-function post(config, options) {
+var POST = exports.POST = function POST(config, options) {
   if (typeof fetch !== 'undefined') {
     return sendFetch('POST', config, options);
   } else if (xhrObject()) {
     return sendXhr('POST', config, options);
   } else {
-    options.callback('XHR POST not supported', null);
+    options.reject('XHR POST not supported');
   }
-}
+};
 
-function put(config, options) {
+var PUT = exports.PUT = function PUT(config, options) {
   if (typeof fetch !== 'undefined') {
     return sendFetch('PUT', config, options);
   } else if (xhrObject()) {
     return sendXhr('PUT', config, options);
   } else {
-    options.callback('XHR PUT not supported', null);
+    options.reject('XHR PUT not supported');
   }
-}
+};
 
-function del(config, options) {
+var DEL = exports.DEL = function DEL(config, options) {
   if (typeof fetch !== 'undefined') {
     return sendFetch('DELETE', config, options);
   } else if (xhrObject()) {
     return sendXhr('DELETE', config, options);
   } else {
-    options.callback('XHR DELETE not supported', null);
+    options.reject('XHR DELETE not supported');
   }
-}
+};
 
-function sendFetch(method, config) {
+var sendFetch = function sendFetch(method, config) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var headers = {};
@@ -1248,50 +1243,44 @@ function sendFetch(method, config) {
   if (config.cache && method !== 'DELETE' && method !== 'PUT' && !options.notFoundInCache) {
     return (0, _cacheBrowser.getFromCache)(url, fetchOptions, config).then(function (responseJSONFromCache) {
       if (responseJSONFromCache) {
-        if (typeof options.callback !== 'undefined') {
-          options.callback.call(self, null, responseJSONFromCache);
-        }
-        return Promise.resolve(responseJSONFromCache);
+        return options.resolve(responseJSONFromCache);
       }
       sendFetch(method, config, _extends({}, options, { notFoundInCache: true }));
     });
   }
 
-  return fetch(url, _extends({}, fetchOptions, {
+  var apiResponse = void 0;
+
+  fetch(url, _extends({}, fetchOptions, {
     signal: options.signal // abort signal
   })).then(function (response) {
+    apiResponse = response;
     if (response.ok && method === 'DELETE') {
       return {};
     }
-    if (response.ok) {
-      return response.json();
-    }
-
-    return response.json().then(function (responseJSON) {
-      return Promise.reject({
+    return response.json();
+  }).then(function (responseJSON) {
+    if (responseJSON.error_code || !apiResponse.ok) {
+      options.reject({
+        ok: false,
         error_code: responseJSON.error_code,
         body: responseJSON.message,
-        status: response.status,
-        ok: false,
-        statusText: response.statusText
+        status: apiResponse.status,
+        statusText: apiResponse.statusText
       });
-    });
-  }).then(function (responseJSON) {
-    if (config.cache && method !== 'DELETE') {
+    }
+    if (config.cache && method !== 'DELETE' && method !== 'PUT') {
       (0, _cacheBrowser.saveToCache)(url, fetchOptions, responseJSON);
     }
-    if (typeof options.callback !== 'undefined') {
-      options.callback.call(self, null, responseJSON);
-    }
-    return Promise.resolve(responseJSON);
+    options.resolve(responseJSON);
   });
-}
+};
 
 // XMLHttpRequest Support
 // ------------------------------
 // DEPRECATED - WILL BE REMOVED
-function xhrObject() {
-  var root = 'undefined' == typeof window ? this : window;
+var xhrObject = function xhrObject() {
+  var root = window || undefined;
   if (root.XMLHttpRequest && (!root.ActiveXObject || root.location && root.location.protocol && 'file:' !== root.location.protocol)) {
     return new XMLHttpRequest();
   } else {
@@ -1309,9 +1298,9 @@ function xhrObject() {
     } catch (e) {}
   }
   return false;
-}
+};
 
-function sendXhr(method, config) {
+var sendXhr = function sendXhr(method, config) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var xhr = xhrObject();
@@ -1383,11 +1372,11 @@ function sendXhr(method, config) {
   }
 
   return xhr;
-}
+};
 
 // JSON-P Support
 // DEPRECATED - WILL BE REMOVED
-function sendJsonp(config) {
+var sendJsonp = function sendJsonp(config) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var url = config.url;
@@ -1432,7 +1421,7 @@ function sendJsonp(config) {
   scriptTag.src = url + '&jsonp=' + callbackName;
   parent.appendChild(scriptTag);
 
-  function handleResponse(a, b) {
+  var handleResponse = function handleResponse(a, b) {
     loaded = true;
     if (cb && typeof cb === 'function') {
       cb(a, b);
@@ -1443,8 +1432,8 @@ function sendJsonp(config) {
       delete window[callbackName];
     } catch (e) {};
     parent.removeChild(scriptTag);
-  }
-}
+  };
+};
 
 /***/ }),
 /* 11 */
@@ -1788,7 +1777,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = request;
-exports.getAnalysisType = getAnalysisType;
 
 var _each = __webpack_require__(0);
 
@@ -1799,6 +1787,8 @@ var _extend = __webpack_require__(2);
 var _extend2 = _interopRequireDefault(_extend);
 
 __webpack_require__(11);
+
+__webpack_require__(3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1871,7 +1861,7 @@ request.prototype.send = function (obj) {
   // for generic HTTP requests to known query resources
   if (this.config['method'] !== 'DELETE' && typeof httpOptions.params.analysis_type === 'undefined') {
     if (httpOptions.url.indexOf('/queries/') > -1 && httpOptions.url.indexOf('/saved/') < 0) {
-      httpOptions.params.analysis_type = getAnalysisType(httpOptions.url);
+      httpOptions.params.analysis_type = httpOptions.url.split('/queries/').pop();
     }
   }
 
@@ -1886,20 +1876,15 @@ request.prototype.send = function (obj) {
     if (fetchAbortController) {
       options.signal = fetchAbortController.signal;
     }
-    options.callback = function (err, res) {
-      var augmentedResponse = res;
-      if (err) {
-        reject(err);
-      } else {
-        // Append query object to ad-hoc query results
-        if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof res.query === 'undefined') {
-          augmentedResponse = (0, _extend2.default)({ query: httpOptions.params }, res);
-        }
-        resolve(augmentedResponse);
-      }
-    };
+    options.resolve = resolve;
+    options.reject = reject;
     httpHandlerResponse = httpHandler(httpOptions, options);
     return httpHandlerResponse;
+  }).then(function (response) {
+    if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof response.query === 'undefined') {
+      return (0, _extend2.default)({ query: httpOptions.params }, response);
+    }
+    return response;
   });
 
   requestPromise.abort = function () {
@@ -1913,11 +1898,6 @@ request.prototype.send = function (obj) {
   };
   return requestPromise;
 };
-
-function getAnalysisType(str) {
-  var split = str.split('/queries/');
-  return split[split.length - 1];
-}
 
 /***/ }),
 /* 13 */
@@ -2815,7 +2795,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-__webpack_require__(4);
+__webpack_require__(3);
 
 var _keenCore = __webpack_require__(15);
 
@@ -2873,20 +2853,34 @@ _keenCore2.default.prototype.query = function (a) {
     if (queryParams.indexOf('/result') < 0) {
       queryParams += '/result';
     }
-    return this.get(this.url('queries', analysisType, queryParams), options).auth(this.config.readKey).send();
+    return this.get({
+      url: this.url('queries', analysisType, queryParams),
+      api_key: this.config.readKey
+    }, options);
   }
 
   // read saved queries
   else if (queryParams && queryParams.saved_query_name) {
       var savedQueryResultsUrl = queryParams.saved_query_name.indexOf('/result') > -1 ? queryParams.saved_query_name : queryParams.saved_query_name + '/result';
-      return this.get(this.url('queries', 'saved', savedQueryResultsUrl), options).auth(this.config.readKey).send();
+      return this.get({
+        url: this.url('queries', 'saved', savedQueryResultsUrl),
+        api_key: this.config.readKey
+      }, options);
     }
 
     // cached datasets - DEPRECATED
     else if (analysisType === 'dataset' && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
-        return this.get(this.url('datasets', queryParams.name, 'results'), options).auth(this.config.readKey).send(queryParams);
+        return this.get({
+          url: this.url('datasets', queryParams.name, 'results'),
+          api_key: this.config.readKey,
+          params: queryParams
+        }, options);
       } else if (queryParams && queryParams.dataset_name) {
-        return this.get(this.url('datasets', queryParams.dataset_name, 'results'), options).auth(this.config.readKey).send(queryParams);
+        return this.get({
+          url: this.url('datasets', queryParams.dataset_name, 'results'),
+          api_key: this.config.readKey,
+          params: queryParams
+        }, options);
       }
 
       // standard queries
@@ -2899,8 +2893,12 @@ _keenCore2.default.prototype.query = function (a) {
             queryBodyParams.timezone = new Date().getTimezoneOffset() * -60;
           }
 
-          return this.post(this.url('queries', analysisType), options).auth(this.config.readKey).send(queryBodyParams);
-        } else if (analysisType && !queryParams) {
+          return this.post({
+            url: this.url('queries', analysisType),
+            api_key: this.config.readKey,
+            params: queryBodyParams
+          }, options);
+        } else if (analysisType && typeof analysisType === 'string' && !queryParams) {
           return Promise.reject({
             error_code: 'SDKError',
             message: ".query() called with incorrect arguments"

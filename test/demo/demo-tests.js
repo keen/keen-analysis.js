@@ -18,6 +18,7 @@ const demoTests = (demoConfig, Keen) => {
     }
   }
   getPageviews();
+  return;
 
   const newDatasetName = 'my-first-dataset2';
 
