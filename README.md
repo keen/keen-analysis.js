@@ -64,6 +64,25 @@ client
 
 **Important:** the `res` response object returned in the example above will also include a `query` object containing the `analysis_type` and query parameters shaping the request. This query information is artificially appended to the response by this SDK, as this information is currently only provided by the API for saved queries. **Why?** Query parameters are extremely useful for intelligent response handling downstream, particularly by our own automagical visualization capabilities in [keen-dataviz.js](https://github.com/keen/keen-dataviz.js).
 
+### Async Await example
+
+```javascript
+const getPageviews = async () => {
+  try {
+    const result = await client
+      .query({
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        timeframe: 'this_31_days'
+      });
+    console.log('Result', result);
+    return result;
+  } catch (error) {
+    console.log('Error', error);
+  }
+}
+```
+
 ---
 
 #### Cache queries in the client

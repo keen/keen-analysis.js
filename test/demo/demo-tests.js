@@ -3,7 +3,21 @@ const demoTests = (demoConfig, Keen) => {
 
   Keen.debug = true;
 
-  return;
+  const getPageviews = async () => {
+    try {
+      const result = await client
+        .query({
+          analysis_type: 'count',
+          event_collection: 'pageviews',
+          timeframe: 'this_31_days'
+        });
+      console.log('Await Result pageviews', result);
+      return result;
+    } catch (error) {
+      console.error('Await Error pageviews', error);
+    }
+  }
+  getPageviews();
 
   const newDatasetName = 'my-first-dataset2';
 
@@ -14,13 +28,14 @@ const demoTests = (demoConfig, Keen) => {
       timeframe: 'this_7_days'
     })
     .then(res => {
-      console.log(res);
+      console.log('get from dataset', res);
       // Handle results
     })
     .catch(err => {
       // Handle errors
+      console.error('get from dataset err', err)
     });
-return;
+
 
   client
     .put({
@@ -40,19 +55,19 @@ return;
           ],
           group_by: 'ip_geo_info.country',
           interval: 'daily',
-          timeframe: 'this_500_days'
+          timeframe: 'this_300_days'
         },
         index_by: 'product.id'
       }
     })
     .then(res => {
-      console.log('res', res);
+      console.log('create dataset res', res);
       // Handle response
     })
     .catch(err => {
+        console.error('create dataset error res', err);
       // Handle error
     });
-return;
 
   client
     .query({
@@ -60,12 +75,12 @@ return;
     })
     .then(res => {
       // Handle results
+      console.log('get saved q', res);
     })
     .catch(err => {
       // Handle errors
+      console.error('get saved q err', err);
     });
-  return;
-
 
   client
     .put({
@@ -86,48 +101,15 @@ return;
         }
       }
     })
-    // .auth(client.config.readKey)
-    // .send()
     .then(res => {
-      console.log('res', res);
+      console.log('create saved res', res);
       // Handle results
     })
     .catch(err => {
-      console.error(err);
+      console.error('create saved err', err);
       // Handle errors
     });
 
-    return;
-  client
-    .put(client.url('queries', 'saved', 'daily-pageviews-this-14-days'))
-    .auth(client.config.readKey)
-    .send({
-      refresh_rate: 60 * 60 * 4, // API will recalculate it every 4 hours [secs]
-      query: {
-        analysis_type: 'count',
-        event_collection: 'pageviews',
-        timeframe: 'this_15_days'
-      },
-      metadata: {
-        display_name: 'Daily pageviews (this 14 days)',
-        visualization: {
-          chart_type: "metric"
-        }
-      }
-      // ...
-    })
-    .then(res => {
-      // Handle results
-    })
-    .catch(err => {
-      // Handle errors
-    });
-
-    return;
-
-
-
-return;
   client
     .query({
       analysis_type: 'count',
@@ -138,26 +120,22 @@ return;
       }
     })
     .then(res => {
-      console.log(res);
+      client
+        .query({
+          analysis_type: 'count',
+          event_collection: 'pageviews',
+          timeframe: 'this_15_days',
+          cache: {
+            maxAge: 10000
+          }
+        }).then(res2 => {
+          console.log('get to cache copy', res);
+          console.log('got from cache', res2);
+        });
         // Handle results
     })
     .catch(err => {
-      console.log('err', err);
-      // Handle errors
-    });
-
-
-  client
-    .query('count', {
-      event_collection: 'pageviews',
-      timeframe: 'this_144_days'
-    }, { cache: { maxAge: 5000 } })
-    .then(res => {
-      console.log(res);
-        // Handle results
-    })
-    .catch(err => {
-      console.log('err', err);
+      console.error('err', err);
       // Handle errors
     });
 
@@ -174,42 +152,11 @@ return;
 
     const runs1 = client.run([qq11, qq21]);
     runs1.then(res => {
-      console.log('runs', res);
+      console.log('client.runs', res);
     })
     .catch(err => {
-      console.log('err', err);
+      console.error('client.runs err', err);
     });
-    return;
-
-  const query = client
-    .get(client.url('queries', 'saved'), { cache: { maxAge: 10000 } })
-    .auth(client.masterKey())
-    .send();
-
-  // cancel ?
-  // query.abort();
-
-  query.then((res) => {
-    console.log('saved queries', res);
-  }).catch((err) => {
-    console.error(err);
-  })
-
-  setTimeout(() => {
-    client
-      .query('count', {
-        event_collection: 'pageviews',
-        timeframe: 'this_144_days'
-      })
-      .then(res => {
-        console.log(res);
-          // Handle results
-      })
-      .catch(err => {
-        console.log('err', err);
-        // Handle errors
-      });
-  }, 1000);
 
   const abortedQuery = client.query('count', {
       event_collection: 'pageviews',
@@ -217,10 +164,10 @@ return;
     });
   abortedQuery.abort();
   abortedQuery.then(res => {
-    console.log('you shouldnt see this - aborted', res);
+    console.error('you shouldnt see this - query was aborted', res);
   })
   .catch(err => {
-    console.log('you shouldnt see this - aborted err', err);
+    console.error('you shouldnt see this - query was aborted err', err);
   });
 
   client
@@ -237,32 +184,6 @@ return;
       // Handle errors
     });
 
-  const qq1 = new Keen.Query('count', {
-    event_collection: 'pageviews',
-    timeframe: 'this_1_days'
-  });
-
-  const qq2 = new Keen.Query('count', {
-    event_collection: 'pageviews',
-    timeframe: 'this_30_days'
-  });
-
-  const runs = client.run([qq1, qq2]);
-  runs.then(res => {
-    console.log('runs', res);
-  })
-  .catch(err => {
-    console.log('err', err);
-  });
-
-  const singleRun = client.run(qq1, (err, res) =>{
-    if (err) {
-      console.log('err', err);
-    }
-    else {
-      console.log('single run', res);
-    }
-  });
 }
 
 if (typeof window !== 'undefined') {

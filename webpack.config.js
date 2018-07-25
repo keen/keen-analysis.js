@@ -79,9 +79,10 @@ module.exports = {
   },
 
   externals: process.env.TARGET === 'node' ? {
+    // don't include these in a bundle, because they are available in node_modules
     'whatwg-fetch' : true,
-    'promise-polyfill' : true,
-    'keen-core' : true
+    'keen-core' : true,
+    'promise-polyfill' : true
   } : {
   },
 
