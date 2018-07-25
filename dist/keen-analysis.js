@@ -1164,49 +1164,6 @@ var _cacheBrowser = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// HTTP Handlers
-// ------------------------------
-
-var GET = exports.GET = function GET(config, options) {
-  if (typeof fetch !== 'undefined') {
-    return sendFetch('GET', config, options);
-  } else if (xhrObject()) {
-    return sendXhr('GET', config, options);
-  } else {
-    return sendJsonp(config, options);
-  }
-};
-
-var POST = exports.POST = function POST(config, options) {
-  if (typeof fetch !== 'undefined') {
-    return sendFetch('POST', config, options);
-  } else if (xhrObject()) {
-    return sendXhr('POST', config, options);
-  } else {
-    options.reject('XHR POST not supported');
-  }
-};
-
-var PUT = exports.PUT = function PUT(config, options) {
-  if (typeof fetch !== 'undefined') {
-    return sendFetch('PUT', config, options);
-  } else if (xhrObject()) {
-    return sendXhr('PUT', config, options);
-  } else {
-    options.reject('XHR PUT not supported');
-  }
-};
-
-var DEL = exports.DEL = function DEL(config, options) {
-  if (typeof fetch !== 'undefined') {
-    return sendFetch('DELETE', config, options);
-  } else if (xhrObject()) {
-    return sendXhr('DELETE', config, options);
-  } else {
-    options.reject('XHR DELETE not supported');
-  }
-};
-
 var sendFetch = function sendFetch(method, config) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -1433,6 +1390,49 @@ var sendJsonp = function sendJsonp(config) {
     } catch (e) {};
     parent.removeChild(scriptTag);
   };
+};
+
+// HTTP Handlers
+// ------------------------------
+
+var GET = exports.GET = function GET(config, options) {
+  if (typeof fetch !== 'undefined') {
+    return sendFetch('GET', config, options);
+  } else if (xhrObject()) {
+    return sendXhr('GET', config, options);
+  } else {
+    return sendJsonp(config, options);
+  }
+};
+
+var POST = exports.POST = function POST(config, options) {
+  if (typeof fetch !== 'undefined') {
+    return sendFetch('POST', config, options);
+  } else if (xhrObject()) {
+    return sendXhr('POST', config, options);
+  } else {
+    options.reject('XHR POST not supported');
+  }
+};
+
+var PUT = exports.PUT = function PUT(config, options) {
+  if (typeof fetch !== 'undefined') {
+    return sendFetch('PUT', config, options);
+  } else if (xhrObject()) {
+    return sendXhr('PUT', config, options);
+  } else {
+    options.reject('XHR PUT not supported');
+  }
+};
+
+var DEL = exports.DEL = function DEL(config, options) {
+  if (typeof fetch !== 'undefined') {
+    return sendFetch('DELETE', config, options);
+  } else if (xhrObject()) {
+    return sendXhr('DELETE', config, options);
+  } else {
+    options.reject('XHR DELETE not supported');
+  }
 };
 
 /***/ }),
@@ -1853,7 +1853,12 @@ request.prototype.send = function (obj) {
   if (obj) {
     this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
   }
-  var httpHandler = this.httpHandlers[this.config['method']];
+  var httpRequestType = this.config['method'];
+  if (httpRequestType === 'DELETE') {
+    // delete is a reserved word in JS, so to avoid bugs
+    httpRequestType = 'DEL';
+  }
+  var httpHandler = this.httpHandlers[httpRequestType];
   var httpOptions = (0, _extend2.default)({}, this.config);
   var self = this;
 
@@ -1896,6 +1901,7 @@ request.prototype.send = function (obj) {
     //node
     httpHandlerResponse.emit('abort');
   };
+
   return requestPromise;
 };
 
