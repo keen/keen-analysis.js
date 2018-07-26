@@ -1210,15 +1210,20 @@ var sendFetch = function sendFetch(method, config) {
 
   fetch(url, _extends({}, fetchOptions, {
     signal: options.signal // abort signal
-  })).then(function (response) {
+  })).catch(function (connectionError) {
+    options.reject(connectionError);
+    return;
+  }).then(function (response) {
+    if (!response) return;
     apiResponse = response;
     if (response.ok && method === 'DELETE') {
       return {};
     }
     return response.json();
   }).then(function (responseJSON) {
+    if (!responseJSON) return;
     if (responseJSON.error_code || !apiResponse.ok) {
-      options.reject({
+      return options.reject({
         ok: false,
         error_code: responseJSON.error_code,
         body: responseJSON.message,
@@ -2843,10 +2848,11 @@ _keenCore2.default.prototype.query = function (a) {
 
     analysisType = analysisTypeExtracted;
     queryParams = queryParamsExtracted;
-    options.cache = _extends({}, this.config.cache || {}, cacheOptionsExtracted || {});
-    if (cacheOptionsExtracted === false) {
-      options.cache = false;
+    var cacheOptions = this.config.cache;
+    if (cacheOptionsExtracted !== undefined) {
+      cacheOptions = cacheOptionsExtracted;
     }
+    options.cache = cacheOptions;
   }
 
   // for deprecated queries

@@ -757,10 +757,11 @@ _keenCore2.default.prototype.query = function (a) {
 
     analysisType = analysisTypeExtracted;
     queryParams = queryParamsExtracted;
-    options.cache = _extends({}, this.config.cache || {}, cacheOptionsExtracted || {});
-    if (cacheOptionsExtracted === false) {
-      options.cache = false;
+    var cacheOptions = this.config.cache;
+    if (cacheOptionsExtracted !== undefined) {
+      cacheOptions = cacheOptionsExtracted;
     }
+    options.cache = cacheOptions;
   }
 
   // for deprecated queries
