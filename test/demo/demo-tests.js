@@ -1,7 +1,24 @@
 const demoTests = (demoConfig, Keen) => {
-  const client = new Keen(demoConfig);
+  const client = new Keen({ ...demoConfig});
 
   Keen.debug = true;
+  client
+    .query({
+      analysis_type: 'count',
+      event_collection: 'pageviews',
+      timeframe: 'this_32_days',
+      cache:{
+        maxAge:4000
+      }
+    }).then(res=>console.log(res))
+    .catch(er => console.log('er', er));
+
+    client
+      .query({
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        timeframe: 'this_32_days'
+      }).then(res=>console.log(res));
 
   const getPageviews = async () => {
     try {
@@ -9,7 +26,8 @@ const demoTests = (demoConfig, Keen) => {
         .query({
           analysis_type: 'count',
           event_collection: 'pageviews',
-          timeframe: 'this_31_days'
+          timeframe: 'this_31_days',
+          cache: false
         });
       console.log('Await Result pageviews', result);
       return result;

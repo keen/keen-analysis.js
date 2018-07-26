@@ -87,6 +87,27 @@ describe('Browser Request methods', () => {
     });
 
     describe('cache', () => {
+      it('should not cache the query by default', async () => {
+        fetch.mockResponseOnce(JSON.stringify(dummyResponse));
+        const queryParams = {
+          analysis_type: 'count',
+          event_collection: 'pageview',
+          timeframe: 'this_14_months'
+        };
+        await client
+          .query(queryParams)
+          .then(res => {
+            expect(fetch.mock.calls.length).toEqual(1);
+          });
+        const dummyData = { notcached: 1 };
+        fetch.mockResponseOnce(JSON.stringify(dummyData));
+        await client
+          .query(queryParams)
+          .then(res => {
+            expect(res).toMatchObject(dummyData);
+            expect(fetch.mock.calls.length).toEqual(2);
+          });
+      });
       it('should cache the query if cache param is present', async () => {
         fetch.mockResponseOnce(JSON.stringify(dummyResponse));
         const queryParams = {
