@@ -1,5 +1,5 @@
 const demoTests = (demoConfig, Keen) => {
-  const client = new Keen({ ...demoConfig});
+  const client = new Keen(demoConfig);
 
   Keen.debug = true;
   client

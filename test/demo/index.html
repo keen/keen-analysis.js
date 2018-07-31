@@ -3,7 +3,6 @@
 <head></head>
 <meta charset="utf-8">
 <body>
-  <script src="demo-config.js"></script>
   <script src="demo-tests.js"></script>
   <script>
     const file = 'keen-analysis.js';
@@ -17,7 +16,7 @@
   </script>
   <script>
     KeenAnalysis.ready(function(){
-      demoTests(demoConfig, KeenAnalysis);
+      demoTests(keenGlobals.demoConfig, KeenAnalysis);
     });
 	</script>
 </body>

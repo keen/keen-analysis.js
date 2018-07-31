@@ -8,6 +8,14 @@ if (process.env.TARGET === 'node'){
   resolveAlias['abortcontroller-polyfill/dist/polyfill-patch-fetch'] = path.resolve(__dirname, 'lib/blank.js');
 }
 
+let definePluginVars = {};
+if (process.env.NODE_ENV === 'development') {
+  const demoConfig = require('../demo-config');
+  definePluginVars = {
+    webpackKeenGlobals: JSON.stringify({ demoConfig })
+  };
+}
+
 module.exports = {
   entry: [entryFile],
 
@@ -66,7 +74,9 @@ module.exports = {
 
   // stats: 'verbose',
 
-  plugins: [],
+  plugins: [
+    new webpack.DefinePlugin(definePluginVars)
+  ],
 
   mode: process.env.NODE_ENV,
 
