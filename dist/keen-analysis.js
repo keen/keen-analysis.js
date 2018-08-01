@@ -2867,7 +2867,7 @@ _keenCore2.default.prototype.query = function (a) {
     }
     return this.get({
       url: this.url('queries', analysisType, queryParams),
-      api_key: this.config.readKey
+      api_key: this.config.readKey || this.config.masterKey
     }, options);
   }
 
@@ -2876,7 +2876,7 @@ _keenCore2.default.prototype.query = function (a) {
       var savedQueryResultsUrl = queryParams.saved_query_name.indexOf('/result') > -1 ? queryParams.saved_query_name : queryParams.saved_query_name + '/result';
       return this.get({
         url: this.url('queries', 'saved', savedQueryResultsUrl),
-        api_key: this.config.readKey
+        api_key: this.config.readKey || this.config.masterKey
       }, options);
     }
 
@@ -2884,13 +2884,13 @@ _keenCore2.default.prototype.query = function (a) {
     else if (analysisType === 'dataset' && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
         return this.get({
           url: this.url('datasets', queryParams.name, 'results'),
-          api_key: this.config.readKey,
+          api_key: this.config.readKey || this.config.masterKey,
           params: queryParams
         }, options);
       } else if (queryParams && queryParams.dataset_name) {
         return this.get({
           url: this.url('datasets', queryParams.dataset_name, 'results'),
-          api_key: this.config.readKey,
+          api_key: this.config.readKey || this.config.masterKey,
           params: queryParams
         }, options);
       }
@@ -2907,7 +2907,7 @@ _keenCore2.default.prototype.query = function (a) {
 
           return this.post({
             url: this.url('queries', analysisType),
-            api_key: this.config.readKey,
+            api_key: this.config.readKey || this.config.masterKey,
             params: queryBodyParams
           }, options);
         } else if (analysisType && typeof analysisType === 'string' && !queryParams) {
@@ -3044,7 +3044,7 @@ exports.default = KeenAnalysis;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.KeenAnalysis = exports.Keen = undefined;
+exports.KeenAnalysis = exports.Keen = exports.keenGlobals = undefined;
 
 var _extend = __webpack_require__(2);
 
@@ -3070,6 +3070,11 @@ _index2.default.prototype.get = new _request2.default('GET', httpHandlers);
 _index2.default.prototype.post = new _request2.default('POST', httpHandlers);
 _index2.default.prototype.put = new _request2.default('PUT', httpHandlers);
 _index2.default.prototype.del = new _request2.default('DELETE', httpHandlers);
+
+var keenGlobals = exports.keenGlobals = undefined;
+if (typeof webpackKeenGlobals !== 'undefined') {
+  exports.keenGlobals = keenGlobals = webpackKeenGlobals;
+}
 
 var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 var KeenAnalysis = exports.KeenAnalysis = Keen; // backward compatibility - CDN

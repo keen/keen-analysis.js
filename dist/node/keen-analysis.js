@@ -776,7 +776,7 @@ _keenCore2.default.prototype.query = function (a) {
     }
     return this.get({
       url: this.url('queries', analysisType, queryParams),
-      api_key: this.config.readKey
+      api_key: this.config.readKey || this.config.masterKey
     }, options);
   }
 
@@ -785,7 +785,7 @@ _keenCore2.default.prototype.query = function (a) {
       var savedQueryResultsUrl = queryParams.saved_query_name.indexOf('/result') > -1 ? queryParams.saved_query_name : queryParams.saved_query_name + '/result';
       return this.get({
         url: this.url('queries', 'saved', savedQueryResultsUrl),
-        api_key: this.config.readKey
+        api_key: this.config.readKey || this.config.masterKey
       }, options);
     }
 
@@ -793,13 +793,13 @@ _keenCore2.default.prototype.query = function (a) {
     else if (analysisType === 'dataset' && (typeof queryParams === 'undefined' ? 'undefined' : _typeof(queryParams)) === 'object') {
         return this.get({
           url: this.url('datasets', queryParams.name, 'results'),
-          api_key: this.config.readKey,
+          api_key: this.config.readKey || this.config.masterKey,
           params: queryParams
         }, options);
       } else if (queryParams && queryParams.dataset_name) {
         return this.get({
           url: this.url('datasets', queryParams.dataset_name, 'results'),
-          api_key: this.config.readKey,
+          api_key: this.config.readKey || this.config.masterKey,
           params: queryParams
         }, options);
       }
@@ -816,7 +816,7 @@ _keenCore2.default.prototype.query = function (a) {
 
           return this.post({
             url: this.url('queries', analysisType),
-            api_key: this.config.readKey,
+            api_key: this.config.readKey || this.config.masterKey,
             params: queryBodyParams
           }, options);
         } else if (analysisType && typeof analysisType === 'string' && !queryParams) {
