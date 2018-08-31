@@ -34,7 +34,9 @@
   },
   "homepage": "https://github.com/keen/keen-analysis.js#readme",
   "dependencies": {
+    "crossfilter2": "^1.4.6",
     "keen-core": "^0.2.0",
+    "moment": "^2.22.2",
     "promise-polyfill": "^8.0.0",
     "whatwg-fetch": "^2.0.4"
   },
