@@ -13,25 +13,24 @@ const demoTests = (demoConfig, Keen) => {
     }).then(res=>{
       console.log(res);
       res.result = [
-        { id: 0, user: 'a@ax33', testing: 33, keen: { timestamp: "2018-08-13T21:18:25.121Z" } },
-        { id: 1, testing: 66, user: 'a@a', open: true, keen: { timestamp: "2018-08-31T01:18:25.121Z" }},
-        { id: 2, testing: 5, user: 'b@b', open: true, keen: { timestamp: "2018-08-24T21:18:25.121Z" }},
-        { id: 3, testing: 4, user: 'a@a', open: false, keen: { timestamp: "2018-08-24T21:18:25.121Z" }},
-        { id: 4, testing: 33, user: 'b@b16', open: true, keen: { timestamp: "2018-08-30T21:18:25.121Z" }},
-        { id: 5, testing: 2, user: 'a@a1', open: false, keen: { timestamp: "2018-08-31T01:18:25.121Z" }},
-        { id: 6, testing: 11, user: 'PLeeee@cccc', open: false, keen: { timestamp: "2018-08-31T12:39:17.130Z" }},
+        { id: 0, user: 'a@ax33', testing: 33, keen: { timestamp: "2018-08-13T21:18:25.000Z" } },
+        { id: 1, testing: 66, user: 'a@a', open: true, keen: { timestamp: "2018-08-31T01:18:25.000Z" }},
+        { id: 2, testing: 5, user: 'b@b', open: true, keen: { timestamp: "2018-08-24T00:18:20.000Z" }},
+        { id: 3, testing: 4, user: 'a@a', open: false, keen: { timestamp: "2018-08-24T20:10:25.000Z" }},
+        { id: 4, testing: 33, user: 'b@b16', open: true, keen: { timestamp: "2018-08-30T21:18:25.000Z" }},
+        { id: 5, testing: 2, user: 'a@a1', open: false, keen: { timestamp: "2018-08-31T01:18:25.000Z" }},
+        { id: 6, testing: 11, user: 'PLeeee@cccc', open: false, keen: { timestamp: "2018-08-31T12:39:17.000Z" }},
       ];
       client
         .queryLocal({
           data: res,
-          xonOutOfTimeframeRange: (e) => console.log('reported', e),
+          zonOutOfTimeframeRange: (e) => console.log('reported', e),
         //  group_by: 'user',
-         analysis_type: 'percentile',
-         percentile: 20,
+         analysis_type: 'minimum',
 
          target_property: 'testing',
 
-         timeframe: 'this_2_years',
+         timeframe: 'this_1_month',
 
          interval: 'daily',
 
@@ -39,9 +38,9 @@ const demoTests = (demoConfig, Keen) => {
 
   /* */
             {
-              property_name: 'user_agent',
-              operator: 'ne',
-              property_value: 'like'
+              property_name: 'id',
+              operator: 'exists',
+              property_value: true
             },
 
             /*
