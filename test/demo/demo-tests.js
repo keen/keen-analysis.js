@@ -14,24 +14,29 @@ const demoTests = (demoConfig, Keen) => {
 
         client
           .localQuery({
-            file: 'http://localhost:8080/dummy-data.csv',
+            file: 'dummy-data.csv',
           //  data: [],
             debug: true,
           //  group_by: 'platform',
-            analysis_type: 'extraction',
 
-        filters: [
-          {
-            property_name: 'keen',
-            operator: 'exists',
-            property_value: true
-          }
-        ],
+          analysis_type: 'count',
+        //  timeframe: 'this_7_days'
 
-        timeframe: 'this_2_days',
-
-        interval: 'every_1_days'
 /*
+analysis_type: 'extraction',
+
+filters: [
+{
+property_name: 'keen',
+operator: 'exists',
+property_value: true
+}
+],
+
+timeframe: 'this_2_days',
+
+interval: 'every_1_days'
+
            timeframe: {
              start: '2018-09-04T14:26:55.207Z',
              end: '2018-09-04T15:26:55.207Z'
@@ -46,6 +51,9 @@ const demoTests = (demoConfig, Keen) => {
           })
           .then(res => {
             console.log('res query', res);
+          })
+          .catch(err => {
+            console.log(err);
           });
 
 
