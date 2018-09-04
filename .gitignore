@@ -6,3 +6,4 @@ test/unit/build/*
 
 demo.js
 demo-config.js
+dummy-data*.*

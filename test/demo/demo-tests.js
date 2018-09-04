@@ -1,7 +1,6 @@
 const demoTests = (demoConfig, Keen) => {
   const client = new Keen(demoConfig);
 
-
   client
     .query({
       analysis_type: 'extraction',
@@ -12,69 +11,58 @@ const demoTests = (demoConfig, Keen) => {
       }
     }).then(res=>{
       console.log(res);
+
+        client
+          .localQuery({
+            file: 'http://localhost:8080/dummy-data.csv',
+          //  data: [],
+            debug: true,
+          //  group_by: 'platform',
+            analysis_type: 'extraction',
+
+        filters: [
+          {
+            property_name: 'keen',
+            operator: 'exists',
+            property_value: true
+          }
+        ],
+
+        timeframe: 'this_2_days',
+
+        interval: 'every_1_days'
+/*
+           timeframe: {
+             start: '2018-09-04T14:26:55.207Z',
+             end: '2018-09-04T15:26:55.207Z'
+           },
+
+            order_by: {
+              property_name: 'testing',
+              direction: 'asc'
+            },
+            xlimit: 3
+             */
+          })
+          .then(res => {
+            console.log('res query', res);
+          });
+
+
+      return;
+
+
+/*
       res.result = [
         { id: 0, user: 'a@ax33', testing: 33, keen: { timestamp: "2018-08-13T21:18:25.000Z" } },
-        { id: 1, testing: 66, user: 'a@a', open: true, keen: { timestamp: "2018-08-31T01:18:25.000Z" }},
-        { id: 2, testing: 5, user: 'b@b', open: true, keen: { timestamp: "2018-08-24T00:18:20.000Z" }},
-        { id: 3, testing: 4, user: 'a@a', open: false, keen: { timestamp: "2018-08-24T20:10:25.000Z" }},
-        { id: 4, testing: 33, user: 'b@b16', open: true, keen: { timestamp: "2018-08-30T21:18:25.000Z" }},
+        { id: 1, testing: 66, do: 'aaa', user: 'a@a', open: true, keen: { timestamp: "2018-08-31T01:18:25.000Z" }},
+        { id: 2, testing: 5, do: {}, user: 'b@b', open: true, keen: { timestamp: "2018-08-24T00:18:20.000Z" }},
+        { id: 3, testing: 4, do: null, user: 'a@a', open: false, keen: { timestamp: "2018-08-24T20:10:25.000Z" }},
+        { id: 4, testing: 33, do: ['aa','bb','cc' , 2], user: 'b@b16', open: true, keen: { timestamp: "2018-08-30T21:18:25.000Z" }},
         { id: 5, testing: 2, user: 'a@a1', open: false, keen: { timestamp: "2018-08-31T01:18:25.000Z" }},
-        { id: 6, testing: 11, user: 'PLeeee@cccc', open: false, keen: { timestamp: "2018-08-31T12:39:17.000Z" }},
+        { id: 6, testing: 11, do: 2, user: 'PLeeee@cccc', open: false, keen: { timestamp: "2018-08-31T12:39:17.000Z" }},
       ];
-      client
-        .queryLocal({
-          data: res,
-          zonOutOfTimeframeRange: (e) => console.log('reported', e),
-        //  group_by: 'user',
-         analysis_type: 'minimum',
-
-         target_property: 'testing',
-
-         timeframe: 'this_1_month',
-
-         interval: 'daily',
-
-          filters: [
-
-  /* */
-            {
-              property_name: 'id',
-              operator: 'exists',
-              property_value: true
-            },
-
-            /*
-
-                        {
-                          property_name: 'user',
-                          operator: 'ne',
-                          property_value: undefined
-                        },
-
-            {
-              property_name: 'user',
-              operator: 'ne',
-              property_value: 'a@a'
-            },
-  */
-    /*
-            {
-              property_name: 'keen.timestamp',
-              operator: 'eq',
-              property_value: '2017-08-31T01:18:25.121Z'
-            },
-     */
-          ],
-
-          order_by: {
-            property_name: 'testing',
-            direction: 'asc'
-          },
-          xlimit: 3
-        })
-        .then(res => {
-          console.log('res query', res);
-        });
+*/
     })
     .catch(er => console.log('er', er));
 
