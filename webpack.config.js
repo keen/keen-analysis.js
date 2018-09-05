@@ -6,7 +6,7 @@ const entryFile = ( process.env.TARGET !== 'node' ) ? './lib/browser.js' : './li
 const resolveAlias = {};
 if (process.env.TARGET === 'node'){
   resolveAlias['abortcontroller-polyfill/dist/polyfill-patch-fetch'] = path.resolve(__dirname, 'lib/blank.js');
-  resolveAlias['utils/local-query'] = path.resolve(__dirname, 'lib/blank.js'); // TODO: node version of local query
+  resolveAlias['./browser-load-data-from-file'] = path.resolve(__dirname, 'lib/utils/node-load-data-from-file.js'); // TODO: node version of local query
 }
 
 let definePluginVars = {};

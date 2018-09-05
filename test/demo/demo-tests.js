@@ -19,9 +19,12 @@ const demoTests = (demoConfig, Keen) => {
     },
 
 /*
+
+
+interval: 'hourly',
+timezone: 'UTC'
 */
-  interval: 'hourly',
-  timezone: 'UTC'
+
   };
 
   client
