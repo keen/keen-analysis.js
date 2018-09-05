@@ -7,7 +7,7 @@
 		var a = typeof exports === 'object' ? factory(require("csvtojson"), require("moment"), require("crossfilter2"), require("keen-core")) : factory(root["csvtojson"], root["moment"], root["crossfilter2"], root["keen-core"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(global, function(__WEBPACK_EXTERNAL_MODULE__11__, __WEBPACK_EXTERNAL_MODULE__13__, __WEBPACK_EXTERNAL_MODULE__14__, __WEBPACK_EXTERNAL_MODULE__16__) {
+})(global, function(__WEBPACK_EXTERNAL_MODULE__10__, __WEBPACK_EXTERNAL_MODULE__12__, __WEBPACK_EXTERNAL_MODULE__13__, __WEBPACK_EXTERNAL_MODULE__15__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -697,45 +697,35 @@ request.prototype.send = function (obj) {
 /* 9 */
 /***/ (function(module, exports) {
 
-module.exports = require("path");
+module.exports = require("fs");
 
 /***/ }),
 /* 10 */
 /***/ (function(module, exports) {
 
-module.exports = require("fs");
+module.exports = __WEBPACK_EXTERNAL_MODULE__10__;
 
 /***/ }),
 /* 11 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__11__;
-
-/***/ }),
-/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(__dirname) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadDataFromFile = undefined;
 
-var _csvtojson = __webpack_require__(11);
+var _csvtojson = __webpack_require__(10);
 
 var _csvtojson2 = _interopRequireDefault(_csvtojson);
 
 __webpack_require__(1);
 
-var _fs = __webpack_require__(10);
+var _fs = __webpack_require__(9);
 
 var _fs2 = _interopRequireDefault(_fs);
-
-var _path = __webpack_require__(9);
-
-var _path2 = _interopRequireDefault(_path);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -743,8 +733,6 @@ var loadDataFromFile = exports.loadDataFromFile = function loadDataFromFile(file
   var extArr = file.split('.');
   var ext = extArr.pop().toLowerCase();
   var responseBodyMethod = { json: 'json', csv: 'text' }[ext];
-
-  var filePath = _path2.default.join(__dirname, file);
 
   return new Promise(function (resolve, reject) {
     _fs2.default.readFile(file, { encoding: 'utf-8' }, function (err, res) {
@@ -764,7 +752,12 @@ var loadDataFromFile = exports.loadDataFromFile = function loadDataFromFile(file
 };
 
 exports.default = loadDataFromFile;
-/* WEBPACK VAR INJECTION */}.call(this, "/"))
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__12__;
 
 /***/ }),
 /* 13 */
@@ -774,12 +767,6 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__13__;
 
 /***/ }),
 /* 14 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__14__;
-
-/***/ }),
-/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -792,15 +779,15 @@ exports.localQuery = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _crossfilter = __webpack_require__(14);
+var _crossfilter = __webpack_require__(13);
 
 var _crossfilter2 = _interopRequireDefault(_crossfilter);
 
-var _moment = __webpack_require__(13);
+var _moment = __webpack_require__(12);
 
 var _moment2 = _interopRequireDefault(_moment);
 
-var _browserLoadDataFromFile = __webpack_require__(12);
+var _browserLoadDataFromFile = __webpack_require__(11);
 
 var _browserLoadDataFromFile2 = _interopRequireDefault(_browserLoadDataFromFile);
 
@@ -1494,13 +1481,13 @@ function parseLocalResponse(_ref3) {
 exports.default = localQuery;
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__16__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__15__;
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1517,7 +1504,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 __webpack_require__(1);
 
-var _keenCore = __webpack_require__(16);
+var _keenCore = __webpack_require__(15);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
@@ -1529,7 +1516,7 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _localQuery = __webpack_require__(15);
+var _localQuery = __webpack_require__(14);
 
 var _localQuery2 = _interopRequireDefault(_localQuery);
 
@@ -1750,7 +1737,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = KeenAnalysis;
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1765,7 +1752,7 @@ var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _index = __webpack_require__(17);
+var _index = __webpack_require__(16);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -1790,10 +1777,10 @@ var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 module.exports = Keen;
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(18);
+module.exports = __webpack_require__(17);
 
 
 /***/ })
