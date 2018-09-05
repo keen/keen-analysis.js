@@ -1,5 +1,73 @@
 const demoTests = (demoConfig, Keen) => {
-  const client = new Keen(demoConfig);
+  //const client = new Keen(demoConfig);
+
+  const client = new Keen({
+    projectId: '5b8e35a4c9e77c00014d9bb0',
+    readKey: '31D5CD12F3F3FDD585BCE74EC1238AC3E23F93302D303721A6E5097C34C838B48F7F88419F2B9F0D8E85892FDD6E864D8124C563F95300F5FE0FDC93412B868C4C27D00A45D86213ED2DA5A3C33707270D7837D72B8F75B4F648A4E76A56D3B1'
+  });
+
+  let query = {
+    analysis_type: 'count',
+  //  target_property: 'user.id',
+    event_collection: 'logins',
+
+    timeframe: 'previous_25_hours',
+
+    timeframe: {
+      start: '2018-09-01T02:00:00.000Z',
+      end: '2018-09-02T05:00:00.000Z'
+    },
+
+/*
+*/
+  interval: 'hourly',
+  timezone: 'UTC'
+  };
+
+  client
+    .query({
+      ...query,
+      cache: {
+        maxAge: 1000 * 60 * 60 * 3
+      }
+    }).then(res => {
+      client
+        .localQuery({
+          file: 'dummy-data.csv',
+          debug: true,
+          ...query
+        }).then(res2 => {
+          console.log(res.result, res2.result);
+          if (JSON.stringify(res.result) === JSON.stringify(res2.result)){
+            console.log('** OK');
+          } else {
+            console.log('!!! BAD');
+            console.log(res,res2);
+
+            let notFound = [];
+            let notFound2 = [];
+            res.result.forEach(item => {
+              let found = res2.result.find(item2 => item2.keen.id === item.keen.id);
+              if (!found) {
+                notFound.push(item);
+              }
+            });
+            res2.result.forEach(item => {
+              let found = res.result.find(item2 => item2.keen.id === item.keen.id);
+              if (!found) {
+                notFound2.push(item);
+              }
+            });
+
+            console.log('not found 1', notFound);
+            console.log('not found 2', notFound2);
+
+          }
+        });
+
+    });
+
+return ;
 
   client
     .query({
@@ -9,7 +77,7 @@ const demoTests = (demoConfig, Keen) => {
       cache: {
         maxAge: 1000 * 60 * 60 * 24
       }
-    }).then(res=>{
+    }).then(res => {
       console.log(res);
 
         client
