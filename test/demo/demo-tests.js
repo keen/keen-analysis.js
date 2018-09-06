@@ -7,13 +7,13 @@ const demoTests = (demoConfig, Keen) => {
   });
 
   let query = {
-    analysis_type: 'count',
+    analysis_type: 'extraction',
   //  target_property: 'user.id',
     event_collection: 'logins',
 
-    timeframe: 'previous_25_hours',
+    timeframe: 'this_45_hours',
 
-    timeframe: {
+    xtimeframe: {
       start: '2018-09-01T02:00:00.000Z',
       end: '2018-09-02T05:00:00.000Z'
     },
@@ -34,11 +34,20 @@ timezone: 'UTC'
         maxAge: 1000 * 60 * 60 * 3
       }
     }).then(res => {
-      client
-        .localQuery({
-          file: 'dummy-data.csv',
+      console.log('res from browser', res);
+      localQuery && localQuery({
+        //  file: 'dummy-data.csv',
+          data: res,
           debug: true,
-          ...query
+          ...query,
+
+        //  timeframe: 'this_1_days',
+          timeframe: {
+            start: '2018-09-05T02:00:00.000Z',
+            end: '2018-09-07T05:00:00.000Z'
+          },
+
+          onOutOfTimeframeRange: () => console.log('OUT OF TIME')
         }).then(res2 => {
           console.log(res.result, res2.result);
           if (JSON.stringify(res.result) === JSON.stringify(res2.result)){

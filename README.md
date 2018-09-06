@@ -13,7 +13,7 @@ npm install keen-analysis --save
 Or load it from a public CDN:
 
 ```html
-<script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@3"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@3/dist/keen-analysis.min.js"></script>
 ```
 
 ### Project ID & API Keys
@@ -138,10 +138,13 @@ client
 
 The Local Query *Experimental* Feature allows you to run queries on already
 browser-side-cached or file-stored data.
+This feature is available only in the NPM version of the library.
 
 #### Local Query on the browser cache
 
 ```javascript
+import KeenAnalysis, { localQuery } from 'keen-analysis';
+
 client
   .query({
     analysis_type: 'extraction', // IMPORTANT
@@ -153,9 +156,7 @@ client
     }
   })
   .then(responseJSON => {
-
-    client
-      .localQuery({
+    localQuery({
         data: responseJSON,
 
         // now run any query that you would normally run
@@ -215,7 +216,8 @@ client
     /*
       Optional
     */
-    debug: true // see the details of each query in your console
+    debug: true, // see the details of each query in your console
+    onOutOfTimeframeRange: () => {}, // load more data from API or ignore
   })
   .then(localQueryResponseJSON => {
     // handle results
