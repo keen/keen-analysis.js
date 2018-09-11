@@ -13,7 +13,7 @@ npm install keen-analysis --save
 Or load it from a public CDN:
 
 ```html
-<script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@3"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@3/dist/keen-analysis.min.js"></script>
 ```
 
 ### Project ID & API Keys
@@ -131,6 +131,99 @@ client
   })
   .catch(err => {
     // Handle errors
+  });
+```
+
+## Local Queries
+
+The Local Query *Experimental* Feature allows you to run queries on already
+browser-side-cached or file-stored data.
+This feature is available only in the NPM version of the library.
+
+#### Local Query on the browser cache
+
+```javascript
+import KeenAnalysis, { localQuery } from 'keen-analysis';
+
+client
+  .query({
+    analysis_type: 'extraction', // IMPORTANT
+    event_collection: 'pageviews',
+    timeframe: 'this_30_days',
+    cache: {
+      // cache the result in the browser for 1 day
+      maxAge: 1000 * 60 * 60 * 24
+    }
+  })
+  .then(responseJSON => {
+    localQuery({
+        data: responseJSON,
+
+        // now run any query that you would normally run
+        // for example
+        analysis_type: 'count',
+        timeframe: 'this_7_days',
+
+        debug: true // OPTIONAL: see the details of each query in your console
+      })
+      .then(localQueryResponseJSON => {
+        // handle results, for example pass them to keen-dataviz
+      })
+      .catch(localQueryError => {
+        console.log(localQueryError);
+      });
+  });
+```
+
+#### Local Query on the file
+
+```javascript
+client
+  .localQuery({
+    file: 'dummy-data.csv', // .csv or .json file
+
+    analysis_type: 'count',
+    timeframe: 'this_14_days'
+  })
+  .then(localQueryResponseJSON => {
+    // handle results
+  })
+  .catch(localQueryError => {
+    // handle error
+  });
+```
+
+#### The Local Query configuration
+
+```javascript
+client
+  .localQuery({
+    /*
+      Define the data source
+      The Local Query accepts all of the Extraction query results
+    */
+    data: responseJSON, // response from the Browser's cache or Keen's API
+    // OR
+    file: 'dummy-data.csv', // .csv or .json files
+
+    /*
+      Use standard query parameters - https://keen.io/docs/api/#analyses
+    */
+    analysis_type: 'count',
+    timeframe: 'this_7_days', // optional
+    // filter, interval, limit etc...
+
+    /*
+      Optional
+    */
+    debug: true, // see the details of each query in your console
+    onOutOfTimeframeRange: () => {}, // load more data from API or ignore
+  })
+  .then(localQueryResponseJSON => {
+    // handle results
+  })
+  .catch(localQueryError => {
+    // handle error
   });
 ```
 

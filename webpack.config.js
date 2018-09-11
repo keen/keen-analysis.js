@@ -6,6 +6,11 @@ const entryFile = ( process.env.TARGET !== 'node' ) ? './lib/browser.js' : './li
 const resolveAlias = {};
 if (process.env.TARGET === 'node'){
   resolveAlias['abortcontroller-polyfill/dist/polyfill-patch-fetch'] = path.resolve(__dirname, 'lib/blank.js');
+  resolveAlias['./browser-load-data-from-file'] = path.resolve(__dirname, 'lib/utils/node-load-data-from-file.js');
+}
+
+if (process.env.OPTIMIZE_MINIMIZE) {
+  resolveAlias['./utils/local-query'] = path.resolve(__dirname, 'lib/blank.js');
 }
 
 let definePluginVars = {};
@@ -92,7 +97,10 @@ module.exports = {
     // don't include these in a bundle, because they are available in node_modules
     'whatwg-fetch' : true,
     'keen-core' : true,
-    'promise-polyfill' : true
+    'promise-polyfill' : true,
+    'moment' : true,
+    'csvtojson' : true,
+    'crossfilter2' : true
   } : {
   },
 

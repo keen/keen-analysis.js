@@ -1,6 +1,160 @@
 const demoTests = (demoConfig, Keen) => {
-  const client = new Keen(demoConfig);
+  //const client = new Keen(demoConfig);
 
+  const client = new Keen({
+    projectId: '5b8e35a4c9e77c00014d9bb0',
+    readKey: '31D5CD12F3F3FDD585BCE74EC1238AC3E23F93302D303721A6E5097C34C838B48F7F88419F2B9F0D8E85892FDD6E864D8124C563F95300F5FE0FDC93412B868C4C27D00A45D86213ED2DA5A3C33707270D7837D72B8F75B4F648A4E76A56D3B1'
+  });
+
+  let query = {
+    analysis_type: 'extraction',
+  //  target_property: 'user.id',
+    event_collection: 'logins',
+
+    timeframe: 'this_45_hours',
+
+    xtimeframe: {
+      start: '2018-09-01T02:00:00.000Z',
+      end: '2018-09-02T05:00:00.000Z'
+    },
+
+/*
+
+
+interval: 'hourly',
+timezone: 'UTC'
+*/
+
+  };
+
+  client
+    .query({
+      ...query,
+      cache: {
+        maxAge: 1000 * 60 * 60 * 3
+      }
+    }).then(res => {
+      console.log('res from browser', res);
+      localQuery && localQuery({
+        //  file: 'dummy-data.csv',
+          data: res,
+          debug: true,
+          ...query,
+
+        //  timeframe: 'this_1_days',
+          timeframe: {
+            start: '2018-09-05T02:00:00.000Z',
+            end: '2018-09-07T05:00:00.000Z'
+          },
+
+          onOutOfTimeframeRange: () => console.log('OUT OF TIME')
+        }).then(res2 => {
+          console.log(res.result, res2.result);
+          if (JSON.stringify(res.result) === JSON.stringify(res2.result)){
+            console.log('** OK');
+          } else {
+            console.log('!!! BAD');
+            console.log(res,res2);
+
+            let notFound = [];
+            let notFound2 = [];
+            res.result.forEach(item => {
+              let found = res2.result.find(item2 => item2.keen.id === item.keen.id);
+              if (!found) {
+                notFound.push(item);
+              }
+            });
+            res2.result.forEach(item => {
+              let found = res.result.find(item2 => item2.keen.id === item.keen.id);
+              if (!found) {
+                notFound2.push(item);
+              }
+            });
+
+            console.log('not found 1', notFound);
+            console.log('not found 2', notFound2);
+
+          }
+        });
+
+    });
+
+return ;
+
+  client
+    .query({
+      analysis_type: 'extraction',
+      event_collection: 'pageviews',
+      timeframe: 'this_30_days',
+      cache: {
+        maxAge: 1000 * 60 * 60 * 24
+      }
+    }).then(res => {
+      console.log(res);
+
+        client
+          .localQuery({
+            file: 'dummy-data.csv',
+          //  data: [],
+            debug: true,
+          //  group_by: 'platform',
+
+          analysis_type: 'count',
+        //  timeframe: 'this_7_days'
+
+/*
+analysis_type: 'extraction',
+
+filters: [
+{
+property_name: 'keen',
+operator: 'exists',
+property_value: true
+}
+],
+
+timeframe: 'this_2_days',
+
+interval: 'every_1_days'
+
+           timeframe: {
+             start: '2018-09-04T14:26:55.207Z',
+             end: '2018-09-04T15:26:55.207Z'
+           },
+
+            order_by: {
+              property_name: 'testing',
+              direction: 'asc'
+            },
+            xlimit: 3
+             */
+          })
+          .then(res => {
+            console.log('res query', res);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+
+
+      return;
+
+
+/*
+      res.result = [
+        { id: 0, user: 'a@ax33', testing: 33, keen: { timestamp: "2018-08-13T21:18:25.000Z" } },
+        { id: 1, testing: 66, do: 'aaa', user: 'a@a', open: true, keen: { timestamp: "2018-08-31T01:18:25.000Z" }},
+        { id: 2, testing: 5, do: {}, user: 'b@b', open: true, keen: { timestamp: "2018-08-24T00:18:20.000Z" }},
+        { id: 3, testing: 4, do: null, user: 'a@a', open: false, keen: { timestamp: "2018-08-24T20:10:25.000Z" }},
+        { id: 4, testing: 33, do: ['aa','bb','cc' , 2], user: 'b@b16', open: true, keen: { timestamp: "2018-08-30T21:18:25.000Z" }},
+        { id: 5, testing: 2, user: 'a@a1', open: false, keen: { timestamp: "2018-08-31T01:18:25.000Z" }},
+        { id: 6, testing: 11, do: 2, user: 'PLeeee@cccc', open: false, keen: { timestamp: "2018-08-31T12:39:17.000Z" }},
+      ];
+*/
+    })
+    .catch(er => console.log('er', er));
+
+return;
   Keen.debug = true;
   client
     .query({
