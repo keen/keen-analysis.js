@@ -22929,13 +22929,22 @@ var localQuery = function localQuery(query) {
           result: query.data
         };
       }
+
+      if (!Array.isArray(query.data.result)) {
+        if (query.data.query && query.data.query.analysis_type !== 'extraction') {
+          throw 'Local Query can use only result of an Extraction';
+          return;
+        }
+        throw 'query.data should be an Array';
+        return;
+      }
+
       sharedData = query.data.result;
       // don't copy this huge array - just make a reference to it
       // so queries with Intervals don't overload the browser
     }
 
     var rows = (0, _crossfilter2.default)(sharedData);
-    query.data.result = null;
 
     if (query.debug) {
       console.log('! Welcome to the Local Query Experimental Feature !');
@@ -23028,7 +23037,7 @@ var localQuery = function localQuery(query) {
     if (query.timeframe) {
       if (
       // check boundries only for data with metadata from a root query
-      query.data.query && (parseTimeframe({ timeframe: query.timeframe, commonTime: commonTime }).start < parseTimeframe({ timeframe: query.data.query.timeframe, commonTime: commonTime }).start || query.timeframe.end && parseTimeframe({ timeframe: query.data.query.timeframe, commonTime: commonTime }).end < parseTimeframe({ timeframe: query.timeframe, commonTime: commonTime }).end)) {
+      query.data.query && (parseTimeframe({ timeframe: query.timeframe, commonTime: commonTime }).start < parseTimeframe({ timeframe: query.data.query.timeframe, commonTime: commonTime }).start || parseTimeframe({ timeframe: query.data.query.timeframe, commonTime: commonTime }).end < parseTimeframe({ timeframe: query.timeframe, commonTime: commonTime }).end)) {
         if (query.debug) console.log('Local query\'s timeframe is out of the Root Query timeframe range');
         if (query.onOutOfTimeframeRange) {
           return query.onOutOfTimeframeRange();

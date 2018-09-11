@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("keen-core"));
+		module.exports = factory(require("keen-core"), require("csvtojson"), require("moment"), require("crossfilter2"));
 	else if(typeof define === 'function' && define.amd)
-		define(["keen-core"], factory);
+		define(["keen-core", "csvtojson", "moment", "crossfilter2"], factory);
 	else {
-		var a = typeof exports === 'object' ? factory(require("keen-core")) : factory(root["keen-core"]);
+		var a = typeof exports === 'object' ? factory(require("keen-core"), require("csvtojson"), require("moment"), require("crossfilter2")) : factory(root["keen-core"], root["csvtojson"], root["moment"], root["crossfilter2"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(global, function(__WEBPACK_EXTERNAL_MODULE__9__) {
+})(global, function(__WEBPACK_EXTERNAL_MODULE__9__, __WEBPACK_EXTERNAL_MODULE__12__, __WEBPACK_EXTERNAL_MODULE__14__, __WEBPACK_EXTERNAL_MODULE__15__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -97,39 +97,6 @@ function extend(target){
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-module.exports = each;
-
-function each(o, cb, s){
-  var n;
-  if (!o){
-    return 0;
-  }
-  s = !s ? o : s;
-  if (o instanceof Array){
-    // Indexed arrays, needed for Safari
-    for (n=0; n<o.length; n++) {
-      if (cb.call(s, o[n], n, o) === false){
-        return 0;
-      }
-    }
-  } else {
-    // Hashtables
-    for (n in o){
-      if (o.hasOwnProperty(n)) {
-        if (cb.call(s, o[n], n, o) === false){
-          return 0;
-        }
-      }
-    }
-  }
-  return 1;
-}
-
-
-/***/ }),
-/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -410,10 +377,43 @@ if (!globalNS.Promise) {
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+module.exports = each;
+
+function each(o, cb, s){
+  var n;
+  if (!o){
+    return 0;
+  }
+  s = !s ? o : s;
+  if (o instanceof Array){
+    // Indexed arrays, needed for Safari
+    for (n=0; n<o.length; n++) {
+      if (cb.call(s, o[n], n, o) === false){
+        return 0;
+      }
+    }
+  } else {
+    // Hashtables
+    for (n in o){
+      if (o.hasOwnProperty(n)) {
+        if (cb.call(s, o[n], n, o) === false){
+          return 0;
+        }
+      }
+    }
+  }
+  return 1;
+}
+
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var each = __webpack_require__(1),
+var each = __webpack_require__(2),
     extend = __webpack_require__(0);
 
 module.exports = serialize;
@@ -566,7 +566,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.default = request;
 
-var _each = __webpack_require__(1);
+var _each = __webpack_require__(2);
 
 var _each2 = _interopRequireDefault(_each);
 
@@ -576,7 +576,7 @@ var _extend2 = _interopRequireDefault(_extend);
 
 __webpack_require__(7);
 
-__webpack_require__(2);
+__webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -715,13 +715,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-__webpack_require__(2);
+__webpack_require__(1);
 
 var _keenCore = __webpack_require__(9);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
-var _each = __webpack_require__(1);
+var _each = __webpack_require__(2);
 
 var _each2 = _interopRequireDefault(_each);
 
@@ -945,6 +945,18 @@ exports.default = KeenAnalysis;
 
 /***/ }),
 /* 11 */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__12__;
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -953,7 +965,800 @@ exports.default = KeenAnalysis;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Keen = undefined;
+exports.loadDataFromFile = undefined;
+
+var _csvtojson = __webpack_require__(12);
+
+var _csvtojson2 = _interopRequireDefault(_csvtojson);
+
+__webpack_require__(1);
+
+var _fs = __webpack_require__(11);
+
+var _fs2 = _interopRequireDefault(_fs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var loadDataFromFile = exports.loadDataFromFile = function loadDataFromFile(file) {
+  var extArr = file.split('.');
+  var ext = extArr.pop().toLowerCase();
+  var responseBodyMethod = { json: 'json', csv: 'text' }[ext];
+
+  return new Promise(function (resolve, reject) {
+    _fs2.default.readFile(file, { encoding: 'utf-8' }, function (err, res) {
+      if (err) {
+        return reject(err);
+      }
+
+      if (ext === 'json') {
+        return resolve(res);
+      }
+
+      return (0, _csvtojson2.default)().fromString(res).then(function (json) {
+        resolve(json);
+      });
+    });
+  });
+};
+
+exports.default = loadDataFromFile;
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__14__;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__15__;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.localQuery = undefined;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _crossfilter = __webpack_require__(15);
+
+var _crossfilter2 = _interopRequireDefault(_crossfilter);
+
+var _moment = __webpack_require__(14);
+
+var _moment2 = _interopRequireDefault(_moment);
+
+var _browserLoadDataFromFile = __webpack_require__(13);
+
+var _browserLoadDataFromFile2 = _interopRequireDefault(_browserLoadDataFromFile);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var sharedData = void 0;
+
+var localQuery = function localQuery(query) {
+  if (query.debug && !query.startedAt) query.startedAt = Date.now();
+
+  if (!query.data && !query.file) {
+    throw 'Specify the source of the data: DATA or FILE';
+    return;
+  }
+
+  if (query.data && query.file) {
+    throw 'Use only one data source: DATA or FILE';
+    return;
+  }
+
+  if (query.file) {
+    return (0, _browserLoadDataFromFile2.default)(query.file).then(function (res) {
+      return localQuery(_extends({}, query, {
+        file: undefined,
+        data: res
+      }));
+    });
+  }
+
+  return new Promise(function (resolve, reject) {
+    if (!sharedData) {
+      if (!query.data && query.res) {
+        throw 'Use query.data instead of query.res property';
+        return;
+      }
+      if (Array.isArray(query.data)) {
+        query.data = {
+          result: query.data
+        };
+      }
+
+      if (!Array.isArray(query.data.result)) {
+        if (query.data.query && query.data.query.analysis_type !== 'extraction') {
+          throw 'Local Query can use only result of an Extraction';
+          return;
+        }
+        throw 'query.data should be an Array';
+        return;
+      }
+
+      sharedData = query.data.result;
+      // don't copy this huge array - just make a reference to it
+      // so queries with Intervals don't overload the browser
+    }
+
+    var rows = (0, _crossfilter2.default)(sharedData);
+
+    if (query.debug) {
+      console.log('! Welcome to the Local Query Experimental Feature !');
+      console.log('* Running a local query with:');
+      console.log('--', 'Number of events before filtering:', sharedData.length);
+      var keysToPrint = ['analysis_type', 'filters', 'timeframe', 'interval', 'group_by', 'order_by', 'limit'];
+      keysToPrint.forEach(function (key) {
+        console.log('--', key, query[key]);
+      });
+    }
+
+    query.combinedFilters = [].concat(_toConsumableArray(query.filters || [])) || [];
+    query.analysis_type = query.analysis_type || 'extraction';
+
+    var supportedAnalysisTypes = ['extraction', 'count', 'count_unique', 'minimum', 'maximum', 'sum', 'average', 'median', 'percentile', 'select_unique'];
+    if (!supportedAnalysisTypes.find(function (item) {
+      return item === query.analysis_type;
+    })) {
+      console.log(query.analysis_type + ' is not supported in the local queries');
+      return;
+    }
+
+    // to group and be able to sort - we need to create a new dimension
+    if (query.order_by && query.order_by.property_name !== 'result' && !query.combinedFilters.find(function (filter) {
+      return filter.property_name === query.order_by.property_name;
+    })) {
+      query.combinedFilters.push({
+        property_name: query.order_by.property_name,
+        operator: 'true'
+      });
+    }
+
+    if (query.target_property) {
+      query.group_by = query.target_property;
+    }
+
+    if (query.group_by) {
+      query.combinedFilters.push({
+        property_name: query.group_by,
+        operator: 'true'
+      });
+    }
+
+    // TIMEFRAME
+
+    if (!query.timeframe && query.data.query && query.data.query.timeframe) {
+      query.timeframe = query.data.query.timeframe;
+      // get timeframe from parent query (general results from cache/file)
+    }
+
+    var commonTime = Date.now(); // necessary to be able to compare dates
+
+    var parseTimeframe = function parseTimeframe(_ref) {
+      var timeframe = _ref.timeframe,
+          _ref$returnPartial = _ref.returnPartial,
+          returnPartial = _ref$returnPartial === undefined ? false : _ref$returnPartial,
+          commonTime = _ref.commonTime;
+
+      if (timeframe.start) {
+        // absolute
+        return {
+          start: _moment2.default.utc(timeframe.start),
+          end: _moment2.default.utc(timeframe.end)
+        };
+      }
+      var timeframeParts = timeframe.split('_');
+      var dateRelation = timeframeParts[0];
+      var unitsNumber = timeframeParts[1];
+      var units = timeframeParts[2];
+      var unit = units.slice(0, units.length - 1);
+      if (!returnPartial) {
+        var start = (0, _moment2.default)().startOf(unit).subtract(unitsNumber - 1, units);
+        var end = (0, _moment2.default)().startOf(unit);
+        if (commonTime) {
+          start = _moment2.default.utc(commonTime).subtract(unitsNumber, units);
+          end = _moment2.default.utc(commonTime);
+        }
+        return {
+          start: start,
+          end: end
+        };
+      }
+      return {
+        dateRelation: dateRelation,
+        unitsNumber: unitsNumber,
+        units: units
+      };
+    };
+
+    if (query.timeframe) {
+      if (
+      // check boundries only for data with metadata from a root query
+      query.data.query && (parseTimeframe({ timeframe: query.timeframe, commonTime: commonTime }).start < parseTimeframe({ timeframe: query.data.query.timeframe, commonTime: commonTime }).start || parseTimeframe({ timeframe: query.data.query.timeframe, commonTime: commonTime }).end < parseTimeframe({ timeframe: query.timeframe, commonTime: commonTime }).end)) {
+        if (query.debug) console.log('Local query\'s timeframe is out of the Root Query timeframe range');
+        if (query.onOutOfTimeframeRange) {
+          return query.onOutOfTimeframeRange();
+        }
+      }
+
+      var addTimeframeFilter = function addTimeframeFilter(timeframe) {
+        if (timeframe.start) {
+          // ABSOLUTE timeframe
+          query.combinedFilters.push({
+            property_name: 'keen.timestamp',
+            operator: 'gte',
+            property_value: _moment2.default.utc(timeframe.start)
+          });
+          query.combinedFilters.push({
+            property_name: 'keen.timestamp',
+            operator: 'lt',
+            property_value: _moment2.default.utc(timeframe.end)
+          });
+        } else {
+          // RELATIVE timeframe
+          var timestamp_parts = parseTimeframe({ timeframe: timeframe, returnPartial: true });
+          var unit = timestamp_parts.units.slice(0, timestamp_parts.units.length - 1);
+
+          var timestamp_from_value_this = parseTimeframe({ timeframe: timeframe }).start;
+          var timestamp_from_value_previous = parseTimeframe({ timeframe: timeframe }).start.startOf(unit);
+          if (!query.subquery) {
+            timestamp_from_value_previous.subtract(1, timestamp_parts.units);
+          }
+
+          var timestamp_to_value_this = (0, _moment2.default)();
+          var timestamp_to_value_previous = (0, _moment2.default)().startOf(unit);
+
+          if (timestamp_parts.dateRelation === 'previous') {
+            // previous
+            query.combinedFilters.push({
+              property_name: 'keen.timestamp',
+              operator: 'lt',
+              property_value: timestamp_to_value_previous
+            });
+            query.combinedFilters.push({
+              property_name: 'keen.timestamp',
+              operator: 'gte',
+              property_value: timestamp_from_value_previous
+            });
+          } else {
+            // this_
+            query.combinedFilters.push({
+              property_name: 'keen.timestamp',
+              operator: 'lt',
+              property_value: timestamp_to_value_this
+            });
+            query.combinedFilters.push({
+              property_name: 'keen.timestamp',
+              operator: 'gte',
+              property_value: timestamp_from_value_this
+            });
+          }
+        }
+      };
+
+      addTimeframeFilter(query.timeframe);
+
+      if (query.rootTimeframe) {
+        addTimeframeFilter(query.rootTimeframe);
+      }
+    }
+
+    // INTERVAL
+
+    var lastRow = sharedData && sharedData[sharedData.length - 1];
+    var lastRowTimeStamp = lastRow && lastRow.keen.timestamp;
+    var intervalFilters = [];
+    if (query.interval) {
+      var startTimestamp = query.combinedFilters.find(function (item) {
+        return item.property_name === 'keen.timestamp' && item.operator === 'gte';
+      }).property_value;
+      var endTimestamp = (query.combinedFilters.find(function (item) {
+        return item.property_name === 'keen.timestamp' && item.operator === 'lt';
+      }) || {}).property_value || _moment2.default.utc(lastRowTimeStamp);
+
+      var currentEndTimestamp = _moment2.default.utc(startTimestamp);
+      var currentStartTimestamp = void 0;
+
+      var timestamp_to = parseTimeframe({ timeframe: query.timeframe, returnPartial: true, commonTime: commonTime });
+
+      var intervalToUnits = {
+        secondly: 'seconds',
+        minutely: 'minutes',
+        hourly: 'hours',
+        daily: 'days',
+        weekly: 'weeks',
+        monthly: 'months',
+        yearly: 'years'
+      };
+
+      var intervalStrParts = query.interval.split('_');
+      var units = intervalStrParts[2] || intervalToUnits[query.interval];
+      var distance = intervalStrParts[1] || 1;
+
+      var promisesArray = [];
+      while (endTimestamp.diff(currentEndTimestamp, 'seconds') > 0) {
+        var timeframe = {
+          start: currentEndTimestamp.startOf(units).toISOString(),
+          end: currentEndTimestamp.add(distance, units).toISOString()
+        };
+        promisesArray.push(localQuery(_extends({}, query, {
+          rootTimeframe: query.timeframe,
+          timeframe: _extends({}, timeframe),
+          interval: null,
+          extendResults: {
+            timeframe: _extends({}, timeframe)
+          },
+          subquery: true,
+          debug: false
+        })));
+      }
+      if (query.debug) console.log('** Running ' + promisesArray.length + ' subQueries because of Interval ' + query.interval);
+      return Promise.all(promisesArray).then(function (res) {
+        var resultToValue = res.map(function (resItem) {
+          var result = resItem.result,
+              otherKeys = _objectWithoutProperties(resItem, ['result']);
+          // Keen's API is responding with key called VALUE instead of RESULT,
+          // so we have to map that here
+
+
+          return _extends({}, otherKeys, { value: result });
+        });
+        printQueryTime(query);
+        return resolve({
+          result: resultToValue,
+          query: getQueryMetadata(query)
+        });
+      }).catch(function (err) {
+        reject(err);
+      });
+    }
+
+    if (!query.combinedFilters.length) {
+      // we need to specify at least one filter to create a dimension
+      query.combinedFilters.push({
+        property_name: 'keen.timestamp',
+        operator: 'exists',
+        property_value: true
+      });
+    }
+
+    var dimensions = {};
+
+    // get nested Object property accessed by string like someObj.some_property
+    var getNestedObject = function getNestedObject(nestedObj, pathArr) {
+      return pathArr.reduce(function (obj, key) {
+        return obj && obj[key] !== 'undefined' ? obj[key] : undefined;
+      }, nestedObj);
+    };
+
+    var firstFilter = void 0;
+    query.combinedFilters.forEach(function (filter) {
+      if (!firstFilter) firstFilter = filter.property_name;
+      var keys = filter.property_name.split('.');
+      dimensions[filter.property_name] = dimensions[filter.property_name] || [];
+      dimensions[filter.property_name].push(rows.dimension(function (d) {
+        return getNestedObject(d, keys);
+      }));
+
+      // FILTERS
+
+      dimensions[filter.property_name][dimensions[filter.property_name].length - 1].filter(function (d) {
+        if (filter.operator === 'eq' && Array.isArray(d)) {
+          // mirror the strange API behaviour
+          filter.operator = 'eq_in';
+          if (query.debug) console.log('Mirror API\'s behaviour - change EQ to EQ_IN');
+        }
+        switch (filter.operator) {
+          case 'eq':
+            return JSON.stringify(d) === JSON.stringify(filter.property_value);
+            break;
+          case 'eq_in':
+            if (!d) return false;
+            if (Array.isArray(d)) {
+              return d.indexOf(filter.property_value) !== -1;
+            }
+            return JSON.stringify(d) === JSON.stringify(filter.property_value);
+            break;
+          case 'strict_eq':
+            // even if the D value is array
+            return JSON.stringify(d) === JSON.stringify(filter.property_value);
+            break;
+          case 'ne':
+            return JSON.stringify(d) !== JSON.stringify(filter.property_value);
+            break;
+          case 'gt':
+            if (filter.property_name === 'keen.timestamp') {
+              return (0, _moment2.default)(d).diff(filter.property_value, 'seconds') > 0;
+            }
+            return d > filter.property_value;
+            break;
+          case 'gte':
+            if (filter.property_name === 'keen.timestamp') {
+              return (0, _moment2.default)(d).diff(filter.property_value, 'seconds') >= 0;
+            }
+            return d >= filter.property_value;
+            break;
+          case 'lte':
+            if (filter.property_name === 'keen.timestamp') {
+              return (0, _moment2.default)(d).diff(filter.property_value, 'seconds') <= 0;
+            }
+            return d <= filter.property_value;
+            break;
+          case 'lt':
+            if (filter.property_name === 'keen.timestamp') {
+              return (0, _moment2.default)(d).diff(filter.property_value, 'seconds') < 0;
+            }
+            return d < filter.property_value;
+            break;
+          case 'exists':
+            return !!d === filter.property_value;
+            break;
+          case 'in':
+            if (!d) return false;
+            if (Array.isArray(filter.property_value) && Array.isArray(d)) {
+              var found = false;
+              filter.property_value.forEach(function (item) {
+                if (d.find(function (itemInPropert) {
+                  return itemInPropert === item;
+                })) {
+                  found = true;
+                }
+              });
+              return found;
+            }
+            if (Array.isArray(filter.property_value)) {
+              return filter.property_value.find(function (item) {
+                return item === d;
+              });
+            }
+            if (Array.isArray(d)) {
+              return d.find(function (item) {
+                return item === filter.property_value;
+              });
+            }
+            break;
+          case 'contains':
+            return d && d.indexOf(filter.property_value) !== -1;
+            break;
+          case 'not_contains':
+            return !d || d.indexOf(filter.property_value) === -1;
+            break;
+          case 'within':
+            reject('not supported operator: within');
+            return false; // TODO: geo coordinates
+            break;
+          default:
+            return true;
+        }
+      });
+    });
+
+    if (query.debug) console.log('Dimensions created:', Object.keys(dimensions));
+
+    var result = dimensions[firstFilter][0];
+
+    if (query.group_by) {
+      result = dimensions[query.group_by][0].group();
+    }
+
+    var limit = query.limit || Infinity;
+    var directionMethod = 'top';
+
+    if (query.debug) console.log('Order direction:', { top: 'asc', bottom: 'desc' }[directionMethod], directionMethod);
+
+    var getValueFromNestedKey = function getValueFromNestedKey(_ref2) {
+      var row = _ref2.row,
+          nestedKey = _ref2.nestedKey;
+
+      if (!row) return undefined;
+      var keys = nestedKey.split('.');
+      var value = getNestedObject(row, keys);
+      if (isNaN(value)) {
+        return value;
+      }
+      return value * 1;
+    };
+    // ANALYSIS TYPES
+
+    if (query.analysis_type === 'minimum') {
+      var resultRow = dimensions[query.group_by][0].bottom(1);
+      var value = getValueFromNestedKey({
+        row: resultRow[0],
+        nestedKey: query.target_property
+      });
+      var _result = value;
+      return resolve(parseLocalResponse({
+        result: _result,
+        query: query
+      }));
+    }
+
+    if (query.analysis_type === 'maximum') {
+      var _resultRow = dimensions[query.group_by][0].top(1);
+      var _value = getValueFromNestedKey({
+        row: _resultRow[0],
+        nestedKey: query.target_property
+      });
+      var _result2 = _value;
+      return resolve(parseLocalResponse({
+        result: _result2,
+        query: query
+      }));
+    }
+
+    if (query.analysis_type === 'sum') {
+      var reducer = function reducer() {
+        var accumulator = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var currentValue = arguments[1];
+
+        return (getValueFromNestedKey({
+          row: accumulator,
+          nestedKey: query.target_property
+        }) || accumulator) + (getValueFromNestedKey({
+          row: currentValue,
+          nestedKey: query.target_property
+        }) || 0);
+      };
+      var _resultRow2 = dimensions[query.group_by][0].top(Infinity);
+      var _result3 = 0;
+      if (_resultRow2 && _resultRow2.length) {
+        _result3 = _resultRow2.reduce(reducer);
+      }
+      return resolve(parseLocalResponse({
+        result: _result3,
+        query: query
+      }));
+    }
+
+    if (query.analysis_type === 'average') {
+      var _reducer = function _reducer() {
+        var accumulator = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var currentValue = arguments[1];
+
+        return (getValueFromNestedKey({
+          row: accumulator,
+          nestedKey: query.target_property
+        }) || accumulator) + (getValueFromNestedKey({
+          row: currentValue,
+          nestedKey: query.target_property
+        }) || 0);
+      };
+      var _resultRow3 = dimensions[query.group_by][0].top(Infinity);
+      var _result4 = 0;
+      if (_resultRow3 && _resultRow3.length) {
+        _result4 = _resultRow3.reduce(_reducer) / (_resultRow3.length > 0 && _resultRow3.length || 1);
+      }
+      return resolve(parseLocalResponse({
+        result: _result4,
+        query: query
+      }));
+    }
+
+    if (query.analysis_type === 'median') {
+      var _resultRow4 = dimensions[query.target_property][0].top(Infinity);
+      var _result5 = 0;
+      if (_resultRow4 && _resultRow4.length) {
+        var half = Math.floor(_resultRow4.length / 2);
+        if (_resultRow4.length % 2) {
+          _result5 = getValueFromNestedKey({
+            row: _resultRow4[half],
+            nestedKey: query.target_property
+          });
+        } else {
+          _result5 = (getValueFromNestedKey({
+            row: _resultRow4[half - 1],
+            nestedKey: query.target_property
+          }) + getValueFromNestedKey({
+            row: _resultRow4[half],
+            nestedKey: query.target_property
+          })) / 2.0;
+        }
+      }
+      return resolve(parseLocalResponse({
+        result: _result5,
+        query: query
+      }));
+    }
+
+    if (query.analysis_type === 'percentile') {
+      var _resultRow5 = dimensions[query.target_property][0].bottom(Infinity);
+      var _result6 = 0;
+      if (_resultRow5 && _resultRow5.length) {
+        var index = query.percentile / 100 * (_resultRow5.length - 1);
+        if (Math.floor(index) === index) {
+          _result6 = getValueFromNestedKey({
+            row: _resultRow5[index],
+            nestedKey: query.target_property
+          });
+        } else {
+          var i = Math.floor(index);
+          var fraction = index - i;
+          _result6 = getValueFromNestedKey({
+            row: _resultRow5[i],
+            nestedKey: query.target_property
+          }) + (getValueFromNestedKey({
+            row: _resultRow5[i + 1],
+            nestedKey: query.target_property
+          }) - getValueFromNestedKey({
+            row: _resultRow5[i],
+            nestedKey: query.target_property
+          })) * fraction;
+        }
+      }
+      return resolve(parseLocalResponse({
+        result: _result6,
+        query: query
+      }));
+    }
+
+    // ORDER BY
+
+    if (query.order_by) {
+      var order_by = {
+        property_name: query.order_by.property_name || firstFilter,
+        direction: query.order_by.direction || 'ASC'
+      };
+      if (order_by.direction.toLowerCase() === 'asc') {
+        directionMethod = 'bottom';
+      }
+      if (query.group_by) {
+        order_by.property_name = 'result';
+      }
+      if (order_by.property_name === 'result' || order_by.property_name === query.group_by) {
+        // group
+        if (directionMethod === 'bottom') {
+          // fix for the bug of the crossfilter lib
+          result = result.top(Infinity);
+          return resolve(parseLocalResponse({
+            result: result.reverse().slice(0, limit),
+            parser: { group_by: query.group_by },
+            query: query
+          }));
+        }
+        return resolve(parseLocalResponse({
+          result: result[directionMethod](limit),
+          parser: { group_by: query.group_by },
+          query: query
+        }));
+      }
+      result = dimensions[order_by.property_name][0][directionMethod](limit);
+      return resolve(parseLocalResponse({
+        result: result,
+        query: query
+      }));
+    }
+
+    return resolve(parseLocalResponse({
+      result: result[directionMethod](limit),
+      query: query
+    }));
+  });
+};
+
+exports.localQuery = localQuery;
+var sortAlpha = function sortAlpha(a, b) {
+  var textA = a.toUpperCase();
+  var textB = b.toUpperCase();
+  return textA < textB ? -1 : textA > textB ? 1 : 0;
+};
+
+var printQueryTime = function printQueryTime(query) {
+  if (query.debug) console.log('** Query time: ', Date.now() - query.startedAt, 'ms');
+};
+
+function getQueryMetadata(query) {
+  var rootQuery = query && query.data && query.data.query;
+  var queryBodyParams = {};
+  if (rootQuery) {
+    queryBodyParams = _extends({}, rootQuery);
+  } else {
+    queryBodyParams = {
+      analysis_type: query.analysis_type,
+      event_collection: query.event_collection,
+      timeframe: query.timeframe,
+      interval: query.interval
+    };
+  }
+  queryBodyParams.timezone = new Date().getTimezoneOffset() * -60;
+  return queryBodyParams;
+}
+
+function parseLocalResponse(_ref3) {
+  var result = _ref3.result,
+      _ref3$parser = _ref3.parser,
+      parser = _ref3$parser === undefined ? {} : _ref3$parser,
+      _ref3$query = _ref3.query,
+      query = _ref3$query === undefined ? {} : _ref3$query;
+
+  query.extendResults = query.extendResults || {};
+  if (!query.subquery) {
+    query.extendResults.query = getQueryMetadata(query);
+  }
+  if (!Array.isArray(result)) {
+    printQueryTime(query);
+    return _extends({
+      result: result
+    }, query.extendResults);
+  }
+
+  var resultParsed = result;
+  if (parser.group_by) {
+    resultParsed = [];
+    var i = 0;
+    result.forEach(function (item) {
+      var _resultParsed;
+
+      resultParsed[i++] = (_resultParsed = {}, _defineProperty(_resultParsed, parser.group_by, item.key), _defineProperty(_resultParsed, 'result', item.value), _resultParsed);
+    });
+  }
+
+  if (query.analysis_type === 'count' && !query.group_by) {
+    resultParsed = resultParsed.length;
+  }
+
+  if (query.analysis_type === 'select_unique') {
+    resultParsed = resultParsed.map(function (value) {
+      return value[Object.keys(value)[0]];
+    });
+    if (typeof resultParsed[0] === 'string') {
+      resultParsed.sort(sortAlpha);
+    } else {
+      resultParsed.sort(function (a, b) {
+        return a - b;
+      });
+    }
+    if (query.order_by && query.order_by.direction === 'desc') {
+      resultParsed = resultParsed.reverse();
+    }
+  }
+
+  printQueryTime(query);
+
+  return _extends({
+    result: resultParsed
+  }, query.extendResults);
+}
+
+exports.default = localQuery;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Keen = exports.localQuery = undefined;
+
+var _localQuery = __webpack_require__(16);
+
+Object.defineProperty(exports, 'localQuery', {
+  enumerable: true,
+  get: function get() {
+    return _localQuery.localQuery;
+  }
+});
 
 var _extend = __webpack_require__(0);
 
@@ -984,10 +1789,10 @@ var Keen = exports.Keen = _index2.default.extendLibrary(_index2.default);
 module.exports = Keen;
 
 /***/ }),
-/* 12 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(11);
+module.exports = __webpack_require__(17);
 
 
 /***/ })
