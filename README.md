@@ -1,6 +1,6 @@
 # keen-analysis.js
 
-JavaScript Client for [Keen](https://keen.io/).
+A JavaScript Client for [Keen](https://keen.io/).
 
 ### Installation
 

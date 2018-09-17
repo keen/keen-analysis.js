@@ -1,7 +1,7 @@
 {
   "name": "keen-analysis",
   "version": "3.1.1",
-  "description": "Data Analysis SDK for Keen IO",
+  "description": "A JavaScript client for Keen.IO",
   "main": "dist/node/keen-analysis.js",
   "browser": "dist/keen-analysis.js",
   "scripts": {
@@ -24,15 +24,31 @@
     "url": "git+https://github.com/keen/keen-analysis.js.git"
   },
   "author": "Keen IO <team@keen.io>",
+  "homepage": "https://keen.io",
   "contributors": [
     "Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)",
     "Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)"
+  ],
+  "keywords": [
+    "Analytics",
+    "Analysis",
+    "Conversion",
+    "Query",
+    "Stats",
+    "Client",
+    "Min",
+    "Max",
+    "Count",
+    "Percentile",
+    "Average",
+    "Median",
+    "Keen",
+    "Keen Query"
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/keen/keen-analysis.js/issues"
   },
-  "homepage": "https://github.com/keen/keen-analysis.js#readme",
   "dependencies": {
     "crossfilter2": "^1.4.6",
     "csvtojson": "^2.0.8",
