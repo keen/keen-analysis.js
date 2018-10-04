@@ -143,7 +143,8 @@ This feature is available only in the NPM version of the library.
 #### Local Query on the browser cache
 
 ```javascript
-import KeenAnalysis, { localQuery } from 'keen-analysis';
+import KeenAnalysis from 'keen-analysis';
+import localQuery from 'keen-analysis/dist/modules/localQuery';
 
 client
   .query({
@@ -178,8 +179,9 @@ client
 #### Local Query on the file
 
 ```javascript
-client
-  .localQuery({
+import localQuery from 'keen-analysis/dist/modules/localQuery';
+
+localQuery({
     file: 'dummy-data.csv', // .csv or .json file
 
     analysis_type: 'count',
@@ -196,8 +198,7 @@ client
 #### The Local Query configuration
 
 ```javascript
-client
-  .localQuery({
+localQuery({
     /*
       Define the data source
       The Local Query accepts all of the Extraction query results
@@ -225,6 +226,14 @@ client
   .catch(localQueryError => {
     // handle error
   });
+```
+
+#### Local Query in the Node.js environment
+
+```javascript
+const KeenAnalysis = require('keen-analysis');
+// import from Node.js modules:
+const localQuery = require('keen-analysis/dist/node/modules/localQuery').default;
 ```
 
 #### Create a Saved Query
