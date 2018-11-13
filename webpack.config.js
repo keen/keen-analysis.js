@@ -9,10 +9,6 @@ if (process.env.TARGET === 'node'){
   resolveAlias['./browser-load-data-from-file'] = path.resolve(__dirname, 'lib/utils/node-load-data-from-file.js');
 }
 
-if (process.env.OPTIMIZE_MINIMIZE) {
-  resolveAlias['./utils/local-query'] = path.resolve(__dirname, 'lib/blank.js');
-}
-
 let definePluginVars = {};
 if (process.env.NODE_ENV === 'development') {
   const demoConfig = require('../demo-config');
