@@ -12,7 +12,7 @@ describe('Node Request methods', () => {
     analysis_type: 'count',
     event_collection: 'pageview',
     timeframe: 'this_12_months',
-    timezone: 7200
+    timezone: 3600
   };
   const dummyResponse = { result: 123 };
   const dummyErrorResponse = { error: true };
@@ -56,7 +56,7 @@ describe('Node Request methods', () => {
       .post(/./, JSON.stringify({
         analysis_type: queryObject.analysis_type,
         event_collection: false,
-        timezone: 7200
+        timezone: 3600
       }))
       .reply(500, {error_code: 500, message: 'Error'});
 
@@ -124,7 +124,8 @@ describe('Node Request methods', () => {
         .query({
           analysis_type: 'count',
           event_collection: 'pageview',
-          timeframe: 'this_12_months'
+          timeframe: 'this_12_months',
+          timezone: 3600
         })
         .then(res => {
           expect(res.query.analysis_type).toBe('count');
@@ -138,7 +139,8 @@ describe('Node Request methods', () => {
       await client
         .query('count', {
           event_collection: 'pageview',
-          timeframe: 'this_12_months'
+          timeframe: 'this_12_months',
+          timezone: 3600
         })
         .then(res => {
           expect(res.query.analysis_type).toBe('count');
@@ -151,7 +153,8 @@ describe('Node Request methods', () => {
     it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', async () => {
       await client
           .query('count', {
-            event_collection: false
+            event_collection: false,
+            timezone: 3600
           })
           .catch(err => {
             expect(err).toBeInstanceOf(Error);
