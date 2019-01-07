@@ -7,16 +7,18 @@ const demoTests = (demoConfig, Keen) => {
   });
 
   let query = {
-    analysis_type: 'extraction',
+    analysis_type: 'count',
   //  target_property: 'user.id',
     event_collection: 'logins',
 
-    timeframe: 'this_45_hours',
+    timeframe: 'this_145_days',
 
     xtimeframe: {
       start: '2018-09-01T02:00:00.000Z',
       end: '2018-09-02T05:00:00.000Z'
     },
+
+    include_metadata: true
 
 /*
 
@@ -26,6 +28,16 @@ timezone: 'UTC'
 */
 
   };
+
+  client
+    .query({
+      ...query
+    }).then(res => {
+      console.log(res);
+    });
+
+
+  return ;
 
   client
     .query({
