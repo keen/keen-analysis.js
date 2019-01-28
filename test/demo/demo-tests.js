@@ -1,10 +1,66 @@
 const demoTests = (demoConfig, Keen) => {
-  //const client = new Keen(demoConfig);
+  const client = new Keen(demoConfig);
 
-  const client = new Keen({
-    projectId: '5b8e35a4c9e77c00014d9bb0',
-    readKey: '31D5CD12F3F3FDD585BCE74EC1238AC3E23F93302D303721A6E5097C34C838B48F7F88419F2B9F0D8E85892FDD6E864D8124C563F95300F5FE0FDC93412B868C4C27D00A45D86213ED2DA5A3C33707270D7837D72B8F75B4F648A4E76A56D3B1'
-  });
+client.query({
+  analysis_type: 'count',
+  event_collection: 'purchases',
+  timeframe: 'this_1_days'
+})
+.then(res => {
+  console.log(res);
+  // Handle response
+})
+.catch(err => {
+  console.log(err);
+  // Handle error
+});
+
+  return;
+
+  const savedQueryName = 'my-saved-query-18jan-6';
+
+  client
+    .put(client.url('queries', 'saved', savedQueryName))
+    .auth(client.masterKey())
+    .send({
+      query: {
+        analysis_type: 'sum',
+        target_property: 'price',
+        event_collection: 'purchases',
+        timeframe: 'this_6_months',
+        filters: [
+          {
+            property_name: 'price',
+            operator: 'gte',
+            property_value: 0.50
+          }
+        ],
+        group_by: [
+          'platform'
+        ],
+        order_by: [
+           {
+             property_name: 'result',
+             direction: 'ASC'
+           }
+        ],
+        limit: 20
+      },
+      metadata: {
+        display_name: savedQueryName,
+      },
+      refresh_rate: 14400
+    })
+    .then(res => {
+      console.log(res);
+      // Handle response
+    })
+    .catch(err => {
+      console.log(err);
+      // Handle error
+    });
+
+
 
   let query = {
     analysis_type: 'count',
@@ -21,8 +77,6 @@ const demoTests = (demoConfig, Keen) => {
     include_metadata: true
 
 /*
-
-
 interval: 'hourly',
 timezone: 'UTC'
 */
