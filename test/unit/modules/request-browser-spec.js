@@ -14,8 +14,6 @@ describe('Browser Request methods', () => {
   };
   const apiQueryUrl = 'queries/count';
   const dummyResponse = { result: 123 };
-  const dummyNormalResponse = { result: 14.212}
-  const dummyRoundResponse = { result: 14 }
   const dummyErrorResponse = { error: true };
   const dummyQueryData = {
     query: {
@@ -88,28 +86,148 @@ describe('Browser Request methods', () => {
         });
     });
 
-    it('should make a POST request with data to a query endpoint, returning a response and query parameters when successful, and rounding values when needed', async () => {
-      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponse));
+    const newConfig = {...helpers.client, roundValues: true};
+    const customClient = new KeenClient(newConfig);
+    const dummyNormalResponseUp = { result: 14.612}
+    const dummyRoundResponseUp = { result: 15 }
+
+    it('rounding values up', async () => {
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseUp));
       const queryParams = {
         analysis_type: 'average',
-        event_collection: 'pageview',
-        timeframe: 'this_12_months'
+        event_collection: 'pageviews',
+        timeframe: 'this_3_months'
       };
-      await client
+      await customClient
         .query(queryParams)
         .then(res => {
-          expect(fetch.mock.calls.length).toEqual(1);
-          expect(fetch.mock.calls[0][0]).toContain('api.keen.io');
-          const fetchOptions = fetch.mock.calls[0][1];
-          expect(JSON.parse(fetchOptions.body)).toMatchObject(queryParams);
-          expect(fetchOptions.method).toBe('POST');
-          expect(fetchOptions.mode).toBe('cors');
-          expect(fetchOptions.headers.Authorization).toBe(client.config.readKey);
-          expect(fetchOptions.signal).not.toBe(undefined);
-          expect(res.query.analysis_type).toBe('average');
-          expect(res.query.event_collection).toBe('pageview');
-          expect(res.query.timeframe).toBe('this_12_months');
-          expect(parseInt(res.result)).toBe(dummyRoundResponse.result);
+          expect(res.result).toBe(dummyRoundResponseUp.result);
+        });
+    });
+
+    const dummyNormalResponseDown = { result: 14.212}
+    const dummyRoundResponseDown = { result: 14 }
+
+    it('rounding values down', async () => {
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseDown));
+      const queryParams = {
+        analysis_type: 'average',
+        event_collection: 'pageviews',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toBe(dummyRoundResponseDown.result);
+        });
+    });
+
+    const dummyNormalResponseGroupBy = {result: [
+      { result: 5.5 },
+      { result: 2.4 },
+      { result: 20.8 },
+      { result: 1.91 },
+    ]}
+    const dummyRoundResponseGroupBy = [
+      { result: 6 },
+      { result: 2 },
+      { result: 21 },
+      { result: 2 },
+    ]
+
+    it('rounding values group by', async () => {
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseGroupBy));
+      const queryParams = {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        group_by: 'page.url',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toMatchObject(dummyRoundResponseGroupBy);
+        });
+    });
+
+    const dummyNormalResponseInterval = {result: [
+      { value: 8 },
+      { value: 1.5 },
+      { value: 7.3 },
+      { value: 9.21 },
+    ]}
+    const dummyRoundResponseInterval = [
+      { value: 8 },
+      { value: 2 },
+      { value: 7 },
+      { value: 9 },
+    ]
+
+    it('rounding values interval', async () => {
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseInterval));
+      const queryParams = {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        interval: 'daily',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toMatchObject(dummyRoundResponseInterval);
+        });
+    });
+
+    const dummyNormalResponseGroupByInterval = {result: [
+      { value: [
+        { result: 2 },
+        { result: 5.2 },
+      ]},
+      { value: [
+        { result: 8.8 },
+        { result: 6.4 },
+      ]},
+      { value: [
+        { result: 1.56 },
+        { result: 9.34 },
+      ]},
+      { value: [
+        { result: 7.9 },
+        { result: 2.4 },
+      ]},
+    ]}
+    const dummyRoundResponseroupByInterval = [
+      { value: [
+        { result: 2 },
+        { result: 5 },
+      ]},
+      { value: [
+        { result: 9 },
+        { result: 6 },
+      ]},
+      { value: [
+        { result: 2 },
+        { result: 9 },
+      ]},
+      { value: [
+        { result: 8 },
+        { result: 2 },
+      ]},
+    ]
+
+    it('rounding values group by and interval', async () => {
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseGroupByInterval));
+      const queryParams = {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        group_by: 'page.url',
+        interval: 'daily',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toMatchObject(dummyRoundResponseroupByInterval);
         });
     });
 
