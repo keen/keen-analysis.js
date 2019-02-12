@@ -508,7 +508,7 @@ const client = new KeenAnalysis({
   readKey: 'YOUR_READ_KEY',
   resultParsers: [
     (value) => {
-      return Math.round(value);
+      return Math.round(value); // or eg. value.toPrecision(2)
     }
   ]
 });
