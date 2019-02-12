@@ -1,4 +1,9 @@
 const demoTests = (demoConfig, Keen) => {
+  demoConfig.resultParsers= [
+    (value) => {
+      return Math.round(value);
+    }
+  ]
   const client = new Keen(demoConfig);
 
 client.query('count', {

@@ -29,7 +29,8 @@
   "homepage": "https://keen.io",
   "contributors": [
     "Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)",
-    "Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)"
+    "Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)",
+    "Dariusz Łacheta <dariusz.lacheta@keen.io> (https://github.com/dariuszlacheta)"
   ],
   "keywords": [
     "Analytics",
