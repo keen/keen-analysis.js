@@ -86,6 +86,151 @@ describe('Browser Request methods', () => {
         });
     });
 
+    const newConfig = {...helpers.client, resultParsers: [
+      (value) => {
+        return Math.round(value);
+      }
+    ]};
+    const customClient = new KeenClient(newConfig);
+
+    it('rounding values up', async () => {
+      const dummyNormalResponseUp = { result: 14.612}
+      const dummyRoundResponseUp = { result: 15 }
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseUp));
+      const queryParams = {
+        analysis_type: 'average',
+        event_collection: 'pageviews',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toBe(dummyRoundResponseUp.result);
+        });
+    });
+
+    it('rounding values down', async () => {
+      const dummyNormalResponseDown = { result: 14.212}
+      const dummyRoundResponseDown = { result: 14 }
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseDown));
+      const queryParams = {
+        analysis_type: 'average',
+        event_collection: 'pageviews',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toBe(dummyRoundResponseDown.result);
+        });
+    });
+
+    it('rounding values group by', async () => {
+      const dummyNormalResponseGroupBy = {result: [
+        { result: 5.5 },
+        { result: 2.4 },
+        { result: 20.8 },
+        { result: 1.91 },
+      ]}
+      const dummyRoundResponseGroupBy = [
+        { result: 6 },
+        { result: 2 },
+        { result: 21 },
+        { result: 2 },
+      ]
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseGroupBy));
+      const queryParams = {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        group_by: 'page.url',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toMatchObject(dummyRoundResponseGroupBy);
+        });
+    });
+
+    it('rounding values interval', async () => {
+      const dummyNormalResponseInterval = {result: [
+        { value: 8 },
+        { value: 1.5 },
+        { value: 7.3 },
+        { value: 9.21 },
+      ]}
+      const dummyRoundResponseInterval = [
+        { value: 8 },
+        { value: 2 },
+        { value: 7 },
+        { value: 9 },
+      ]
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseInterval));
+      const queryParams = {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        interval: 'daily',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toMatchObject(dummyRoundResponseInterval);
+        });
+    });
+
+    it('rounding values group by and interval', async () => {
+      const dummyNormalResponseGroupByInterval = {result: [
+        { value: [
+          { result: 2 },
+          { result: 5.2 },
+        ]},
+        { value: [
+          { result: 8.8 },
+          { result: 6.4 },
+        ]},
+        { value: [
+          { result: 1.56 },
+          { result: 9.34 },
+        ]},
+        { value: [
+          { result: 7.9 },
+          { result: 2.4 },
+        ]},
+      ]}
+      const dummyRoundResponseGroupByInterval = [
+        { value: [
+          { result: 2 },
+          { result: 5 },
+        ]},
+        { value: [
+          { result: 9 },
+          { result: 6 },
+        ]},
+        { value: [
+          { result: 2 },
+          { result: 9 },
+        ]},
+        { value: [
+          { result: 8 },
+          { result: 2 },
+        ]},
+      ]
+      fetch.mockResponseOnce(JSON.stringify(dummyNormalResponseGroupByInterval));
+      const queryParams = {
+        analysis_type: 'count',
+        event_collection: 'pageviews',
+        group_by: 'page.url',
+        interval: 'daily',
+        timeframe: 'this_3_months'
+      };
+      await customClient
+        .query(queryParams)
+        .then(res => {
+          expect(res.result).toMatchObject(dummyRoundResponseGroupByInterval);
+        });
+    });
+
     describe('cache', () => {
       it('should not cache the query by default', async () => {
         fetch.mockResponseOnce(JSON.stringify(dummyResponse));

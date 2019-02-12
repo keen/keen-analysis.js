@@ -496,6 +496,38 @@ client
 
 ---
 
+### Parsing query results
+
+`resultParsers` is an array of functions and the response from API will be parsed by each function.
+
+```javascript
+import KeenAnalysis from 'keen-analysis';
+
+const client = new KeenAnalysis({
+  projectId: 'YOUR_PROJECT_ID',
+  readKey: 'YOUR_READ_KEY',
+  resultParsers: [
+    (value) => {
+      return Math.round(value);
+    }
+  ]
+});
+
+client.query({
+  analysis_type: 'count',
+  event_collection: 'pageviews',
+  timeframe: 'this_3_months'
+  })
+  .then(res => {
+    // Handle results
+  })
+  .catch(err => {
+    // Handle errors
+  });
+```
+
+---
+
 ### Client instance methods
 
 The following HTTP methods are exposed on the client instance:
