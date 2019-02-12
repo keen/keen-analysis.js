@@ -513,10 +513,9 @@ const client = new KeenAnalysis({
   ]
 });
 
-client.query('count', {
+client.query({
+  analysis_type: 'count',
   event_collection: 'pageviews',
-  group_by: 'page.url',
-  interval: 'daily',
   timeframe: 'this_3_months'
   })
   .then(res => {
