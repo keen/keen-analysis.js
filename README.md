@@ -395,7 +395,7 @@ client
   });
 ```
 
-#### Cancel a query
+#### Cancel query
 
 ```javascript
 import KeenAnalysis from 'keen-analysis';
@@ -494,8 +494,6 @@ client
   });
 ```
 
----
-
 ### Parsing query results
 
 `resultParsers` is an array of functions and the response from API will be parsed by each function.
@@ -517,6 +515,26 @@ client.query({
   analysis_type: 'count',
   event_collection: 'pageviews',
   timeframe: 'this_3_months'
+  })
+  .then(res => {
+    // Handle results
+  })
+  .catch(err => {
+    // Handle errors
+  });
+```
+
+### Optimise queries to cut costs
+
+Get [execution metadata](https://keen.io/docs/api/?javascript#execution-metadata)
+to better understand how to reduce your bill. See our [Compute pricing guide](https://keen.io/docs/compute/compute-pricing-guide/)
+
+```javascript
+client.query({
+  analysis_type: 'count',
+  event_collection: 'pageviews',
+  timeframe: 'this_3_months',
+  include_metadata: true
   })
   .then(res => {
     // Handle results
