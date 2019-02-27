@@ -1,6 +1,6 @@
 {
   "name": "keen-analysis",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "description": "A JavaScript client for Keen.IO",
   "main": "dist/node/keen-analysis.js",
   "browser": "dist/keen-analysis.js",
