@@ -298,7 +298,8 @@ describe('Browser Request methods', () => {
 
     it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', async () => {
       fetch.mockResponseOnce(JSON.stringify(dummyErrorResponse));
-      await client
+      try {
+        await client
         .query('count', {
           event_collection: false
         })
@@ -307,6 +308,9 @@ describe('Browser Request methods', () => {
         .catch(err => {
           expect(err).toEqual(dummyErrorResponse);
         });
+      } catch (e) {
+        expect(e.message).toEqual('Queries must contain a time range. Please provide timeframe parameter');
+      }
     });
 
     it('should make a GET request to a saved query endpoint, returning a response when successful', async () => {
