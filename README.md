@@ -559,6 +559,12 @@ These HTTP methods take a single argument and return a promise for the asynchron
 
 ---
 
+### CamelCase conversion
+
+All parameters provided in a camelCase format will be automatically converted into an API-digestible under_score format.
+
+---
+
 ### Upgrading from keen-js
 
 There are several breaking changes from earlier versions of [keen-js](https://github.com/keen/keen-js).
