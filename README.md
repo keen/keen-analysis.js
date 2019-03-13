@@ -50,8 +50,8 @@ const client = new KeenAnalysis({
 
 client
   .query({
-    analysis_type: 'count',
-    event_collection: 'pageviews',
+    analysisType: 'count',
+    eventCollection: 'pageviews',
     timeframe: 'this_31_days'
   })
   .then(res => {
@@ -71,8 +71,8 @@ const getPageviews = async () => {
   try {
     const result = await client
       .query({
-        analysis_type: 'count',
-        event_collection: 'pageviews',
+        analysisType: 'count',
+        eventCollection: 'pageviews',
         timeframe: 'this_31_days'
       });
     console.log('Result', result);
@@ -104,8 +104,8 @@ const client = new KeenAnalysis({
 // or set custom caching for a specific query *Optional*
 client
   .query({
-    analysis_type: 'count',
-    event_collection: 'pageviews',
+    analysisType: 'count',
+    eventCollection: 'pageviews',
     timeframe: 'this_31_days',
     cache: {
       maxAge: 10 * 1000 // [ms]
@@ -121,8 +121,8 @@ client
 // don't cache a specific query, even if the global caching is on
 client
   .query({
-    analysis_type: 'count',
-    event_collection: 'pageviews',
+    analysisType: 'count',
+    eventCollection: 'pageviews',
     timeframe: 'this_14_days',
     cache: false
   })
@@ -148,8 +148,8 @@ import localQuery from 'keen-analysis/dist/modules/localQuery';
 
 client
   .query({
-    analysis_type: 'extraction', // IMPORTANT
-    event_collection: 'pageviews',
+    analysisType: 'extraction', // IMPORTANT
+    eventCollection: 'pageviews',
     timeframe: 'this_30_days',
     cache: {
       // cache the result in the browser for 1 day
@@ -162,7 +162,7 @@ client
 
         // now run any query that you would normally run
         // for example
-        analysis_type: 'count',
+        analysisType: 'count',
         timeframe: 'this_7_days',
 
         debug: true // OPTIONAL: see the details of each query in your console
@@ -184,7 +184,7 @@ import localQuery from 'keen-analysis/dist/modules/localQuery';
 localQuery({
     file: 'dummy-data.csv', // .csv or .json file
 
-    analysis_type: 'count',
+    analysisType: 'count',
     timeframe: 'this_14_days'
   })
   .then(localQueryResponseJSON => {
@@ -210,7 +210,7 @@ localQuery({
     /*
       Use standard query parameters - https://keen.io/docs/api/#analyses
     */
-    analysis_type: 'count',
+    analysisType: 'count',
     timeframe: 'this_7_days', // optional
     // filter, interval, limit etc...
 
@@ -254,20 +254,20 @@ client
     url: client.url('queries', 'saved', 'daily-pageviews-this-14-days'),
     api_key: client.config.masterKey,
     params: {
-      refresh_rate: 60 * 60 * 4, // API will refresh result of this query every 4 hours
+      refreshRate: 60 * 60 * 4, // API will refresh result of this query every 4 hours
       query: {
-        analysis_type: 'count',
-        event_collection: 'pageviews',
+        analysisType: 'count',
+        eventCollection: 'pageviews',
         timeframe: 'this_14_days'
       },
       metadata: {
-        display_name: 'Daily pageviews (this 14 days)',
+        displayName: 'Daily pageviews (this 14 days)',
         /*
           If you plan to use this saved query inside Explorer set the default visualization.
           We suggest using "metric" for a single value, "area" for intervals
         */
         visualization: {
-          chart_type: "metric"
+          chartType: "metric"
         }
       }
     }
@@ -293,7 +293,7 @@ const client = new KeenAnalysis({
 // read already saved query
 client
   .query({
-    saved_query_name: 'pageviews-this-14-days'
+    savedQueryName: 'pageviews-this-14-days'
   })
   .then(res => {
     // Handle results
@@ -344,22 +344,22 @@ client
     url: client.url('datasets', newDatasetName),
     api_key: client.config.masterKey,
     params: {
-      display_name: 'Count Daily Product Purchases Over $100 by Country',
+      displayName: 'Count Daily Product Purchases Over $100 by Country',
       query: {
-        analysis_type: 'count',
-        event_collection: 'purchases',
+        analysisType: 'count',
+        eventCollection: 'purchases',
         filters: [
           {
-            property_name: 'price',
+            propertyName: 'price',
             operator: 'gte',
-            property_value: 100
+            propertyValue: 100
           }
         ],
-        group_by: 'ip_geo_info.country',
+        groupBy: 'ip_geo_info.country',
         interval: 'daily',
         timeframe: 'this_500_days'
       },
-      index_by: 'product.id'
+      indexBy: 'product.id'
     }
   })
   .then(res => {
@@ -383,8 +383,8 @@ const client = new KeenAnalysis({
 
 client
   .query({
-    dataset_name: 'my-cached-dataset',
-    index_by: 'customer.id',
+    datasetName: 'my-cached-dataset',
+    indexBy: 'customer.id',
     timeframe: 'this_7_days'
   })
   .then(res => {
@@ -406,8 +406,8 @@ const client = new KeenAnalysis({
 });
 
 const queryPageviews = client.query({
-  analysis_type: 'count',
-  event_collection: 'pageviews',
+  analysisType: 'count',
+  eventCollection: 'pageviews',
   timeframe: 'this_31_days'
 });
 
@@ -437,8 +437,8 @@ const client = new KeenAnalysis({
 });
 
 const queryPageviews = client.query({
-  analysis_type: 'count',
-  event_collection: 'pageviews',
+  analysisType: 'count',
+  eventCollection: 'pageviews',
   timeframe: 'this_31_days'
 });
 
@@ -472,14 +472,14 @@ const client = new KeenAnalysis({
 });
 
 const queryPageviews = client.query({
-  analysis_type: 'count',
-  event_collection: 'pageviews',
+  analysisType: 'count',
+  eventCollection: 'pageviews',
   timeframe: 'this_14_days'
 });
 
 const queryFormSubmissions = client.query({
-  analysis_type: 'count',
-  event_collection: 'form_submissions',
+  analysisType: 'count',
+  eventCollection: 'form_submissions',
   timeframe: 'this_14_days'
 });
 
@@ -512,8 +512,8 @@ const client = new KeenAnalysis({
 });
 
 client.query({
-  analysis_type: 'count',
-  event_collection: 'pageviews',
+  analysisType: 'count',
+  eventCollection: 'pageviews',
   timeframe: 'this_3_months'
   })
   .then(res => {
@@ -531,10 +531,10 @@ to better understand how to reduce your bill. See our [Compute pricing guide](ht
 
 ```javascript
 client.query({
-  analysis_type: 'count',
-  event_collection: 'pageviews',
+  analysisType: 'count',
+  eventCollection: 'pageviews',
   timeframe: 'this_3_months',
-  include_metadata: true
+  includeMetadata: true
   })
   .then(res => {
     // Handle results
@@ -559,12 +559,17 @@ These HTTP methods take a single argument and return a promise for the asynchron
 
 ---
 
+### CamelCase conversion
+
+All parameters provided in a camelCase format will be automatically converted into an API-digestible under_score format.
+
+---
+
 ### Upgrading from keen-js
 
 There are several breaking changes from earlier versions of [keen-js](https://github.com/keen/keen-js).
 
 * **All new HTTP methods:** [keen-js](https://github.com/keen/keen-js) supports generic HTTP methods (`.get()`, `.post()`, `.put()`, and `.del()`) for interacting with various API resources. The new Promise-backed design of this SDK necessitated a full rethinking of how these methods behave.
-* **camelCase conversion:** previously, query parameters could be provided to a `Keen.Query` object in camelCase format, and would be converted to the underscore format that the API requires. Eg: `eventCollection` would be converted to `event_collection` before being sent to the API. This pattern has caused plenty of confusion, so we have axed this conversion entirely. All query parameters must be supplied in the format outlined by the [API reference](https://keen.io/docs/api) (`event_collection`).
 * **`Keen.Request` object has been removed:** this object is no longer necessary for managing query requests.
 * **Redesigned implementation of `client.url()`:** This method previously included `https://api.keen.io/3.0/projects/PROJECT_ID` plus a `path` argument ('/events/whatever'). This design severely limited its utility, so we've revamped this method.
 
