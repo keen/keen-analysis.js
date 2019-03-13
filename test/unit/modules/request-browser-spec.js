@@ -325,14 +325,14 @@ describe('Browser Request methods', () => {
     it('should make a POST request with data to a query endpoint, returning an error when unsuccessful', async () => {
       fetch.mockResponseOnce(JSON.stringify(dummyErrorResponse));
       await client
-      .query('count', {
-        event_collection: false
-      })
-      .then(res => {
-      })
-      .catch(err => {
-        expect(err).toEqual(dummyErrorResponse);
-      });
+        .query('count', {
+          event_collection: false
+        })
+        .then(res => {
+        })
+        .catch(err => {
+          expect(err).toEqual(dummyErrorResponse);
+        });
     });
 
     it('should make a GET request to a saved query endpoint, returning a response when successful', async () => {
