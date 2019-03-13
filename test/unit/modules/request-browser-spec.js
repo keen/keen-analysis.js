@@ -1,6 +1,7 @@
 import helpers from '../helpers/client-config';
 // import KeenClient from '../../../dist/keen-analysis.js';
 import KeenClient from '../../../lib/browser';
+import { mapKeysToUnderscore } from '../../../lib/utils/keys-to-underscore';
 
 describe('Browser Request methods', () => {
 
@@ -75,6 +76,31 @@ describe('Browser Request methods', () => {
           expect(fetch.mock.calls[0][0]).toContain('api.keen.io');
           const fetchOptions = fetch.mock.calls[0][1];
           expect(JSON.parse(fetchOptions.body)).toMatchObject(queryParams);
+          expect(fetchOptions.method).toBe('POST');
+          expect(fetchOptions.mode).toBe('cors');
+          expect(fetchOptions.headers.Authorization).toBe(client.config.readKey);
+          expect(fetchOptions.signal).not.toBe(undefined);
+          expect(res.query.analysis_type).toBe('count');
+          expect(res.query.event_collection).toBe('pageview');
+          expect(res.query.timeframe).toBe('this_12_months');
+          expect(res.result).toBe(dummyResponse.result);
+        });
+    });
+    
+    it('should make a POST request with data (camelCase params) to a query endpoint, returning a response and query parameters when successful', async () => {
+      fetch.mockResponseOnce(JSON.stringify(dummyResponse));
+      const queryParams = {
+        analysisType: 'count',
+        eventCollection: 'pageview',
+        timeframe: 'this_12_months'
+      };
+      await client
+        .query(queryParams)
+        .then(res => {
+          expect(fetch.mock.calls.length).toEqual(1);
+          expect(fetch.mock.calls[0][0]).toContain('api.keen.io');
+          const fetchOptions = fetch.mock.calls[0][1];
+          expect(JSON.parse(fetchOptions.body)).toMatchObject(mapKeysToUnderscore(queryParams));
           expect(fetchOptions.method).toBe('POST');
           expect(fetchOptions.mode).toBe('cors');
           expect(fetchOptions.headers.Authorization).toBe(client.config.readKey);
