@@ -19,7 +19,7 @@
     "preversion": "npm run build:node && npm run test",
     "version": "npm run build && git add .",
     "postversion": "git push && git push --tags",
-    "demo": "node ./test/demo/index.node.js"
+    "demo": "npm run build:node && node ./test/demo/index.node.js"
   },
   "repository": {
     "type": "git",
