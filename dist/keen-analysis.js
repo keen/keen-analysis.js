@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ 	return __webpack_require__(__webpack_require__.s = 24);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -160,7 +160,7 @@ function extend(target){
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
 /* harmony import */ var _finally__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 
 
@@ -687,10 +687,59 @@ if (!globalNS.Promise) {
 /* 6 */
 /***/ (function(module) {
 
-module.exports = {"name":"keen-analysis","version":"3.3.3","description":"A JavaScript client for Keen.IO","main":"dist/node/keen-analysis.js","browser":"dist/keen-analysis.js","scripts":{"start":"NODE_ENV=development webpack-dev-server","test":"NODE_ENV=test jest && npm run test:node","test:node":"NODE_ENV=test TEST_ENV=node jest","test:watch":"NODE_ENV=test jest --watch","test:node:watch":"NODE_ENV=test TEST_ENV=node jest --watch","build":"NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node && npm run build:modules && npm run build:modules:node","build:node":"TARGET=node NODE_ENV=production webpack -p","build:modules":"NODE_ENV=production webpack -p --config webpack.modules.config.js","build:modules:node":"NODE_ENV=production TARGET=node webpack -p --config webpack.modules.config.js","profile":"webpack --profile --json > stats.json","analyze":"webpack-bundle-analyzer stats.json /dist","preversion":"npm run build:node && npm run test","version":"npm run build && git add .","postversion":"git push && git push --tags","demo":"node ./test/demo/index.node.js"},"repository":{"type":"git","url":"git+https://github.com/keen/keen-analysis.js.git"},"author":"Keen IO <team@keen.io>","homepage":"https://keen.io","contributors":["Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)","Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)","Dariusz Łacheta <dariusz.lacheta@keen.io> (https://github.com/dariuszlacheta)"],"keywords":["Analytics","Analysis","Conversion","Query","Stats","Client","Min","Max","Count","Percentile","Average","Median","Keen","Keen Query"],"license":"MIT","bugs":{"url":"https://github.com/keen/keen-analysis.js/issues"},"dependencies":{"crossfilter2":"^1.4.6","csvtojson":"^2.0.8","keen-core":"^0.2.0","moment":"^2.22.2","promise-polyfill":"^8.0.0","whatwg-fetch":"^2.0.4"},"devDependencies":{"abortcontroller-polyfill":"^1.1.9","babel-loader":"^7.1.4","babel-plugin-transform-es2015-modules-commonjs":"^6.26.2","babel-plugin-transform-object-rest-spread":"^6.26.0","babel-preset-env":"^1.7.0","del":"^2.1.0","eslint":"^4.19.1","eslint-config-airbnb":"^16.1.0","eslint-loader":"^2.0.0","eslint-plugin-import":"^2.11.0","eslint-plugin-jsx-a11y":"^6.0.3","fake-indexeddb":"^2.0.4","html-loader":"^0.5.5","html-webpack-plugin":"^3.2.0","jest":"^22.4.3","jest-fetch-mock":"^1.6.5","merge":"^1.2.1","nock":"^9.2.6","regenerator-runtime":"^0.11.1","requirejs":"^2.1.22","through2":"^2.0.0","url-parse":"^1.4.3","webpack":"^4.5.0","webpack-bundle-analyzer":"^2.11.1","webpack-cli":"^2.0.13","webpack-dev-server":"^3.1.14","xhr-mock":"^2.3.2"}};
+module.exports = {"name":"keen-analysis","version":"3.4.0","description":"A JavaScript client for Keen.IO","main":"dist/node/keen-analysis.js","browser":"dist/keen-analysis.js","scripts":{"start":"NODE_ENV=development webpack-dev-server","test":"NODE_ENV=test jest && npm run test:node","test:node":"NODE_ENV=test TEST_ENV=node jest","test:watch":"NODE_ENV=test jest --watch","test:node:watch":"NODE_ENV=test TEST_ENV=node jest --watch","build":"NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node && npm run build:modules && npm run build:modules:node","build:node":"TARGET=node NODE_ENV=production webpack -p","build:modules":"NODE_ENV=production webpack -p --config webpack.modules.config.js","build:modules:node":"NODE_ENV=production TARGET=node webpack -p --config webpack.modules.config.js","profile":"webpack --profile --json > stats.json","analyze":"webpack-bundle-analyzer stats.json /dist","preversion":"npm run build:node && npm run test","version":"npm run build && git add .","postversion":"git push && git push --tags","demo":"npm run build:node && node ./test/demo/index.node.js"},"repository":{"type":"git","url":"git+https://github.com/keen/keen-analysis.js.git"},"author":"Keen IO <team@keen.io>","homepage":"https://keen.io","contributors":["Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)","Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)","Dariusz Łacheta <dariusz.lacheta@keen.io> (https://github.com/dariuszlacheta)"],"keywords":["Analytics","Analysis","Conversion","Query","Stats","Client","Min","Max","Count","Percentile","Average","Median","Keen","Keen Query"],"license":"MIT","bugs":{"url":"https://github.com/keen/keen-analysis.js/issues"},"dependencies":{"crossfilter2":"^1.4.6","csvtojson":"^2.0.8","keen-core":"^0.2.0","moment":"^2.22.2","promise-polyfill":"^8.0.0","whatwg-fetch":"^2.0.4"},"devDependencies":{"abortcontroller-polyfill":"^1.1.9","babel-loader":"^7.1.4","babel-plugin-transform-es2015-modules-commonjs":"^6.26.2","babel-plugin-transform-object-rest-spread":"^6.26.0","babel-preset-env":"^1.7.0","del":"^2.1.0","eslint":"^4.19.1","eslint-config-airbnb":"^16.1.0","eslint-loader":"^2.0.0","eslint-plugin-import":"^2.11.0","eslint-plugin-jsx-a11y":"^6.0.3","fake-indexeddb":"^2.0.4","html-loader":"^0.5.5","html-webpack-plugin":"^3.2.0","jest":"^22.4.3","jest-fetch-mock":"^1.6.5","merge":"^1.2.1","nock":"^9.2.6","regenerator-runtime":"^0.11.1","requirejs":"^2.1.22","through2":"^2.0.0","url-parse":"^1.4.3","webpack":"^4.5.0","webpack-bundle-analyzer":"^2.11.1","webpack-cli":"^2.0.13","webpack-dev-server":"^3.1.14","xhr-mock":"^2.3.2"}};
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.mapKeysToUnderscore = mapKeysToUnderscore;
+function mapKeysToUnderscore(obj) {
+    var exludedKeys = ['cache'];
+
+    if (!obj || (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object') return obj;
+
+    var keys = Object.keys(obj) || [];
+    var convertedObj = {};
+    keys.forEach(function (key) {
+        var value = obj[key];
+        if (exludedKeys.includes(key)) {
+            return convertedObj[key] = value;
+        }
+
+        if (key.match(new RegExp('[A-Z]'))) {
+            key = key.replace(/[A-Z]/g, function (k) {
+                return '_' + k.toLowerCase();
+            });
+        }
+
+        if (Array.isArray(value)) {
+            return convertedObj[key] = value.map(function (item) {
+                return mapKeysToUnderscore(item);
+            });
+        }
+
+        if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+            return convertedObj[key] = mapKeysToUnderscore(value);
+        }
+
+        convertedObj[key] = value;
+    });
+
+    return convertedObj;
+}
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var each = __webpack_require__(0),
@@ -711,7 +760,7 @@ function serialize(data){
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -945,10 +994,10 @@ Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
 
 /* harmony default export */ __webpack_exports__["a"] = (Promise);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(19).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(21).setImmediate))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -999,7 +1048,7 @@ var MD5 = exports.MD5 = function MD5(d) {
 exports.default = MD5;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1016,7 +1065,7 @@ __webpack_require__(3);
 
 __webpack_require__(5);
 
-var _md = __webpack_require__(9);
+var _md = __webpack_require__(10);
 
 var _md2 = _interopRequireDefault(_md);
 
@@ -1141,7 +1190,7 @@ var getFromCache = exports.getFromCache = function getFromCache(url, fetchOption
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1162,11 +1211,11 @@ var _each = __webpack_require__(0);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _serialize = __webpack_require__(7);
+var _serialize = __webpack_require__(8);
 
 var _serialize2 = _interopRequireDefault(_serialize);
 
-var _cacheBrowser = __webpack_require__(10);
+var _cacheBrowser = __webpack_require__(11);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1447,7 +1496,7 @@ var DEL = exports.DEL = function DEL(config, options) {
 };
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {(function (global, factory) {
@@ -1773,7 +1822,7 @@ function abortableFetchDecorator(patchTargets) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1797,9 +1846,11 @@ var _extend = __webpack_require__(2);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-__webpack_require__(12);
+__webpack_require__(13);
 
 __webpack_require__(3);
+
+var _keysToUnderscore = __webpack_require__(7);
 
 var _package = __webpack_require__(6);
 
@@ -1867,8 +1918,9 @@ request.prototype.timeout = function (num) {
 request.prototype.send = function (obj) {
   var _this = this;
 
+  if (this.config && !this.config.api_key) throw new Error('Please provide valid API key');
   if (obj) {
-    this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? obj : {};
+    this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? (0, _keysToUnderscore.mapKeysToUnderscore)(obj) : {};
   }
   var httpRequestType = this.config['method'];
   if (httpRequestType === 'DELETE') {
@@ -1959,7 +2011,28 @@ request.prototype.send = function (obj) {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.validateAuthCredentials = validateAuthCredentials;
+function validateAuthCredentials(config) {
+    if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) !== 'object') return;
+    if (!config.projectId) throw new Error('Please provide valid project ID');
+    if (!config.masterKey && !config.readKey) throw new Error('Please provide valid API key');
+    return true;
+}
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2128,7 +2201,7 @@ Emitter.prototype.hasListeners = function(event){
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = parseParams;
@@ -2150,17 +2223,17 @@ function parseParams(str){
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {(function(env){
   var previousKeen = env.Keen || undefined;
   var each = __webpack_require__(0),
       extend = __webpack_require__(2),
-      parseParams = __webpack_require__(15),
-      serialize = __webpack_require__(7);
+      parseParams = __webpack_require__(17),
+      serialize = __webpack_require__(8);
 
-  var Emitter = __webpack_require__(14);
+  var Emitter = __webpack_require__(16);
 
   function Client(props){
     if (this instanceof Client === false) {
@@ -2386,7 +2459,7 @@ function parseParams(str){
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2576,7 +2649,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -2766,10 +2839,10 @@ process.umask = function() { return 0; };
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1), __webpack_require__(17)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1), __webpack_require__(19)))
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -2825,7 +2898,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(18);
+__webpack_require__(20);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -2839,7 +2912,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2856,7 +2929,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 __webpack_require__(3);
 
-var _keenCore = __webpack_require__(16);
+var _keenCore = __webpack_require__(18);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
@@ -2867,6 +2940,10 @@ var _each2 = _interopRequireDefault(_each);
 var _extend = __webpack_require__(2);
 
 var _extend2 = _interopRequireDefault(_extend);
+
+var _validateAuthCredentials = __webpack_require__(15);
+
+var _keysToUnderscore = __webpack_require__(7);
 
 var _package = __webpack_require__(6);
 
@@ -2886,17 +2963,23 @@ _keenCore2.default.prototype.query = function (a) {
   var b = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+  (0, _validateAuthCredentials.validateAuthCredentials)(this.config);
   // a - analysis type or config object
   // b - params
-  var analysisType = a;
-  var queryParams = b;
+  var mapObj = {
+    a: (0, _keysToUnderscore.mapKeysToUnderscore)(a),
+    b: (0, _keysToUnderscore.mapKeysToUnderscore)(b)
+  };
+  var analysisType = mapObj.a;
+  var queryParams = mapObj.b;
 
   // all this for backward compatibility, remove in next major version
   if ((typeof a === 'undefined' ? 'undefined' : _typeof(a)) === 'object' && !b) {
-    // initialized with signle argument - config object
-    var analysisTypeExtracted = a.analysis_type,
-        cacheOptionsExtracted = a.cache,
-        queryParamsExtracted = _objectWithoutProperties(a, ['analysis_type', 'cache']);
+    // initialized with single argument - config object
+    var _mapObj$a = mapObj.a,
+        analysisTypeExtracted = _mapObj$a.analysis_type,
+        cacheOptionsExtracted = _mapObj$a.cache,
+        queryParamsExtracted = _objectWithoutProperties(_mapObj$a, ['analysis_type', 'cache']);
 
     analysisType = analysisTypeExtracted;
     queryParams = queryParamsExtracted;
@@ -3091,7 +3174,7 @@ var KeenAnalysis = exports.KeenAnalysis = _keenCore2.default;
 exports.default = KeenAnalysis;
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3106,15 +3189,15 @@ var _extend = __webpack_require__(2);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _index = __webpack_require__(20);
+var _index = __webpack_require__(22);
 
 var _index2 = _interopRequireDefault(_index);
 
-var _request = __webpack_require__(13);
+var _request = __webpack_require__(14);
 
 var _request2 = _interopRequireDefault(_request);
 
-var _httpBrowser = __webpack_require__(11);
+var _httpBrowser = __webpack_require__(12);
 
 var httpHandlers = _interopRequireWildcard(_httpBrowser);
 
@@ -3137,10 +3220,10 @@ var KeenAnalysis = exports.KeenAnalysis = Keen; // backward compatibility - CDN
 exports.default = Keen;
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(21);
+module.exports = __webpack_require__(23);
 
 
 /***/ })
