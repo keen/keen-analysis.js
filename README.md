@@ -10,7 +10,9 @@ Install this package from NPM *Recommended*
 npm install keen-analysis --save
 ```
 
-Or load it from a public CDN:
+Public CDN
+
+[![](https://data.jsdelivr.com/v1/package/npm/keen-analysis/badge)](https://www.jsdelivr.com/package/npm/keen-analysis)
 
 ```html
 <script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@3/dist/keen-analysis.min.js"></script>
