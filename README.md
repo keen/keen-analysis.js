@@ -2,6 +2,15 @@
 
 A JavaScript Client for [Keen](https://keen.io/).
 
+<a href="https://keen.io/"><img src="https://img.shields.io/github/release/keen/keen-analysis.js.svg?style=flat-square&maxAge=600" alt=""></a>
+<a href="https://github.com/keen/keen-analysis.js/graphs/contributors" alt="Contributors"><img src="https://img.shields.io/github/contributors/keen/keen-analysis.js.svg" /></a>
+<a href="https://github.com/keen/keen-analysis.js/pulse" alt="Activity"><img src="https://img.shields.io/github/last-commit/keen/keen-analysis.js.svg" /></a>
+![](https://img.shields.io/github/license/keen/keen-analysis.js.svg)
+<a href="http://slack.keen.io/"><img src="https://img.shields.io/badge/slack-keen-orange.svg?style=flat-square&maxAge=3600" alt="Slack"></a>
+<a href="https://www.jsdelivr.com/package/npm/keen-analysis"><img src="https://data.jsdelivr.com/v1/package/npm/keen-analysis/badge" alt=""></a>
+<a href="https://www.npmjs.com/package/keen-analysis"><img src="https://img.shields.io/npm/dm/keen-analysis.svg" alt=""></a>
+
+
 ### Installation
 
 Install this package from NPM *Recommended*
@@ -11,8 +20,6 @@ npm install keen-analysis --save
 ```
 
 Public CDN
-
-[![](https://data.jsdelivr.com/v1/package/npm/keen-analysis/badge)](https://www.jsdelivr.com/package/npm/keen-analysis)
 
 ```html
 <script crossorigin src="https://cdn.jsdelivr.net/npm/keen-analysis@3/dist/keen-analysis.min.js"></script>
