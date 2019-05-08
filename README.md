@@ -533,10 +533,9 @@ client.query({
   });
 ```
 
-### Optimise queries to cut costs
+### Optimise queries
 
-Get [execution metadata](https://keen.io/docs/api/?javascript#execution-metadata)
-to better understand how to reduce your bill. See our [Compute pricing guide](https://keen.io/docs/compute/compute-pricing-guide/)
+Read [the execution metadata](https://keen.io/docs/api/?javascript#execution-metadata) to optimise queries and reduce your bill.
 
 ```javascript
 client.query({
@@ -553,7 +552,17 @@ client.query({
   });
 ```
 
----
+### Custom Host
+
+You can set a custom domain for requests
+
+```
+const client = new KeenAnalysis({
+  projectId: 'PROJECT_ID',
+  readKey: 'YOUR_READ_KEY',
+  host: 'somehost.com'
+});
+```
 
 ### Client instance methods
 
@@ -570,7 +579,7 @@ These HTTP methods take a single argument and return a promise for the asynchron
 
 ### CamelCase conversion
 
-All parameters provided in a camelCase format will be automatically converted into an API-digestible under_score format.
+All of the parameters provided in the camelCase format will be automatically converted into an API-digestible under_score format.
 
 ---
 
