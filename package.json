@@ -18,7 +18,7 @@
     "analyze": "webpack-bundle-analyzer stats.json /dist",
     "preversion": "npm run build:node && npm run test",
     "version": "npm run build && git add .",
-    "postversion": "git push && git push --tags",
+    "postversion": "git push && git push --tags && npm publish",
     "demo": "npm run build:node && node ./test/demo/index.node.js"
   },
   "repository": {
