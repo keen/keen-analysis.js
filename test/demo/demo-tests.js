@@ -1,17 +1,73 @@
 const demoTests = (demoConfig, Keen) => {
-  demoConfig.resultParsers= [
+  demoConfig.xresultParsers= [
     (value) => {
       return Math.round(value);
     }
   ]
   const client = new Keen(demoConfig);
 
-  client.query('count', {
-    event_collection: 'pageviews',
-    // group_by: 'page.url',
-    interval: 'daily',
-    timeframe: 'this_3_months'
-  }).then(res=>console.log(res))
+  const savedQueryName = 'XZmy-saved-query';
+
+ 
+  client
+  .post({
+    url: client.url('projectId', 'keys'),
+    apiKey: client.masterKey(),
+    params: {
+      name: 'My Access Key',
+      isActive: true,
+      permitted: [ 'queries', 'cached_queries' ],
+      options: {
+        queries: {
+          filters: [
+            {
+              propertyName: 'customer.id',
+              operator: 'eq',
+              propertyValue: 'f234124dsfb',
+            }
+          ]
+        },
+        cachedQueries: {
+          allowed: [ 'my-cached-query' ],
+        }
+      }
+    }
+  })
+  .then(res => {
+    // Handle response
+  })
+  .catch(err => {
+    // Handle error
+  });
+
+
+  return;
+  client
+    .put({
+      url: client.url('queries', 'saved', savedQueryName),
+      api_key: client.masterKey(),
+      params: {
+        query: {
+          analysisType: 'sum',
+          targetProperty: 'price',
+          eventCollection: 'purchases',
+          timeframe: 'this_112_weeks',
+        },
+        metadata: {
+          displayName: 'created XZ',
+        },
+        refreshRate: 0,
+      }
+    })
+  .then(res => {
+    // Handle results
+    console.log(res);
+  })
+  .catch(err => {
+    // Handle errors
+    console.log(err);
+  });
+
 
   return ; 
   client
