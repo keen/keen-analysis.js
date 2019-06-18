@@ -8,38 +8,20 @@ const demoTests = (demoConfig, Keen) => {
 
   const savedQueryName = 'XZmy-saved-query';
 
- 
   client
-  .post({
-    url: client.url('projectId', 'keys'),
-    apiKey: client.masterKey(),
-    params: {
-      name: 'My Access Key',
-      isActive: true,
-      permitted: [ 'queries', 'cached_queries' ],
-      options: {
-        queries: {
-          filters: [
-            {
-              propertyName: 'customer.id',
-              operator: 'eq',
-              propertyValue: 'f234124dsfb',
-            }
-          ]
-        },
-        cachedQueries: {
-          allowed: [ 'my-cached-query' ],
-        }
-      }
-    }
-  })
-  .then(res => {
-    // Handle response
-  })
-  .catch(err => {
-    // Handle error
-  });
+    .get(client.url('queries', 'saved'))
+    .auth(client.masterKey())
+    .send()
+    .then(res => {
+      // Handle response
+      console.log(res);
+    })
+    .catch(err => {
+      // Handle error
+      console.log(err);
+    });
 
+    return;
 
   return;
   client
@@ -70,20 +52,7 @@ const demoTests = (demoConfig, Keen) => {
 
 
   return ; 
-  client
-    .get(client.url('queries', 'saved'))
-    .auth(client.masterKey())
-    .send()
-    .then(res => {
-      // Handle response
-      console.log(res);
-    })
-    .catch(err => {
-      // Handle error
-      console.log(err);
-    });
 
-    return;
 
   client
         .get(client.url('dashboards'))
