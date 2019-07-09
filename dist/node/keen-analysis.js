@@ -780,32 +780,48 @@ request.prototype.send = function (obj) {
             //interval and group by result
             response.result.forEach(function (val) {
               val.value.forEach(function (res) {
+                var parsedValue = void 0;
                 _this.config.resultParsers.forEach(function (func) {
-                  res.result = func(res.result);
+                  parsedValue = parsedValue ? func(parsedValue) : func(res.result);
                 });
+                res.result = parsedValue;
               });
             });
           } else {
             //interval result
             response.result.forEach(function (val) {
+              var parsedValue = void 0;
               _this.config.resultParsers.forEach(function (func) {
-                val.value = func(val.value);
+                parsedValue = parsedValue ? func(parsedValue) : func(val.value);
               });
+              val.value = parsedValue;
             });
           }
         } else {
           //group by result
           response.result.forEach(function (res) {
+            var parsedValue = void 0;
             _this.config.resultParsers.forEach(function (func) {
-              res.result = func(res.result);
+              parsedValue = parsedValue ? func(parsedValue) : func(res.result);
             });
+            res.result = parsedValue;
           });
         }
+      } else if (_typeof(response.result) === 'object') {
+        Object.keys(response.result).forEach(function (res) {
+          var parsedValue = void 0;
+          _this.config.resultParsers.forEach(function (func) {
+            parsedValue = parsedValue ? func(parsedValue) : func(response.result[res]);
+          });
+          response.result[res] = parsedValue;
+        });
       } else {
         //simple result
+        var parsedValue = void 0;
         _this.config.resultParsers.forEach(function (func) {
-          response.result = func(response.result);
+          parsedValue = parsedValue ? func(parsedValue) : func(response.result);
         });
+        response.result = parsedValue;
       }
     }
     if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof response.query === 'undefined') {
