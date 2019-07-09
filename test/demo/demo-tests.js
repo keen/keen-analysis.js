@@ -1,5 +1,5 @@
 const demoTests = (demoConfig, Keen) => {
-  demoConfig.resultParsers= [
+  demoConfig.xresultParsers= [
     (value) => {
       return Math.round(value);
     },
@@ -47,7 +47,8 @@ const demoTests = (demoConfig, Keen) => {
     }
   }).then(res=>console.log(res))
 
-  return ; 
+  const savedQueryName = 'XZmy-saved-query';
+
   client
     .get(client.url('queries', 'saved'))
     .auth(client.masterKey())
@@ -62,6 +63,37 @@ const demoTests = (demoConfig, Keen) => {
     });
 
     return;
+
+  return;
+  client
+    .put({
+      url: client.url('queries', 'saved', savedQueryName),
+      api_key: client.masterKey(),
+      params: {
+        query: {
+          analysisType: 'sum',
+          targetProperty: 'price',
+          eventCollection: 'purchases',
+          timeframe: 'this_112_weeks',
+        },
+        metadata: {
+          displayName: 'created XZ',
+        },
+        refreshRate: 0,
+      }
+    })
+  .then(res => {
+    // Handle results
+    console.log(res);
+  })
+  .catch(err => {
+    // Handle errors
+    console.log(err);
+  });
+
+
+  return ; 
+
 
   client
         .get(client.url('dashboards'))
