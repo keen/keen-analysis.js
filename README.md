@@ -552,6 +552,18 @@ client.query({
   });
 ```
 
+For multiple queries you can define `includeMetadata` in client constructor and this will be propagated to all queries.
+
+```javascript
+import KeenAnalysis from 'keen-analysis';
+
+const client = new KeenAnalysis({
+  projectId: 'YOUR_PROJECT_ID',
+  readKey: 'YOUR_READ_KEY',
+  includeMetadata: true,
+});
+```
+
 ### Custom Host
 
 You can set a custom domain for requests
