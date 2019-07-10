@@ -1,5 +1,5 @@
 const demoTests = (demoConfig, Keen) => {
-  demoConfig.xresultParsers= [
+  demoConfig.resultParsers= [
     (value) => {
       return Math.round(value);
     },
