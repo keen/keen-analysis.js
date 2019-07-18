@@ -6,6 +6,36 @@ const demoTests = (demoConfig, Keen) => {
   ]
   const client = new Keen(demoConfig);
 
+
+
+  const url = {
+    url: client.url('events', 'abc2'),
+    api_key: client.masterKey(),
+    filters: encodeURIComponent(JSON.stringify([
+      {
+        propertyName: 'firstField',
+        operator: 'eq',
+        propertyValue: 'some val 2',
+      }
+    ])),
+    timeframe: encodeURIComponent(JSON.stringify({
+      start: '2015-05-15T19:00:00.000Z',
+      end: '2021-03-07T19:00:00.000Z'
+    })),
+    timezone: 'US/Pacific',
+  };
+  
+  client
+    .del(url)
+    .then(res => {
+      // Handle response
+    })
+    .catch(err => {
+      // Handle error
+    });
+
+    return;
+
   const savedQueryName = 'XZmy-saved-query';
 
   client
