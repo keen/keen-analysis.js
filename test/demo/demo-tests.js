@@ -1,12 +1,14 @@
 const demoTests = (demoConfig, Keen) => {
-  demoConfig.xresultParsers= [
+  demoConfig.resultParsers= [
     (value) => {
       return Math.round(value);
-    }
+    },
+    value =>  {
+      return Math.round(value) + 10;
+    },
+    value => `last parser: ${value}`,
   ]
   const client = new Keen(demoConfig);
-
-
 
   const url = {
     url: client.url('events', 'abc2'),
@@ -35,6 +37,43 @@ const demoTests = (demoConfig, Keen) => {
     });
 
     return;
+
+  // client
+  // .query({
+  //   analysisType: 'multi_analysis',
+  //   eventCollection: 'pageviews',
+  //   analyses: {
+  //     'unique users': {
+  //       analysisType: 'count_unique',
+  //       targetProperty: 'keen.id',
+  //     },
+  //     'total visits': {
+  //       analysisType: 'count',
+  //     }
+  //   },
+  //   timeframe: 'this_1117_days',
+  // })
+  // .then(res => {
+  //   // Handle results
+  //   console.log(res);
+  // })
+  // .catch(err => {
+  //   // Handle errors
+  //   console.log(err);
+  // });
+
+  // return;
+
+  client.query('count', {
+    event_collection: 'pageviews',
+    // group_by: 'page.url',
+    interval: 'daily',
+    timeframe: 'this_3_months',
+    includeMetadata: false,
+    metadata: {
+      display_name: 'Purchases (past 2 weeks)',
+    }
+  }).then(res=>console.log(res))
 
   const savedQueryName = 'XZmy-saved-query';
 
