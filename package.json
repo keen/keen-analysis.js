@@ -55,8 +55,6 @@
   "dependencies": {
     "crossfilter2": "^1.4.6",
     "csvtojson": "^2.0.8",
-    "handlebars": "^4.1.2",
-    "js-yaml": "^3.13.1",
     "keen-core": "^0.2.0",
     "moment": "^2.22.2",
     "promise-polyfill": "^8.0.0",
