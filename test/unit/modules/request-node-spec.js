@@ -14,7 +14,7 @@ describe('Node Request methods', () => {
     timeframe: 'this_12_months',
     timezone: 3600
   };
-  const dummyResponse = { result: 123 };
+  const dummyResponse = { result: 123, query: {...queryObject} };
   const dummyErrorResponse = { error: true };
   const dummyQueryData = {
     query: {
