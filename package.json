@@ -1,6 +1,6 @@
 {
   "name": "keen-analysis",
-  "version": "3.4.6",
+  "version": "3.4.7-rc.0",
   "description": "A JavaScript client for Keen.IO",
   "main": "dist/node/keen-analysis.js",
   "browser": "dist/keen-analysis.js",
@@ -16,7 +16,7 @@
     "build:modules:node": "NODE_ENV=production TARGET=node webpack -p --config webpack.modules.config.js",
     "profile": "webpack --profile --json > stats.json",
     "analyze": "webpack-bundle-analyzer stats.json /dist",
-    "preversion": "npm run build:node && npm run test",
+    "preversion": "npm run build && npm run test",
     "version": "npm run build && git add .",
     "postversion": "git push && git push --tags && npm publish",
     "demo": "npm run build:node && node ./test/demo/index.node.js"

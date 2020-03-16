@@ -83,6 +83,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports) {
 
+module.exports = extend;
+
+function extend(target){
+  for (var i = 1; i < arguments.length; i++) {
+    for (var prop in arguments[i]){
+      target[prop] = arguments[i][prop];
+    }
+  }
+  return target;
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
 module.exports = each;
 
 function each(o, cb, s){
@@ -113,7 +129,7 @@ function each(o, cb, s){
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports) {
 
 var g;
@@ -136,22 +152,6 @@ try {
 // easier to handle this case. if(!global) { ...}
 
 module.exports = g;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = extend;
-
-function extend(target){
-  for (var i = 1; i < arguments.length; i++) {
-    for (var prop in arguments[i]){
-      target[prop] = arguments[i][prop];
-    }
-  }
-  return target;
-};
 
 
 /***/ }),
@@ -187,7 +187,7 @@ if (!globalNS.Promise) {
   globalNS.Promise.prototype['finally'] = _finally__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"];
 }
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
 /* 4 */
@@ -687,7 +687,7 @@ if (!globalNS.Promise) {
 /* 6 */
 /***/ (function(module) {
 
-module.exports = {"name":"keen-analysis","version":"3.4.6","description":"A JavaScript client for Keen.IO","main":"dist/node/keen-analysis.js","browser":"dist/keen-analysis.js","scripts":{"start":"NODE_ENV=development webpack-dev-server","test":"NODE_ENV=test jest && npm run test:node","test:node":"NODE_ENV=test TEST_ENV=node jest","test:watch":"NODE_ENV=test jest --watch","test:node:watch":"NODE_ENV=test TEST_ENV=node jest --watch","build":"NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node && npm run build:modules && npm run build:modules:node","build:node":"TARGET=node NODE_ENV=production webpack -p","build:modules":"NODE_ENV=production webpack -p --config webpack.modules.config.js","build:modules:node":"NODE_ENV=production TARGET=node webpack -p --config webpack.modules.config.js","profile":"webpack --profile --json > stats.json","analyze":"webpack-bundle-analyzer stats.json /dist","preversion":"npm run build:node && npm run test","version":"npm run build && git add .","postversion":"git push && git push --tags && npm publish","demo":"npm run build:node && node ./test/demo/index.node.js"},"repository":{"type":"git","url":"git+https://github.com/keen/keen-analysis.js.git"},"author":"Keen IO <team@keen.io>","homepage":"https://keen.io","contributors":["Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)","Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)","Dariusz Łacheta <dariusz.lacheta@keen.io> (https://github.com/dariuszlacheta)"],"keywords":["Analytics","Analysis","Conversion","Query","Stats","Client","Min","Max","Count","Percentile","Average","Median","Keen","Keen Query"],"license":"MIT","bugs":{"url":"https://github.com/keen/keen-analysis.js/issues"},"dependencies":{"crossfilter2":"^1.4.6","csvtojson":"^2.0.8","keen-core":"^0.2.0","moment":"^2.22.2","promise-polyfill":"^8.0.0","whatwg-fetch":"^2.0.4"},"devDependencies":{"abortcontroller-polyfill":"^1.1.9","babel-loader":"^7.1.4","babel-plugin-transform-es2015-modules-commonjs":"^6.26.2","babel-plugin-transform-object-rest-spread":"^6.26.0","babel-preset-env":"^1.7.0","del":"^2.1.0","eslint":"^4.19.1","eslint-config-airbnb":"^16.1.0","eslint-loader":"^2.0.0","eslint-plugin-import":"^2.11.0","eslint-plugin-jsx-a11y":"^6.0.3","fake-indexeddb":"^2.0.4","html-loader":"^0.5.5","html-webpack-plugin":"^3.2.0","jest":"^22.4.3","jest-fetch-mock":"^1.6.5","merge":"^1.2.1","nock":"^9.2.6","regenerator-runtime":"^0.11.1","requirejs":"^2.1.22","through2":"^2.0.0","url-parse":"^1.4.3","webpack":"^4.5.0","webpack-bundle-analyzer":"^3.3.2","webpack-cli":"^2.0.13","webpack-dev-server":"^3.1.14","xhr-mock":"^2.3.2"}};
+module.exports = {"name":"keen-analysis","version":"3.4.7-rc.0","description":"A JavaScript client for Keen.IO","main":"dist/node/keen-analysis.js","browser":"dist/keen-analysis.js","scripts":{"start":"NODE_ENV=development webpack-dev-server","test":"NODE_ENV=test jest && npm run test:node","test:node":"NODE_ENV=test TEST_ENV=node jest","test:watch":"NODE_ENV=test jest --watch","test:node:watch":"NODE_ENV=test TEST_ENV=node jest --watch","build":"NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node && npm run build:modules && npm run build:modules:node","build:node":"TARGET=node NODE_ENV=production webpack -p","build:modules":"NODE_ENV=production webpack -p --config webpack.modules.config.js","build:modules:node":"NODE_ENV=production TARGET=node webpack -p --config webpack.modules.config.js","profile":"webpack --profile --json > stats.json","analyze":"webpack-bundle-analyzer stats.json /dist","preversion":"npm run build && npm run test","version":"npm run build && git add .","postversion":"git push && git push --tags && npm publish","demo":"npm run build:node && node ./test/demo/index.node.js"},"repository":{"type":"git","url":"git+https://github.com/keen/keen-analysis.js.git"},"author":"Keen IO <team@keen.io>","homepage":"https://keen.io","contributors":["Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)","Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)","Dariusz Łacheta <dariusz.lacheta@keen.io> (https://github.com/dariuszlacheta)"],"keywords":["Analytics","Analysis","Conversion","Query","Stats","Client","Min","Max","Count","Percentile","Average","Median","Keen","Keen Query"],"license":"MIT","bugs":{"url":"https://github.com/keen/keen-analysis.js/issues"},"dependencies":{"crossfilter2":"^1.4.6","csvtojson":"^2.0.8","keen-core":"^0.2.0","moment":"^2.22.2","promise-polyfill":"^8.0.0","whatwg-fetch":"^2.0.4"},"devDependencies":{"abortcontroller-polyfill":"^1.1.9","babel-loader":"^7.1.4","babel-plugin-transform-es2015-modules-commonjs":"^6.26.2","babel-plugin-transform-object-rest-spread":"^6.26.0","babel-preset-env":"^1.7.0","del":"^2.1.0","eslint":"^4.19.1","eslint-config-airbnb":"^16.1.0","eslint-loader":"^2.0.0","eslint-plugin-import":"^2.11.0","eslint-plugin-jsx-a11y":"^6.0.3","fake-indexeddb":"^2.0.4","html-loader":"^0.5.5","html-webpack-plugin":"^3.2.0","jest":"^22.4.3","jest-fetch-mock":"^1.6.5","merge":"^1.2.1","nock":"^9.2.6","regenerator-runtime":"^0.11.1","requirejs":"^2.1.22","through2":"^2.0.0","url-parse":"^1.4.3","webpack":"^4.5.0","webpack-bundle-analyzer":"^3.3.2","webpack-cli":"^2.0.13","webpack-dev-server":"^3.1.14","xhr-mock":"^2.3.2"}};
 
 /***/ }),
 /* 7 */
@@ -742,8 +742,8 @@ function mapKeysToUnderscore(obj) {
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var each = __webpack_require__(0),
-    extend = __webpack_require__(2);
+var each = __webpack_require__(1),
+    extend = __webpack_require__(0);
 
 module.exports = serialize;
 
@@ -1201,15 +1201,21 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DEL = exports.PUT = exports.POST = exports.GET = undefined;
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 __webpack_require__(3);
 
 __webpack_require__(5);
 
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
+
+var _extend = __webpack_require__(0);
+
+var _extend2 = _interopRequireDefault(_extend);
 
 var _serialize = __webpack_require__(8);
 
@@ -1289,6 +1295,104 @@ var sendFetch = function sendFetch(method, config) {
     if (config.cache && method !== 'DELETE' && method !== 'PUT') {
       (0, _cacheBrowser.saveToCache)(url, fetchOptions, responseJSON);
     }
+    var httpOptions = (0, _extend2.default)({}, config);
+
+    if (Array.isArray(responseJSON.result)) {
+      if (config.params.interval) {
+        if (config.params.group_by) {
+          if (config.params.analysis_type === 'extraction') {
+            options.resolve(responseJSON);
+          } else if (responseJSON.result && Array.isArray(responseJSON.result)) {
+            //interval and group by result
+            responseJSON.result.forEach(function (val) {
+              if (!val.value) return val;
+              if (!Array.isArray(val.value)) return val.value;
+              val.value.forEach(function (res) {
+                if (!isNaN(Number(res.result))) {
+                  res.result = Number(res.result);
+                }
+              });
+            });
+          }
+        } else {
+          //interval result
+          responseJSON.result.forEach(function (val) {
+            if (!isNaN(Number(val.value))) {
+              val.value = Number(val.value);
+            }
+          });
+        }
+      } else {
+        //group by result
+        responseJSON.result.forEach(function (res) {
+          if (!isNaN(Number(res.result))) {
+            res.result = Number(res.result);
+          }
+        });
+      }
+    } else {
+      //simple result
+      if (!isNaN(Number(responseJSON.result))) {
+        responseJSON.result = Number(responseJSON.result);
+      }
+    }
+    //math round values config check
+    if (config.resultParsers) {
+      if (Array.isArray(responseJSON.result)) {
+        if (config.params.interval) {
+          if (config.params.group_by) {
+            //interval and group by result
+            responseJSON.result.forEach(function (val) {
+              val.value.forEach(function (res) {
+                var parsedValue = void 0;
+                config.resultParsers.forEach(function (func) {
+                  parsedValue = parsedValue ? func(parsedValue) : func(res.result);
+                });
+                res.result = parsedValue;
+              });
+            });
+          } else {
+            //interval result
+            responseJSON.result.forEach(function (val) {
+              var parsedValue = void 0;
+              config.resultParsers.forEach(function (func) {
+                parsedValue = parsedValue ? func(parsedValue) : func(val.value);
+              });
+              val.value = parsedValue;
+            });
+          }
+        } else {
+          //group by result
+          responseJSON.result.forEach(function (res) {
+            var parsedValue = void 0;
+            config.resultParsers.forEach(function (func) {
+              parsedValue = parsedValue ? func(parsedValue) : func(res.result);
+            });
+            res.result = parsedValue;
+          });
+        }
+      } else if (_typeof(responseJSON.result) === 'object') {
+        Object.keys(responseJSON.result).forEach(function (res) {
+          var parsedValue = void 0;
+          config.resultParsers.forEach(function (func) {
+            parsedValue = parsedValue ? func(parsedValue) : func(responseJSON.result[res]);
+          });
+          responseJSON.result[res] = parsedValue;
+        });
+      } else {
+        //simple result
+        var parsedValue = void 0;
+        config.resultParsers.forEach(function (func) {
+          parsedValue = parsedValue ? func(parsedValue) : func(responseJSON.result);
+        });
+        responseJSON.result = parsedValue;
+      }
+    }
+    if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof responseJSON.query === 'undefined') {
+      var responseWithQuery = (0, _extend2.default)({ query: httpOptions.params }, responseJSON);
+      options.resolve(responseWithQuery);
+    }
+
     options.resolve(responseJSON);
   });
 };
@@ -1819,7 +1923,7 @@ function abortableFetchDecorator(patchTargets) {
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
 /* 14 */
@@ -1838,11 +1942,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.default = request;
 
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _extend = __webpack_require__(2);
+var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
@@ -1963,8 +2067,6 @@ request.prototype.timeout = function (num) {
 };
 
 request.prototype.send = function (obj) {
-  var _this = this;
-
   if (this.config && !this.config.api_key && !this.config.apiKey) throw new Error('Please provide a valid API key');
   if (obj) {
     this.config.params = obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' ? (0, _keysToUnderscore.mapKeysToUnderscore)(obj) : {};
@@ -2002,99 +2104,6 @@ request.prototype.send = function (obj) {
     httpHandlerResponse = httpHandler(httpOptions, options);
     return httpHandlerResponse;
   }).then(function (response) {
-    //Making sure that result is a number when should be
-    if (Array.isArray(response.result)) {
-      if (_this.config.params.interval) {
-        if (_this.config.params.group_by) {
-          if (_this.config.params.analysis_type === 'extraction') {
-            return response;
-          } else {
-            //interval and group by result
-            response.result.forEach(function (val) {
-              val.value.forEach(function (res) {
-                if (!isNaN(Number(res.result))) {
-                  res.result = Number(res.result);
-                }
-              });
-            });
-          }
-        } else {
-          //interval result
-          response.result.forEach(function (val) {
-            if (!isNaN(Number(val.value))) {
-              val.value = Number(val.value);
-            }
-          });
-        }
-      } else {
-        //group by result
-        response.result.forEach(function (res) {
-          if (!isNaN(Number(res.result))) {
-            res.result = Number(res.result);
-          }
-        });
-      }
-    } else {
-      //simple result
-      if (!isNaN(Number(response.result))) {
-        response.result = Number(response.result);
-      }
-    }
-    //math round values config check
-    if (_this.config.resultParsers) {
-      if (Array.isArray(response.result)) {
-        if (_this.config.params.interval) {
-          if (_this.config.params.group_by) {
-            //interval and group by result
-            response.result.forEach(function (val) {
-              val.value.forEach(function (res) {
-                var parsedValue = void 0;
-                _this.config.resultParsers.forEach(function (func) {
-                  parsedValue = parsedValue ? func(parsedValue) : func(res.result);
-                });
-                res.result = parsedValue;
-              });
-            });
-          } else {
-            //interval result
-            response.result.forEach(function (val) {
-              var parsedValue = void 0;
-              _this.config.resultParsers.forEach(function (func) {
-                parsedValue = parsedValue ? func(parsedValue) : func(val.value);
-              });
-              val.value = parsedValue;
-            });
-          }
-        } else {
-          //group by result
-          response.result.forEach(function (res) {
-            var parsedValue = void 0;
-            _this.config.resultParsers.forEach(function (func) {
-              parsedValue = parsedValue ? func(parsedValue) : func(res.result);
-            });
-            res.result = parsedValue;
-          });
-        }
-      } else if (_typeof(response.result) === 'object') {
-        Object.keys(response.result).forEach(function (res) {
-          var parsedValue = void 0;
-          _this.config.resultParsers.forEach(function (func) {
-            parsedValue = parsedValue ? func(parsedValue) : func(response.result[res]);
-          });
-          response.result[res] = parsedValue;
-        });
-      } else {
-        //simple result
-        var parsedValue = void 0;
-        _this.config.resultParsers.forEach(function (func) {
-          parsedValue = parsedValue ? func(parsedValue) : func(response.result);
-        });
-        response.result = parsedValue;
-      }
-    }
-    if (httpOptions.params && typeof httpOptions.params.event_collection !== 'undefined' && typeof response.query === 'undefined') {
-      return (0, _extend2.default)({ query: httpOptions.params }, response);
-    }
     return response;
   });
 
@@ -2329,8 +2338,8 @@ function parseParams(str){
 
 /* WEBPACK VAR INJECTION */(function(global) {(function(env){
   var previousKeen = env.Keen || undefined;
-  var each = __webpack_require__(0),
-      extend = __webpack_require__(2),
+  var each = __webpack_require__(1),
+      extend = __webpack_require__(0),
       parseParams = __webpack_require__(17),
       serialize = __webpack_require__(8);
 
@@ -2557,7 +2566,7 @@ function parseParams(str){
 
 }).call(this, typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {});
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
 /* 19 */
@@ -2940,7 +2949,7 @@ process.umask = function() { return 0; };
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1), __webpack_require__(19)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(19)))
 
 /***/ }),
 /* 21 */
@@ -3010,7 +3019,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
 /* 22 */
@@ -3034,11 +3043,11 @@ var _keenCore = __webpack_require__(18);
 
 var _keenCore2 = _interopRequireDefault(_keenCore);
 
-var _each = __webpack_require__(0);
+var _each = __webpack_require__(1);
 
 var _each2 = _interopRequireDefault(_each);
 
-var _extend = __webpack_require__(2);
+var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
@@ -3289,7 +3298,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.KeenAnalysis = exports.Keen = exports.keenGlobals = undefined;
 
-var _extend = __webpack_require__(2);
+var _extend = __webpack_require__(0);
 
 var _extend2 = _interopRequireDefault(_extend);
 
