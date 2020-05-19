@@ -687,7 +687,7 @@ if (!globalNS.Promise) {
 /* 6 */
 /***/ (function(module) {
 
-module.exports = {"name":"keen-analysis","version":"3.5.0","description":"A JavaScript client for Keen.IO","main":"dist/node/keen-analysis.js","browser":"dist/keen-analysis.js","scripts":{"start":"NODE_ENV=development webpack-dev-server","test":"NODE_ENV=test jest && npm run test:node","test:node":"NODE_ENV=test TEST_ENV=node jest","test:watch":"NODE_ENV=test jest --watch","test:node:watch":"NODE_ENV=test TEST_ENV=node jest --watch","build":"NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node && npm run build:modules && npm run build:modules:node","build:node":"TARGET=node NODE_ENV=production webpack -p","build:modules":"NODE_ENV=production webpack -p --config webpack.modules.config.js","build:modules:node":"NODE_ENV=production TARGET=node webpack -p --config webpack.modules.config.js","profile":"webpack --profile --json > stats.json","analyze":"webpack-bundle-analyzer stats.json /dist","preversion":"npm run build && npm run test","version":"npm run build && git add .","postversion":"git push && git push --tags && npm publish","demo":"npm run build:node && node ./test/demo/index.node.js"},"repository":{"type":"git","url":"git+https://github.com/keen/keen-analysis.js.git"},"author":"Keen IO <team@keen.io>","homepage":"https://keen.io","contributors":["Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)","Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)","Dariusz Łacheta <dariusz.lacheta@keen.io> (https://github.com/dariuszlacheta)"],"keywords":["Analytics","Analysis","Conversion","Query","Stats","Client","Min","Max","Count","Percentile","Average","Median","Keen","Keen Query"],"license":"MIT","bugs":{"url":"https://github.com/keen/keen-analysis.js/issues"},"dependencies":{"crossfilter2":"^1.4.6","csvtojson":"^2.0.8","keen-core":"^0.2.0","moment":"^2.22.2","promise-polyfill":"^8.0.0","whatwg-fetch":"^2.0.4"},"devDependencies":{"abortcontroller-polyfill":"^1.1.9","babel-loader":"^7.1.4","babel-plugin-transform-es2015-modules-commonjs":"^6.26.2","babel-plugin-transform-object-rest-spread":"^6.26.0","babel-preset-env":"^1.7.0","del":"^2.1.0","eslint":"^4.19.1","eslint-config-airbnb":"^16.1.0","eslint-loader":"^2.0.0","eslint-plugin-import":"^2.11.0","eslint-plugin-jsx-a11y":"^6.0.3","fake-indexeddb":"^2.0.4","html-loader":"^0.5.5","html-webpack-plugin":"^3.2.0","jest":"^22.4.3","jest-fetch-mock":"^1.6.5","merge":"^1.2.1","nock":"^9.2.6","regenerator-runtime":"^0.11.1","requirejs":"^2.1.22","through2":"^2.0.0","url-parse":"^1.4.3","webpack":"^4.5.0","webpack-bundle-analyzer":"^3.3.2","webpack-cli":"^2.0.13","webpack-dev-server":"^3.1.14","xhr-mock":"^2.3.2"}};
+module.exports = {"name":"keen-analysis","version":"3.6.0","description":"A JavaScript client for Keen.IO","main":"dist/node/keen-analysis.js","browser":"dist/keen-analysis.js","scripts":{"start":"NODE_ENV=development webpack-dev-server","test":"NODE_ENV=test jest && npm run test:node","test:node":"NODE_ENV=test TEST_ENV=node jest","test:watch":"NODE_ENV=test jest --watch","test:node:watch":"NODE_ENV=test TEST_ENV=node jest --watch","build":"NODE_ENV=production webpack -p && NODE_ENV=production OPTIMIZE_MINIMIZE=1 webpack -p && npm run build:node && npm run build:modules && npm run build:modules:node","build:node":"TARGET=node NODE_ENV=production webpack -p","build:modules":"NODE_ENV=production webpack -p --config webpack.modules.config.js","build:modules:node":"NODE_ENV=production TARGET=node webpack -p --config webpack.modules.config.js","profile":"webpack --profile --json > stats.json","analyze":"webpack-bundle-analyzer stats.json /dist","preversion":"npm run build && npm run test","version":"npm run build && git add .","postversion":"git push && git push --tags && npm publish","demo":"npm run build:node && node ./test/demo/index.node.js"},"repository":{"type":"git","url":"git+https://github.com/keen/keen-analysis.js.git"},"author":"Keen IO <team@keen.io>","homepage":"https://keen.io","contributors":["Dustin Larimer <dustin@keen.io> (https://github.com/dustinlarimer)","Adam Kasprowicz <adam.kasprowicz@keen.io> (https://github.com/adamkasprowicz)","Dariusz Łacheta <dariusz.lacheta@keen.io> (https://github.com/dariuszlacheta)"],"keywords":["Analytics","Analysis","Conversion","Query","Stats","Client","Min","Max","Count","Percentile","Average","Median","Keen","Keen Query"],"license":"MIT","bugs":{"url":"https://github.com/keen/keen-analysis.js/issues"},"dependencies":{"crossfilter2":"^1.4.6","csvtojson":"^2.0.8","keen-core":"^0.2.0","moment":"^2.22.2","promise-polyfill":"^8.0.0","whatwg-fetch":"^2.0.4"},"devDependencies":{"abortcontroller-polyfill":"^1.1.9","babel-loader":"^7.1.4","babel-plugin-transform-es2015-modules-commonjs":"^6.26.2","babel-plugin-transform-object-rest-spread":"^6.26.0","babel-preset-env":"^1.7.0","del":"^2.1.0","eslint":"^4.19.1","eslint-config-airbnb":"^16.1.0","eslint-loader":"^2.0.0","eslint-plugin-import":"^2.11.0","eslint-plugin-jsx-a11y":"^6.0.3","fake-indexeddb":"^2.0.4","html-loader":"^0.5.5","html-webpack-plugin":"^3.2.0","jest":"^22.4.3","jest-fetch-mock":"^1.6.5","merge":"^1.2.1","nock":"^9.2.6","regenerator-runtime":"^0.11.1","requirejs":"^2.1.22","through2":"^2.0.0","url-parse":"^1.4.3","webpack":"^4.5.0","webpack-bundle-analyzer":"^3.3.2","webpack-cli":"^2.0.13","webpack-dev-server":"^3.1.14","xhr-mock":"^2.3.2"}};
 
 /***/ }),
 /* 7 */
@@ -1305,6 +1305,7 @@ var sendFetch = function sendFetch(method, config) {
           } else if (responseJSON.result && Array.isArray(responseJSON.result)) {
             //interval and group by result
             responseJSON.result.forEach(function (val) {
+              if (!val) return;
               if (!val.value) return val;
               if (!Array.isArray(val.value)) return val.value;
               val.value.forEach(function (res) {
@@ -1317,6 +1318,7 @@ var sendFetch = function sendFetch(method, config) {
         } else {
           //interval result
           responseJSON.result.forEach(function (val) {
+            if (!val) return;
             if (!isNaN(Number(val.value))) {
               val.value = Number(val.value);
             }
@@ -1325,6 +1327,7 @@ var sendFetch = function sendFetch(method, config) {
       } else {
         //group by result
         responseJSON.result.forEach(function (res) {
+          if (!res) return;
           if (!isNaN(Number(res.result))) {
             res.result = Number(res.result);
           }
