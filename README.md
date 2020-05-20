@@ -29,6 +29,16 @@ Public CDN
 
 [Login to Keen IO to create a project](https://keen.io/login?s=gh_js) and grab the **Project ID** and **Read Key** from your project's **Access** page.
 
+To run **keen-analysis** on your localhost you need to grab your access keys and update `config.js` file.
+
+```javascript
+const demoConfig = {
+  projectId: 'YOUR_PROJECT_ID',
+  readKey: 'YOUR_READ_KEY',
+  writeKey: 'YOUR_WRITE_KEY',
+  masterKey: 'YOUR_MASTER_KEY',
+};
+```
 
 ### Getting started
 
