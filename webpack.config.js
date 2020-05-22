@@ -11,7 +11,7 @@ if (process.env.TARGET === 'node'){
 
 let definePluginVars = {};
 if (process.env.NODE_ENV === 'development') {
-  const demoConfig = require('../demo-config');
+  const demoConfig = require('./config');
   definePluginVars = {
     webpackKeenGlobals: JSON.stringify({ demoConfig })
   };
